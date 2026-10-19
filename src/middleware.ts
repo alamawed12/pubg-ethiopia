@@ -28,6 +28,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Role-based route protection: Event Scanner staff is restricted ONLY to check-in
+  const role = (token.role as string) || '';
+  if (role === 'scanner') {
+    if (pathname !== '/admin/check-in' && !pathname.startsWith('/admin/check-in')) {
+      return NextResponse.redirect(new URL('/admin/check-in', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 

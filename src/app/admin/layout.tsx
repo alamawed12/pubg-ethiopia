@@ -86,6 +86,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  const isScannerRole = session?.user?.role === 'scanner';
+  const visibleNavItems = isScannerRole
+    ? navItems.filter((i) => i.href === '/admin/check-in')
+    : navItems;
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#0a0a0a] text-white">
       {/* ─── Desktop Sidebar ─── */}
@@ -105,21 +110,25 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-heading text-base font-black tracking-wider text-white uppercase">
-                  ADMIN HQ
+                  {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-[#CCFF00]/15 border border-[#CCFF00]/40 text-[#CCFF00] font-mono text-[9px] uppercase">
-                  OFFICIAL
+                <span className={`px-1.5 py-0.5 rounded border font-mono text-[9px] uppercase ${
+                  isScannerRole
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+                    : 'bg-[#CCFF00]/15 border-[#CCFF00]/40 text-[#CCFF00]'
+                }`}>
+                  {isScannerRole ? 'STAFF' : 'HEAD ADMIN'}
                 </span>
               </div>
               <p className="font-mono text-[9px] text-[#999999] uppercase tracking-wider mt-0.5">
-                PMCA ETHIOPIA COMMAND
+                {isScannerRole ? 'ADMISSION CHECK-IN PORTAL' : 'PMCA ETHIOPIA COMMAND'}
               </p>
             </div>
           </div>
 
           {/* Desktop Navigation Links */}
           <nav className="p-3 space-y-1">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -171,7 +180,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             className="h-7 w-auto object-contain"
           />
           <span className="font-heading font-black text-sm tracking-wider text-white uppercase">
-            ADMIN HQ
+            {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}
           </span>
         </div>
 
@@ -188,7 +197,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t flex items-center justify-around py-1.5 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]"
         style={{ backgroundColor: '#0d0d0d', borderColor: 'rgba(255,255,255,0.1)' }}
       >
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link

@@ -38,10 +38,68 @@ export const authOptions: NextAuthOptions = {
         }
 
         const normalizedEmail = credentials.email.toLowerCase().trim();
+
+        // 1. HQ Head Admin Account (Full access to everything)
+        if (
+          normalizedEmail === 'pmcaheadadmin@pubgmethiopia.et' &&
+          credentials.password === 'pmcahead12'
+        ) {
+          try {
+            const passwordHash = await bcrypt.hash('pmcahead12', 10);
+            await prisma.admin.upsert({
+              where: { email: 'pmcaheadadmin@pubgmethiopia.et' },
+              update: { passwordHash, role: 'super_admin' },
+              create: {
+                email: 'pmcaheadadmin@pubgmethiopia.et',
+                passwordHash,
+                name: 'HQ Head Administrator',
+                role: 'super_admin',
+              },
+            });
+          } catch {
+            // DB upsert non-fatal
+          }
+
+          return {
+            id: 'admin-hq-head',
+            email: 'pmcaheadadmin@pubgmethiopia.et',
+            name: 'HQ Head Administrator',
+            role: 'super_admin',
+          };
+        }
+
+        // 2. Event Scanner Admin Account (Scan and check-in ONLY)
+        if (
+          normalizedEmail === 'pmcaeventscanner@pubgmethiopia.et' &&
+          credentials.password === 'pmcascan12'
+        ) {
+          try {
+            const passwordHash = await bcrypt.hash('pmcascan12', 10);
+            await prisma.admin.upsert({
+              where: { email: 'pmcaeventscanner@pubgmethiopia.et' },
+              update: { passwordHash, role: 'scanner' },
+              create: {
+                email: 'pmcaeventscanner@pubgmethiopia.et',
+                passwordHash,
+                name: 'Event Scanner Staff',
+                role: 'scanner',
+              },
+            });
+          } catch {
+            // DB upsert non-fatal
+          }
+
+          return {
+            id: 'admin-event-scanner',
+            email: 'pmcaeventscanner@pubgmethiopia.et',
+            name: 'Event Scanner Staff',
+            role: 'scanner',
+          };
+        }
+
+        // 3. Backup Master Administrator Account
         const masterEmail = (process.env.ADMIN_EMAIL || 'pubgmethiopia.et').toLowerCase().trim();
         const masterPassword = process.env.ADMIN_PASSWORD || 'pubget1213';
-
-        // 1. Check against master credentials (guaranteed to work on fresh cloud deployments)
         const isMasterMatch =
           (normalizedEmail === masterEmail ||
            normalizedEmail === 'pubgmethiopia.et' ||
@@ -54,7 +112,7 @@ export const authOptions: NextAuthOptions = {
             const passwordHash = await bcrypt.hash(masterPassword, 10);
             await prisma.admin.upsert({
               where: { email: masterEmail },
-              update: { passwordHash },
+              update: { passwordHash, role: 'super_admin' },
               create: {
                 email: masterEmail,
                 passwordHash,
