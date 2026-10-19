@@ -121,3 +121,19 @@ model SystemSetting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model VerifiedPayment {
+  id              String    @id @default(cuid())
+  txnCode         String    @unique
+  amount          Float
+  paymentMethod   String    // TELEBIRR, AWASH_BANK
+  senderName      String?
+  senderPhone     String?
+  rawSms          String?
+  isClaimed       Boolean   @default(false)
+  claimedByRefId  String?
+  createdAt       DateTime  @default(now())
+
+  @@index([txnCode])
+  @@index([isClaimed])
+}

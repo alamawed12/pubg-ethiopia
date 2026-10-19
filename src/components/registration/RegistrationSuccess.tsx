@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { EventPass } from './EventPass';
 import { Button } from '@/components/ui/Button';
@@ -26,9 +26,50 @@ export interface RegistrationSuccessProps {
 }
 
 export function RegistrationSuccess({ registrationData }: RegistrationSuccessProps) {
-  const isVip = registrationData.ticketTier?.toUpperCase() === 'VIP';
-  const isConfirmed = registrationData.status?.toUpperCase() === 'CONFIRMED';
+  const [data, setData] = useState<RegistrationSuccessData>(registrationData);
+  const [isCheckingSms, setIsCheckingSms] = useState(true);
+
+  const isVip = data.ticketTier?.toUpperCase() === 'VIP';
+  const isConfirmed = data.status?.toUpperCase() === 'CONFIRMED';
   const isVipPending = isVip && !isConfirmed;
+
+  // Real-time polling to check if Android SMS bot automatically confirmed the transaction
+  useEffect(() => {
+    if (!isVip || isConfirmed) return;
+
+    let pollCount = 0;
+    const interval = setInterval(async () => {
+      pollCount++;
+      if (pollCount > 40) {
+        setIsCheckingSms(false);
+        clearInterval(interval);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/register/${data.referenceId}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            if (json.data.status?.toUpperCase() === 'CONFIRMED') {
+              setData((prev) => ({
+                ...prev,
+                ...json.data,
+                status: 'CONFIRMED',
+                paymentStatus: 'APPROVED',
+                qrDataUrl: json.qrDataUrl || prev.qrDataUrl,
+              }));
+              clearInterval(interval);
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [data.referenceId, isConfirmed, isVip]);
 
   // Trigger pass image download
   const handleDownload = () => {
@@ -37,10 +78,10 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
     );
     if (passDownloadTrigger) {
       passDownloadTrigger.click();
-    } else if (registrationData.qrDataUrl) {
+    } else if (data.qrDataUrl) {
       const link = document.createElement('a');
-      link.href = registrationData.qrDataUrl;
-      link.download = `PUBG-${isVip ? 'VIP-' : ''}PASS-${registrationData.referenceId}.png`;
+      link.href = data.qrDataUrl;
+      link.download = `PUBG-${isVip ? 'VIP-' : ''}PASS-${data.referenceId}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -51,7 +92,7 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
   // ─── VIP PASS PENDING VERIFICATION SCREEN ─────────────────────────────────
   // ════════════════════════════════════════════════════════════════════════════
   if (isVipPending) {
-    const telegramClean = registrationData.telegramUsername?.replace(/^@/, '') || '';
+    const telegramClean = data.telegramUsername?.replace(/^@/, '') || '';
     const telegramLink = telegramClean ? `https://t.me/${telegramClean}` : null;
 
     return (
@@ -84,13 +125,21 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
           <span>PAYMENT VERIFICATION IN PROGRESS</span>
         </div>
 
+        {/* Real-time SMS Listener Status */}
+        {isCheckingSms && (
+          <div className="mb-3 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-amber-500/40 text-amber-300 font-mono text-[11px] shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>Automated Bank SMS Listener: Checking incoming payment alerts...</span>
+          </div>
+        )}
+
         {/* Heading */}
         <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-white drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]">
           VIP REGISTRATION SUBMITTED
         </h2>
 
         <p className="mt-2 text-sm sm:text-base text-neutral-300 max-w-lg mx-auto">
-          Your payment transaction has been logged. Our Head Admin will confirm receipt with our bank/Telebirr records and dispatch your official ticket directly to your Telegram.
+          Your payment transaction has been logged. As soon as the Telebirr / Awash SMS arrives on our system, your VIP ticket will unlock automatically.
         </p>
 
         {/* Official Reference Number Box */}
@@ -99,7 +148,7 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
             OFFICIAL VIP REGISTRATION REFERENCE
           </span>
           <span className="font-mono text-2xl sm:text-3xl font-bold tracking-widest text-amber-400">
-            REF: {registrationData.referenceId}
+            REF: {data.referenceId}
           </span>
         </div>
 
@@ -110,21 +159,21 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
               <span>⭐</span> VIP TRANSACTION LOG
             </span>
             <span className="font-mono text-xs text-amber-300 font-bold">
-              {registrationData.vipPrice || 500} ETB
+              {data.vipPrice || 500} ETB
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
             <div>
               <span className="text-neutral-400 uppercase text-[10px] block">ATTENDEE</span>
-              <span className="text-white font-bold text-sm">{registrationData.fullName}</span>
-              <span className="text-amber-400 text-xs block">IGN: {registrationData.inGameName}</span>
+              <span className="text-white font-bold text-sm">{data.fullName}</span>
+              <span className="text-amber-400 text-xs block">IGN: {data.inGameName}</span>
             </div>
 
             <div>
               <span className="text-neutral-400 uppercase text-[10px] block">PAYMENT METHOD</span>
               <span className="text-white font-bold text-sm uppercase">
-                {registrationData.paymentMethod === 'AWASH_BANK'
+                {data.paymentMethod === 'AWASH_BANK'
                   ? 'Awash Bank (Tsige Dagne)'
                   : 'Telebirr (Alamawed Begashawe)'}
               </span>
@@ -133,14 +182,14 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
             <div>
               <span className="text-neutral-400 uppercase text-[10px] block">TRANSACTION CODE / REF</span>
               <span className="text-amber-400 font-bold text-sm break-all">
-                {registrationData.paymentTxnCode || 'LOGGED FOR VERIFICATION'}
+                {data.paymentTxnCode || 'LOGGED FOR VERIFICATION'}
               </span>
             </div>
 
             <div>
               <span className="text-neutral-400 uppercase text-[10px] block">DELIVERY TELEGRAM</span>
               <span className="text-white font-bold text-sm">
-                {registrationData.telegramUsername || 'Contact Recorded'}
+                {data.telegramUsername || 'Contact Recorded'}
               </span>
             </div>
           </div>
@@ -148,13 +197,9 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
           {/* Verification Protocol Notice */}
           <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 font-body text-xs text-amber-200/90 leading-relaxed">
             <strong className="text-amber-400 block font-mono text-[11px] uppercase mb-1">
-              🛡️ WHAT HAPPENS NEXT?
+              🛡️ AUTOMATIC VERIFICATION IN EFFECT
             </strong>
-            1. The Head Admin verifies your transaction code in our official Telebirr or Awash Bank records.
-            <br />
-            2. Once approved, your custom <strong>Horizontal Luxury VIP Ticket</strong> with embedded anti-tamper QR code is generated.
-            <br />
-            3. The verified ticket is sent directly to your Telegram (<strong>{registrationData.telegramUsername}</strong>).
+            When our phone receives the Telebirr or Awash Bank confirmation SMS, this page will update automatically and reveal your <strong>Horizontal Luxury VIP Ticket</strong> with QR credentials.
           </div>
         </div>
 
@@ -185,7 +230,7 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
         </div>
 
         <p className="mt-6 text-xs font-mono text-neutral-400 max-w-sm mx-auto">
-          Need urgent assistance? Contact HQ admin on Telegram with your Reference: {registrationData.referenceId}
+          Need urgent assistance? Contact HQ admin on Telegram with your Reference: {data.referenceId}
         </p>
       </motion.div>
     );
@@ -250,20 +295,20 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
           OFFICIAL REGISTRATION REFERENCE
         </span>
         <span className="font-mono text-2xl sm:text-3xl font-bold tracking-widest text-white selection:bg-[var(--color-lime,#CCFF00)] selection:text-black">
-          REF: {registrationData.referenceId}
+          REF: {data.referenceId}
         </span>
       </div>
 
       {/* Digital Event Pass Component */}
       <div className="my-6">
         <EventPass
-          referenceId={registrationData.referenceId}
-          fullName={registrationData.fullName}
-          inGameName={registrationData.inGameName}
-          category={registrationData.category}
-          status={registrationData.status}
-          ticketTier={registrationData.ticketTier}
-          qrDataUrl={registrationData.qrDataUrl}
+          referenceId={data.referenceId}
+          fullName={data.fullName}
+          inGameName={data.inGameName}
+          category={data.category}
+          status={data.status}
+          ticketTier={data.ticketTier}
+          qrDataUrl={data.qrDataUrl}
         />
       </div>
 

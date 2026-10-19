@@ -152,7 +152,39 @@ export async function POST(req: NextRequest) {
       lightColor: '#FFFFFF',
     });
 
-    // 7. Persist to SQLite Database via Prisma
+    // 7. Check for Instant Automated Match in VerifiedPayment (SMS Bot)
+    const rawTier = (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD';
+    const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
+
+    let initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
+    let initialRegistrationStatus = registrationStatus;
+    let autoApproved = false;
+
+    if (rawTier === 'VIP' && submittedTxnCode) {
+      const matchedPayment = await prisma.verifiedPayment.findFirst({
+        where: {
+          txnCode: submittedTxnCode,
+          isClaimed: false,
+        },
+      });
+
+      if (matchedPayment) {
+        initialPaymentStatus = 'APPROVED';
+        initialRegistrationStatus = 'CONFIRMED';
+        autoApproved = true;
+
+        // Mark SMS payment as claimed
+        await prisma.verifiedPayment.update({
+          where: { id: matchedPayment.id },
+          data: {
+            isClaimed: true,
+            claimedByRefId: referenceId,
+          },
+        });
+      }
+    }
+
+    // 8. Persist to SQLite Database via Prisma
     const newRegistration = await prisma.registration.create({
       data: {
         referenceId,
@@ -169,17 +201,19 @@ export async function POST(req: NextRequest) {
         squadDetails: data.squadDetails || null,
         idFrontImage: (rawBody as Record<string, unknown>).idFrontImage as string || null,
         idBackImage: (rawBody as Record<string, unknown>).idBackImage as string || null,
-        ticketTier: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD',
-        vipPrice: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
+        ticketTier: rawTier,
+        vipPrice: rawTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
         paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
-        paymentTxnCode: ((rawBody as Record<string, unknown>).paymentTxnCode as string) || null,
+        paymentTxnCode: submittedTxnCode || null,
         telegramUsername: ((rawBody as Record<string, unknown>).telegramUsername as string) || null,
-        paymentStatus: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID',
-        status: registrationStatus,
+        paymentStatus: initialPaymentStatus,
+        status: initialRegistrationStatus,
+        paymentApprovedAt: autoApproved ? new Date() : null,
+        paymentApprovedBy: autoApproved ? 'AUTOMATED_SMS_BOT' : null,
       },
     });
 
-    // 8. Return Confirmation Response
+    // 9. Return Confirmation Response
     return NextResponse.json(
       {
         success: true,
@@ -197,6 +231,7 @@ export async function POST(req: NextRequest) {
           paymentTxnCode: newRegistration.paymentTxnCode,
           telegramUsername: newRegistration.telegramUsername,
           paymentStatus: newRegistration.paymentStatus,
+          autoApproved,
         },
       },
       { status: 201 }
