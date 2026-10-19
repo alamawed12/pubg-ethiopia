@@ -118,7 +118,7 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                {['Ref', 'Name', 'IGN', 'UID', 'Category', 'Status', 'Date'].map((h) => (
+                {['Ref', 'Name', 'IGN', 'UID', 'Tier', 'Category', 'Status', 'Date'].map((h) => (
                   <th
                     key={h}
                     className="text-left px-4 py-3 text-xs uppercase tracking-wider"
@@ -132,7 +132,7 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
             <tbody>
               {registrations.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center" style={{ color: '#666666' }}>
+                  <td colSpan={8} className="px-4 py-8 text-center" style={{ color: '#666666' }}>
                     No registrations found.
                   </td>
                 </tr>
@@ -154,6 +154,17 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
                       <td className="px-4 py-3" style={{ color: '#cccccc' }}>{r.inGameName}</td>
                       <td className="px-4 py-3" style={{ fontFamily: 'var(--font-mono)', color: '#999999' }}>
                         {r.pubgUid}
+                      </td>
+                      <td className="px-4 py-3">
+                        {r.ticketTier === 'VIP' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                            ★ VIP
+                          </span>
+                        ) : (
+                          <span className="text-xs font-mono text-[#666666]">
+                            STD
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 capitalize" style={{ color: '#999999' }}>
                         {r.category.replace('_', ' ')}

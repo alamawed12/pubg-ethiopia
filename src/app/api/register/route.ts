@@ -169,6 +169,8 @@ export async function POST(req: NextRequest) {
         squadDetails: data.squadDetails || null,
         idFrontImage: (rawBody as Record<string, unknown>).idFrontImage as string || null,
         idBackImage: (rawBody as Record<string, unknown>).idBackImage as string || null,
+        ticketTier: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD',
+        vipPrice: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
         status: registrationStatus,
       },
     });
@@ -185,6 +187,7 @@ export async function POST(req: NextRequest) {
           fullName: newRegistration.fullName,
           inGameName: newRegistration.inGameName,
           category: newRegistration.category,
+          ticketTier: newRegistration.ticketTier,
         },
       },
       { status: 201 }

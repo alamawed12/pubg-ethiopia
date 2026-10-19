@@ -18,6 +18,8 @@ interface Registration {
   squadDetails: string | null;
   idFrontImage: string | null;
   idBackImage: string | null;
+  ticketTier?: string;
+  vipPrice?: number;
   status: string;
   phoneVerified: boolean;
   createdAt: string;
@@ -151,6 +153,11 @@ export default function RegistrationDetailPage() {
               >
                 {statusConfig.label}
               </span>
+              {reg.ticketTier === 'VIP' && (
+                <span className="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-black bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                  ★ VIP PASS ({reg.vipPrice || 500} ETB)
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>

@@ -1,117 +1,444 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 
-interface CheckInResult {
-  success: boolean;
+interface RegistrationDetail {
+  id: string;
+  referenceId: string;
+  fullName: string;
+  inGameName: string;
+  pubgUid: string;
+  phoneNumber: string;
+  cityRegion: string;
+  category: string;
+  ticketTier?: string;
+  vipPrice?: number;
+  status: string;
+  idFrontImage?: string | null;
+  idBackImage?: string | null;
+  checkedInAt?: string | null;
+  checkedInBy?: string | null;
+}
+
+interface ScanResult {
+  status: 'SUCCESS' | 'ALREADY_CHECKED_IN' | 'INVALID' | 'ERROR';
   message: string;
-  data?: { fullName: string; inGameName: string; referenceId: string; status: string; category: string };
+  registration?: RegistrationDetail;
 }
 
 export default function CheckInPage() {
-  const [refId, setRefId] = useState('');
+  const [refIdInput, setRefIdInput] = useState('');
+  const [scanning, setScanning] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [result, setResult] = useState<ScanResult | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
 
-  const handleCheckIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!refId.trim()) return;
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
+
+  // Play audio tones for instant auditory feedback
+  const playFeedbackSound = (type: 'success' | 'warning' | 'error') => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'success') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      } else if (type === 'warning') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(240, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      }
+    } catch {
+      // AudioContext unavailable on some browsers without interaction
+    }
+  };
+
+  const processCheckIn = useCallback(async (ticketId: string) => {
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
     setLoading(true);
     setResult(null);
 
+    // Clean ticketId (support JSON payload or plain ref)
+    let cleanId = ticketId.trim();
     try {
-      const res = await fetch(`/api/admin/registrations/${refId}/check-in`, {
+      if (cleanId.startsWith('{') && cleanId.endsWith('}')) {
+        const parsed = JSON.parse(cleanId);
+        cleanId = parsed.ref || parsed.token || cleanId;
+      }
+    } catch {
+      // Not JSON, use raw string
+    }
+
+    try {
+      const res = await fetch(`/api/admin/registrations/${encodeURIComponent(cleanId)}/check-in`, {
         method: 'POST',
       });
       const data = await res.json();
-      setResult({
-        success: res.ok && data.success,
-        message: data.message || data.error || (res.ok ? 'Check-in successful!' : 'Check-in failed.'),
-        data: data.registration ? {
-          fullName: data.registration.fullName,
-          inGameName: data.registration.inGameName,
-          referenceId: data.registration.referenceId,
-          status: data.registration.status,
-          category: data.registration.category,
-        } : undefined,
-      });
-    } catch {
-      setResult({ success: false, message: 'Network error. Please try again.' });
-    }
 
-    setLoading(false);
+      if (res.ok && data.success) {
+        playFeedbackSound('success');
+        setResult({
+          status: 'SUCCESS',
+          message: 'GENUINE TICKET VERIFIED — ATTENDEE CHECKED IN',
+          registration: data.registration,
+        });
+      } else if (res.status === 409) {
+        playFeedbackSound('warning');
+        setResult({
+          status: 'ALREADY_CHECKED_IN',
+          message: `ALREADY CHECKED IN on ${new Date(data.checkedInAt).toLocaleTimeString()} by ${data.checkedInBy || 'Staff'}`,
+          registration: data.registration,
+        });
+      } else if (res.status === 404) {
+        playFeedbackSound('error');
+        setResult({
+          status: 'INVALID',
+          message: 'COUNTERFEIT / UNRECOGNIZED PASS — NOT FOUND IN DATABASE',
+        });
+      } else {
+        playFeedbackSound('error');
+        setResult({
+          status: 'ERROR',
+          message: data.error || 'Check-in validation failed.',
+        });
+      }
+    } catch {
+      playFeedbackSound('error');
+      setResult({
+        status: 'ERROR',
+        message: 'Network communication error during ticket verification.',
+      });
+    } finally {
+      setLoading(false);
+      setTimeout(() => {
+        isProcessingRef.current = false;
+      }, 1500);
+    }
+  }, []);
+
+  const startScanner = async () => {
+    setCameraError(null);
+    setResult(null);
+
+    try {
+      const qrScanner = new Html5Qrcode('qr-reader-container');
+      html5QrCodeRef.current = qrScanner;
+
+      await qrScanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 260, height: 260 },
+          aspectRatio: 1.0,
+        },
+        (decodedText) => {
+          processCheckIn(decodedText);
+        },
+        () => {
+          // Frame scanner parse errors ignored
+        }
+      );
+
+      setScanning(true);
+    } catch (err) {
+      console.error('Camera initialization error:', err);
+      setCameraError('Unable to open camera. Please grant camera permissions or use manual entry below.');
+      setScanning(false);
+    }
   };
 
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current && scanning) {
+      try {
+        await html5QrCodeRef.current.stop();
+        html5QrCodeRef.current.clear();
+      } catch {
+        // Ignore stop error
+      }
+      html5QrCodeRef.current = null;
+    }
+    setScanning(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (html5QrCodeRef.current) {
+        try {
+          html5QrCodeRef.current.stop();
+        } catch {
+          // Unmount cleanup
+        }
+      }
+    };
+  }, []);
+
   return (
-    <div>
-      <h1
-        className="text-3xl tracking-wider uppercase mb-2"
-        style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
+    <div className="max-w-4xl space-y-8">
+      {/* Header */}
+      <div>
+        <h1
+          className="text-3xl tracking-wider uppercase mb-2"
+          style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
+        >
+          AUTHENTIC TICKET SCANNER &amp; CHECK-IN
+        </h1>
+        <p className="text-sm" style={{ color: '#999999' }}>
+          Point your phone or laptop camera at the attendee&apos;s QR code to verify ticket authenticity, inspect National ID photo, and confirm admission.
+        </p>
+      </div>
+
+      {/* Camera Scanner Controls */}
+      <div
+        className="p-6 rounded-xl border"
+        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
       >
-        CHECK-IN
-      </h1>
-      <p className="text-sm mb-8" style={{ color: '#999999' }}>
-        Enter a registration reference ID to check in an attendee. Camera-based QR scanning requires a
-        separate library integration.
-      </p>
-
-      <form onSubmit={handleCheckIn} className="flex gap-4 mb-8 max-w-xl">
-        <input
-          type="text"
-          value={refId}
-          onChange={(e) => setRefId(e.target.value.toUpperCase())}
-          placeholder="PUBG-ET-XXXXXX"
-          className="flex-1 px-4 py-3 rounded-lg border text-sm text-white outline-none uppercase tracking-wider"
-          style={{
-            backgroundColor: '#1a1a1a',
-            borderColor: 'rgba(255,255,255,0.1)',
-            fontFamily: 'var(--font-mono)',
-          }}
-        />
-        <button
-          type="submit"
-          disabled={loading || !refId.trim()}
-          className="px-8 py-3 rounded-lg text-sm font-semibold tracking-wider uppercase cursor-pointer disabled:opacity-50"
-          style={{ backgroundColor: '#CCFF00', color: '#050505', fontFamily: 'var(--font-heading)' }}
-        >
-          {loading ? 'CHECKING...' : 'CHECK IN'}
-        </button>
-      </form>
-
-      {result && (
-        <div
-          className="max-w-xl rounded-xl border p-6"
-          style={{
-            backgroundColor: '#111111',
-            borderColor: result.success ? 'rgba(204,255,0,0.3)' : 'rgba(239,68,68,0.3)',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
             <span
-              className="text-2xl"
-              style={{ color: result.success ? '#CCFF00' : '#ef4444' }}
-            >
-              {result.success ? '✓' : '✗'}
-            </span>
-            <span
-              className="text-lg tracking-wider uppercase"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                color: result.success ? '#CCFF00' : '#ef4444',
-              }}
-            >
-              {result.success ? 'CHECK-IN SUCCESSFUL' : 'CHECK-IN FAILED'}
+              className={`w-3 h-3 rounded-full ${scanning ? 'bg-[#CCFF00] animate-pulse shadow-[0_0_10px_#CCFF00]' : 'bg-[#666666]'}`}
+            />
+            <span className="font-heading text-lg uppercase tracking-wider text-white">
+              {scanning ? 'OPTICAL CAMERA SCANNER: ACTIVE' : 'LIVE CAMERA QR APPROVER'}
             </span>
           </div>
-          <p className="text-sm mb-4" style={{ color: '#999999' }}>{result.message}</p>
-          {result.data && (
-            <div className="space-y-2 text-sm">
-              <p><span style={{ color: '#666' }}>Name:</span> <span className="text-white">{result.data.fullName}</span></p>
-              <p><span style={{ color: '#666' }}>IGN:</span> <span style={{ color: '#CCFF00' }}>{result.data.inGameName}</span></p>
-              <p><span style={{ color: '#666' }}>Ref:</span> <span style={{ fontFamily: 'var(--font-mono)', color: '#cccccc' }}>{result.data.referenceId}</span></p>
-              <p><span style={{ color: '#666' }}>Category:</span> <span className="capitalize" style={{ color: '#cccccc' }}>{result.data.category.replace('_', ' ')}</span></p>
+
+          <button
+            type="button"
+            onClick={scanning ? stopScanner : startScanner}
+            className={`px-6 py-3 rounded-lg font-heading text-sm font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${
+              scanning
+                ? 'bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30'
+                : 'bg-[#CCFF00] text-[#050505] hover:bg-[#b8e600] shadow-[0_0_20px_rgba(204,255,0,0.35)]'
+            }`}
+          >
+            {scanning ? '⏹ STOP CAMERA' : '📷 OPEN CAMERA SCANNER'}
+          </button>
+        </div>
+
+        {cameraError && (
+          <div className="mb-4 p-4 rounded-lg bg-red-950/40 border border-red-500/30 text-red-400 text-xs font-mono">
+            {cameraError}
+          </div>
+        )}
+
+        {/* Video Camera Viewfinder Box */}
+        <div
+          className={`relative mx-auto max-w-sm rounded-xl overflow-hidden border-2 transition-all ${
+            scanning ? 'border-[#CCFF00] shadow-[0_0_25px_rgba(204,255,0,0.2)]' : 'border-white/10 bg-black/40'
+          }`}
+          style={{ minHeight: scanning ? '340px' : '160px' }}
+        >
+          <div id="qr-reader-container" className="w-full h-full" />
+
+          {!scanning && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+              <svg className="w-12 h-12 text-[#666666] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+              <p className="font-heading text-sm text-[#999999] uppercase tracking-wider">
+                CAMERA READY FOR SCANNING
+              </p>
+              <p className="text-xs text-[#666666] mt-1">
+                Click &quot;Open Camera Scanner&quot; above to scan passes directly with your device camera
+              </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Manual Reference ID Form */}
+      <div
+        className="p-6 rounded-xl border"
+        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+      >
+        <span className="block text-xs font-mono uppercase tracking-wider text-[#999999] mb-3">
+          OR SEARCH / CHECK-IN MANUALLY BY REFERENCE ID
+        </span>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (refIdInput.trim()) processCheckIn(refIdInput);
+          }}
+          className="flex flex-col sm:flex-row gap-3"
+        >
+          <input
+            type="text"
+            value={refIdInput}
+            onChange={(e) => setRefIdInput(e.target.value.toUpperCase())}
+            placeholder="PUBG-ET-XXXXXX"
+            className="flex-1 px-4 py-3 rounded-lg border text-sm text-white outline-none uppercase font-mono tracking-wider focus:border-[#CCFF00]"
+            style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)' }}
+          />
+          <button
+            type="submit"
+            disabled={loading || !refIdInput.trim()}
+            className="px-8 py-3 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50"
+            style={{
+              backgroundColor: '#CCFF00',
+              color: '#050505',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            {loading ? 'VERIFYING...' : 'MANUAL VERIFY'}
+          </button>
+        </form>
+      </div>
+
+      {/* ─── SCAN RESULT & ATTENDEE AUTHENTICATION CARD ─── */}
+      {result && (
+        <div
+          className={`p-6 sm:p-8 rounded-xl border-2 transition-all ${
+            result.status === 'SUCCESS'
+              ? 'border-[#CCFF00] bg-[#0c1a0c] shadow-[0_0_30px_rgba(204,255,0,0.25)]'
+              : result.status === 'ALREADY_CHECKED_IN'
+              ? 'border-amber-500 bg-amber-950/30 shadow-[0_0_30px_rgba(245,158,11,0.2)]'
+              : 'border-red-500 bg-red-950/30 shadow-[0_0_30px_rgba(239,68,68,0.25)]'
+          }`}
+        >
+          {/* Header Banner */}
+          <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-white/10">
+            <span className="text-3xl">
+              {result.status === 'SUCCESS' ? '✅' : result.status === 'ALREADY_CHECKED_IN' ? '⚠️' : '❌'}
+            </span>
+            <div>
+              <h2
+                className={`text-xl sm:text-2xl font-black uppercase tracking-wider ${
+                  result.status === 'SUCCESS'
+                    ? 'text-[#CCFF00]'
+                    : result.status === 'ALREADY_CHECKED_IN'
+                    ? 'text-amber-400'
+                    : 'text-red-400'
+                }`}
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                {result.status === 'SUCCESS'
+                  ? 'GENUINE TICKET VERIFIED'
+                  : result.status === 'ALREADY_CHECKED_IN'
+                  ? 'DUPLICATE TICKET WARNING'
+                  : 'INVALID TICKET / NOT FOUND'}
+              </h2>
+              <p className="text-xs font-mono text-[#cccccc] mt-0.5">{result.message}</p>
+            </div>
+          </div>
+
+          {/* Attendee Details when Found */}
+          {result.registration && (
+            <div className="space-y-6">
+              {/* Top Details & Pass Tier */}
+              <div className="flex flex-wrap items-center justify-between gap-4 bg-black/40 p-4 rounded-lg border border-white/10">
+                <div>
+                  <span className="text-xs font-mono text-[#999999] uppercase">ATTENDEE NAME</span>
+                  <div className="text-xl sm:text-2xl font-bold font-heading text-white uppercase">
+                    {result.registration.fullName}
+                  </div>
+                </div>
+
+                {/* VIP / Standard Badge */}
+                <div>
+                  {result.registration.ticketTier === 'VIP' ? (
+                    <div className="px-4 py-2 rounded-lg bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-black font-heading text-sm tracking-widest uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2">
+                      <span>⭐</span> VIP ALL-ACCESS PASS
+                    </div>
+                  ) : (
+                    <div className="px-3.5 py-1.5 rounded-lg bg-white/10 border border-white/20 text-[#cccccc] font-bold font-heading text-xs tracking-wider uppercase">
+                      STANDARD PASS
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Data Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+                <div className="bg-black/30 p-3 rounded border border-white/5">
+                  <span className="text-[#999999] block mb-1">IN-GAME NAME</span>
+                  <span className="text-[#CCFF00] font-bold text-sm">{result.registration.inGameName}</span>
+                </div>
+                <div className="bg-black/30 p-3 rounded border border-white/5">
+                  <span className="text-[#999999] block mb-1">PUBG UID</span>
+                  <span className="text-white font-bold text-sm">{result.registration.pubgUid}</span>
+                </div>
+                <div className="bg-black/30 p-3 rounded border border-white/5">
+                  <span className="text-[#999999] block mb-1">PHONE</span>
+                  <span className="text-white font-bold text-sm">{result.registration.phoneNumber}</span>
+                </div>
+                <div className="bg-black/30 p-3 rounded border border-white/5">
+                  <span className="text-[#999999] block mb-1">REF ID</span>
+                  <span className="text-[#CCFF00] font-bold text-sm">{result.registration.referenceId}</span>
+                </div>
+              </div>
+
+              {/* Prominent Ticket Name Banner */}
+              <div
+                className={`p-5 rounded-xl border text-center transition-all ${
+                  result.registration.ticketTier === 'VIP'
+                    ? 'border-amber-500/60 bg-gradient-to-r from-amber-950/40 via-amber-900/30 to-amber-950/40 shadow-[0_0_25px_rgba(245,158,11,0.25)]'
+                    : 'border-[#CCFF00]/40 bg-black/50 shadow-[0_0_20px_rgba(204,255,0,0.1)]'
+                }`}
+              >
+                <span className="font-mono text-xs uppercase tracking-widest text-[#999999] block mb-1">
+                  OFFICIAL ADMISSION TICKET NAME
+                </span>
+                <div
+                  className={`text-2xl sm:text-3xl font-black uppercase tracking-wider ${
+                    result.registration.ticketTier === 'VIP'
+                      ? 'text-amber-400 drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]'
+                      : 'text-[#CCFF00] drop-shadow-[0_0_12px_rgba(204,255,0,0.35)]'
+                  }`}
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  {result.registration.ticketTier === 'VIP'
+                    ? '⭐ VIP ALL-ACCESS PASS TICKET'
+                    : '🎫 STANDARD ASSEMBLY PASS TICKET'}
+                </div>
+                <div className="flex items-center justify-center gap-3 mt-2 font-mono text-xs text-[#cccccc]">
+                  <span>CATEGORY: <strong className="text-white uppercase">{result.registration.category.replace('_', ' ')}</strong></span>
+                  <span>•</span>
+                  <span>
+                    PRICE: <strong className="text-white">
+                      {result.registration.ticketTier === 'VIP' ? `${result.registration.vipPrice || 500} ETB` : 'FREE ADMISSION'}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reset / Next Button */}
+          <div className="mt-6 pt-4 border-t border-white/10 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setResult(null);
+                setRefIdInput('');
+              }}
+              className="px-6 py-2.5 rounded-lg text-xs font-bold font-heading uppercase tracking-wider bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+            >
+              CLEAR &amp; SCAN NEXT ATTENDEE →
+            </button>
+          </div>
         </div>
       )}
     </div>

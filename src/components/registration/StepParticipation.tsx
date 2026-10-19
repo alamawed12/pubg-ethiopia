@@ -13,8 +13,10 @@ export interface StepParticipationProps {
     teamName: string;
     tournamentInterest: boolean;
     squadDetails: string;
+    ticketTier?: 'STANDARD' | 'VIP';
+    vipPrice?: number;
   };
-  updateField: (field: string, value: string | boolean) => void;
+  updateField: (field: string, value: string | boolean | number) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -34,6 +36,19 @@ export function StepParticipation({
   onBack,
 }: StepParticipationProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [activeVipPrice, setActiveVipPrice] = useState(formData.vipPrice || 500);
+
+  React.useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.vipPrice) {
+          setActiveVipPrice(d.vipPrice);
+          updateField('vipPrice', d.vipPrice);
+        }
+      })
+      .catch(() => {});
+  }, [updateField]);
 
   const isEsportsCategory =
     formData.category === 'tournament_player' || formData.category === 'team_rep';
@@ -118,6 +133,61 @@ export function StepParticipation({
           error={errors.category}
           required
         />
+
+        {/* Pass Tier Selection (Standard vs VIP) */}
+        <div className="space-y-2 pt-1">
+          <label className="block text-xs uppercase font-mono tracking-wider text-[#cccccc]">
+            SELECT EVENT ACCESS TIER
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Standard Pass */}
+            <div
+              onClick={() => updateField('ticketTier', 'STANDARD')}
+              className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                formData.ticketTier !== 'VIP'
+                  ? 'border-[#CCFF00] bg-[#CCFF00]/10 shadow-[0_0_15px_rgba(204,255,0,0.15)] ring-1 ring-[#CCFF00]'
+                  : 'border-white/10 bg-[#111111] hover:border-white/20 opacity-70'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-heading font-black text-base uppercase text-white">STANDARD PASS</span>
+                <span className="font-mono text-xs font-bold text-[#CCFF00] px-2 py-0.5 rounded bg-black/40 border border-[#CCFF00]/40">
+                  FREE
+                </span>
+              </div>
+              <ul className="text-[11px] text-[#999999] space-y-1 font-mono">
+                <li>✓ General Event Admission</li>
+                <li>✓ Tournament Spectator Area</li>
+                <li>✓ Digital QR Event Pass</li>
+              </ul>
+            </div>
+
+            {/* VIP Pass */}
+            <div
+              onClick={() => updateField('ticketTier', 'VIP')}
+              className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                formData.ticketTier === 'VIP'
+                  ? 'border-[#f59e0b] bg-[#f59e0b]/15 shadow-[0_0_20px_rgba(245,158,11,0.3)] ring-1 ring-[#f59e0b]'
+                  : 'border-white/10 bg-[#111111] hover:border-[#f59e0b]/40 opacity-70'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-heading font-black text-base uppercase text-[#f59e0b] flex items-center gap-1.5">
+                  <span>⭐</span> VIP ACCESS PASS
+                </span>
+                <span className="font-mono text-xs font-bold text-[#f59e0b] px-2 py-0.5 rounded bg-black/40 border border-[#f59e0b]/40">
+                  {activeVipPrice.toLocaleString()} ETB
+                </span>
+              </div>
+              <ul className="text-[11px] text-[#cccccc] space-y-1 font-mono">
+                <li>★ Priority Front-Row Arena Seating</li>
+                <li>★ Fast-Track VIP Check-In Queue</li>
+                <li>★ Official Assembly Lanyard &amp; Badge</li>
+                <li>★ Pro Player &amp; Creator Lounge Access</li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
         {/* Team Name Input (conditional for tournament player or team rep) */}
         <AnimatePresence>

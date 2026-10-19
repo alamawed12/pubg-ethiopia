@@ -11,6 +11,7 @@ export interface EventPassProps {
   inGameName: string;
   category: string;
   status: string;
+  ticketTier?: string;
   qrDataUrl?: string;
   className?: string;
 }
@@ -21,6 +22,7 @@ export function EventPass({
   inGameName,
   category,
   status,
+  ticketTier,
   qrDataUrl,
   className,
 }: EventPassProps) {
@@ -265,6 +267,13 @@ export function EventPass({
 
           {/* Divider */}
           <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
+          {/* VIP Pass Badge */}
+          {ticketTier === 'VIP' && (
+            <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 border border-amber-500/50 text-amber-400 font-heading font-black text-xs tracking-widest uppercase shadow-[0_0_12px_rgba(245,158,11,0.4)]">
+              <span>⭐</span> VIP ALL-ACCESS PASS
+            </div>
+          )}
 
           {/* Reference ID Pill */}
           <div className="mb-5 inline-flex items-center gap-2 rounded bg-black/50 px-3.5 py-1.5 border border-white/10">

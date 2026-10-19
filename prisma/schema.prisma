@@ -30,6 +30,10 @@ model Registration {
   idFrontImage  String?
   idBackImage   String?
 
+  // Ticket Tier
+  ticketTier    String   @default("STANDARD") // STANDARD, VIP
+  vipPrice      Int?
+
   // Status
   status        String   @default("PENDING") // PENDING, CONFIRMED, REJECTED, WAITLISTED, CHECKED_IN
   phoneVerified Boolean  @default(false)
@@ -100,4 +104,10 @@ model OTPVerification {
 
   @@index([phoneNumber])
   @@index([expiresAt])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

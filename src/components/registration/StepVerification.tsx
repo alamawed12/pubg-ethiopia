@@ -20,6 +20,8 @@ export interface RegistrationReviewData {
   squadDetails: string;
   idFrontImage: string;
   idBackImage: string;
+  ticketTier?: 'STANDARD' | 'VIP';
+  vipPrice?: number;
 }
 
 export interface StepVerificationProps {
@@ -177,6 +179,21 @@ export function StepVerification({
               >
                 {formData.tournamentInterest ? 'Yes (Active Competitor)' : 'Spectating / Non-competitor'}
               </span>
+            </div>
+
+            <div className="sm:col-span-2">
+              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                Access Pass Tier
+              </span>
+              {formData.ticketTier === 'VIP' ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-mono text-xs border border-amber-500/40">
+                  ★ VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#CCFF00]/10 text-[#CCFF00] font-bold font-mono text-xs border border-[#CCFF00]/30">
+                  STANDARD PASS (FREE)
+                </span>
+              )}
             </div>
 
             {formData.teamName && (

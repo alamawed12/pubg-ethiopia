@@ -11,6 +11,7 @@ export interface RegistrationSuccessData {
   inGameName: string;
   category: string;
   status: string;
+  ticketTier?: string;
   qrToken?: string;
   qrDataUrl?: string;
 }
@@ -108,6 +109,7 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
           inGameName={registrationData.inGameName}
           category={registrationData.category}
           status={registrationData.status}
+          ticketTier={registrationData.ticketTier}
           qrDataUrl={registrationData.qrDataUrl}
         />
       </div>

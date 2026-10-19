@@ -23,6 +23,8 @@ export interface RegistrationFormData {
   squadDetails: string;
   idFrontImage: string;
   idBackImage: string;
+  ticketTier: 'STANDARD' | 'VIP';
+  vipPrice: number;
 }
 
 const INITIAL_FORM_DATA: RegistrationFormData = {
@@ -38,6 +40,8 @@ const INITIAL_FORM_DATA: RegistrationFormData = {
   squadDetails: '',
   idFrontImage: '',
   idBackImage: '',
+  ticketTier: 'STANDARD',
+  vipPrice: 500,
 };
 
 const FORM_STEPS: StepItem[] = [
@@ -72,7 +76,7 @@ export function RegistrationForm() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Field updater
-  const updateField = (field: string, value: string | boolean) => {
+  const updateField = (field: string, value: string | boolean | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
