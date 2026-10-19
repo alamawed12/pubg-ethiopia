@@ -223,11 +223,9 @@ export function Footer() {
       {/* ─── Bottom Section: Disclaimers & Copyright ─── */}
       <div className="border-t border-white/5 bg-[#0a0a0a]/60 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs font-mono text-[#999999]/70">
-          {/* Official Disclaimer */}
-          <p className="leading-relaxed border-l-2 border-[#CCFF00]/40 pl-3">
-            This is an independently organized community event. Not officially operated
-            by or affiliated with PUBG MOBILE or Krafton, Inc. PUBG MOBILE is a registered
-            trademark of Krafton, Inc. and Proxima Beta Pte. Limited.
+          {/* Official Team & Community Affiliation */}
+          <p className="leading-relaxed border-l-2 border-[#CCFF00] pl-3 text-[#cccccc]">
+            Official PUBG MOBILE Esports Team &amp; Community Assembly Ethiopia. Organized for competitive squads and esports talent in Ethiopia. All PUBG MOBILE logos, trademarks, and game properties belong to Krafton, Inc. and Level Infinite.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">

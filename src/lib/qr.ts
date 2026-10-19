@@ -29,9 +29,9 @@ export async function generateQRDataURL(
   }
 
   const qrOptions: QRCode.QRCodeToDataURLOptions = {
-    width: options?.width ?? 300,
+    width: options?.width ?? 320,
     margin: options?.margin ?? 3,
-    errorCorrectionLevel: options?.errorCorrectionLevel ?? 'M',
+    errorCorrectionLevel: options?.errorCorrectionLevel ?? 'H', // High error correction (30%) enables center logo embedding
     color: {
       dark: options?.darkColor ?? '#000000', // high contrast solid black modules
       light: options?.lightColor ?? '#FFFFFF', // solid white background for optical detection

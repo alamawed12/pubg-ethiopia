@@ -163,6 +163,33 @@ export function EventPass({
 
         // Draw the QR image on top of the background box
         ctx.drawImage(qrImage, 180, 275, 240, 240);
+
+        // Draw centered PUBG Mobile logo in the QR code (Error correction 'H' protects scanning)
+        try {
+          const logoImg = new Image();
+          logoImg.src = '/images/pubg-mobile-logo.png';
+          await new Promise<void>((resolve) => {
+            logoImg.onload = () => resolve();
+            logoImg.onerror = () => resolve();
+          });
+          if (logoImg.complete && logoImg.naturalWidth > 0) {
+            const logoW = 54;
+            const logoH = 40;
+            const logoX = 300 - logoW / 2;
+            const logoY = 395 - logoH / 2;
+
+            ctx.fillStyle = '#050505';
+            drawRoundRect(logoX - 4, logoY - 4, logoW + 8, logoH + 8, 6);
+            ctx.fill();
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+          }
+        } catch {
+          // ignore logo overlay error
+        }
       }
 
       // Attendee Info Section
@@ -201,12 +228,12 @@ export function EventPass({
 
       ctx.font = '500 12px Inter, sans-serif';
       ctx.fillStyle = '#666666';
-      ctx.fillText('ADDIS ABABA, ETHIOPIA • ADMISSION TICKET', 300, 755);
+      ctx.fillText('OFFICIAL PUBG MOBILE TEAM • ADMISSION TICKET', 300, 755);
       ctx.fillText('Present this pass & valid ID at the assembly entrance.', 300, 775);
 
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.fillStyle = '#CCFF00';
-      ctx.fillText('SECURE CHECK-IN SYSTEM // PUBG MOBILE ET', 300, 830);
+      ctx.fillText('OFFICIAL COMMUNITY ASSEMBLY // PUBG MOBILE ET', 300, 830);
 
       // Trigger automatic file download
       const dataUri = canvas.toDataURL('image/png');
@@ -252,6 +279,12 @@ export function EventPass({
 
         {/* Card Body */}
         <div className="p-6 text-center">
+          {/* Official Team Verified Pill */}
+          <div className="mb-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[10px] tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
+            OFFICIAL PUBG MOBILE TEAM
+          </div>
+
           {/* Event Branding Header */}
           <div className="space-y-0.5">
             <span className="block font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[var(--color-silver,#999999)]">
@@ -288,14 +321,27 @@ export function EventPass({
           {/* QR Code Container (Crisp white background for instant optical detection) */}
           <div className="relative mx-auto mb-5 flex h-48 w-48 items-center justify-center rounded-2xl bg-white p-3 border-2 border-[var(--color-lime,#CCFF00)] shadow-[0_0_25px_rgba(204,255,0,0.25)]">
             {qrDataUrl ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={qrDataUrl}
-                alt={`Check-in QR Code for ${referenceId}`}
-                width={172}
-                height={172}
-                className="h-full w-full object-contain rounded select-none"
-              />
+              <div className="relative flex h-full w-full items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrDataUrl}
+                  alt={`Check-in QR Code for ${referenceId}`}
+                  width={172}
+                  height={172}
+                  className="h-full w-full object-contain rounded select-none"
+                />
+                {/* Centered PUBG MOBILE Logo Badge */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-[#050505] px-1.5 py-1 rounded-md border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/pubg-mobile-logo.png"
+                      alt="PUBG Mobile"
+                      className="h-6 w-auto object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="flex h-full w-full items-center justify-center font-mono text-xs text-neutral-500">
                 QR Code Loading...

@@ -273,6 +273,11 @@ export default function CheckInPage() {
     <div className="max-w-4xl space-y-8">
       {/* Header */}
       <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="px-2.5 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[10px] tracking-widest uppercase">
+            ⭐ OFFICIAL PUBG MOBILE TEAM ADMISSION SYSTEM
+          </span>
+        </div>
         <h1
           className="text-3xl tracking-wider uppercase mb-2"
           style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
@@ -280,7 +285,7 @@ export default function CheckInPage() {
           AUTHENTIC TICKET SCANNER &amp; CHECK-IN
         </h1>
         <p className="text-sm" style={{ color: '#999999' }}>
-          Point your phone or laptop camera at the attendee&apos;s QR code to verify ticket authenticity, inspect National ID photo, and confirm admission.
+          Point your phone or laptop camera at the attendee&apos;s QR code to verify ticket authenticity and confirm admission.
         </p>
       </div>
 

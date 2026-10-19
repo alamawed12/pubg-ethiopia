@@ -96,6 +96,11 @@ export function Navigation() {
                 {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
               </span>
             </span>
+
+            <span className="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[9px] tracking-wider uppercase">
+              <span className="w-1 h-1 rounded-full bg-[#CCFF00] animate-pulse" />
+              OFFICIAL TEAM
+            </span>
           </Link>
 
           {/* ─── Center: Desktop Navigation Links ─── */}

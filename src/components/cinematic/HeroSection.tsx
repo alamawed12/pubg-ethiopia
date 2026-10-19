@@ -123,11 +123,11 @@ export function HeroSection() {
           {/* Pre-heading: Mono Terminal Tag */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-2 mb-4 px-3 py-1 rounded border border-[#CCFF00]/25 bg-black/50 backdrop-blur-sm"
+            className="flex items-center gap-2 mb-4 px-3 py-1 rounded border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm"
           >
             <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
             <span className="font-mono text-xs md:text-sm text-[#CCFF00] tracking-widest uppercase">
-              {'// ADDIS ABABA, ETHIOPIA'}
+              {'OFFICIAL PUBG MOBILE TEAM // ADDIS ABABA, ETHIOPIA'}
             </span>
             <span className="inline-block w-1.5 h-3.5 bg-[#CCFF00] animate-pulse ml-0.5" />
           </motion.div>
