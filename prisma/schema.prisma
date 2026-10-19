@@ -34,6 +34,14 @@ model Registration {
   ticketTier    String   @default("STANDARD") // STANDARD, VIP
   vipPrice      Int?
 
+  // VIP Payment Verification
+  paymentMethod       String?   // TELEBIRR, AWASH_BANK, FREE
+  paymentTxnCode      String?   // Transaction Reference / SMS receipt code
+  telegramUsername    String?   // @username or phone for sending VIP pass
+  paymentStatus       String    @default("UNPAID") // UNPAID, PENDING_APPROVAL, APPROVED, REJECTED
+  paymentApprovedAt   DateTime?
+  paymentApprovedBy   String?
+
   // Status
   status        String   @default("PENDING") // PENDING, CONFIRMED, REJECTED, WAITLISTED, CHECKED_IN
   phoneVerified Boolean  @default(false)
@@ -47,6 +55,8 @@ model Registration {
   updatedAt     DateTime @updatedAt
 
   @@index([status])
+  @@index([paymentStatus])
+  @@index([ticketTier])
   @@index([category])
   @@index([phoneNumber])
   @@index([pubgUid])

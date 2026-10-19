@@ -6,6 +6,7 @@ import { ProgressBar, StepItem } from '@/components/ui/ProgressBar';
 import { StepPlayerIdentity } from './StepPlayerIdentity';
 import { StepParticipation } from './StepParticipation';
 import { StepIdUpload } from './StepIdUpload';
+import { StepVipPayment } from './StepVipPayment';
 import { StepVerification } from './StepVerification';
 import { RegistrationSuccess, RegistrationSuccessData } from './RegistrationSuccess';
 import { ParticipationCategory } from '@/lib/validation';
@@ -25,6 +26,9 @@ export interface RegistrationFormData {
   idBackImage: string;
   ticketTier: 'STANDARD' | 'VIP';
   vipPrice: number;
+  paymentMethod: string;
+  paymentTxnCode: string;
+  telegramUsername: string;
 }
 
 const INITIAL_FORM_DATA: RegistrationFormData = {
@@ -42,14 +46,10 @@ const INITIAL_FORM_DATA: RegistrationFormData = {
   idBackImage: '',
   ticketTier: 'STANDARD',
   vipPrice: 500,
+  paymentMethod: 'TELEBIRR',
+  paymentTxnCode: '',
+  telegramUsername: '',
 };
-
-const FORM_STEPS: StepItem[] = [
-  { number: 1, label: 'Player Identity' },
-  { number: 2, label: 'Participation' },
-  { number: 3, label: 'ID Upload' },
-  { number: 4, label: 'Verification' },
-];
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -75,6 +75,24 @@ export function RegistrationForm() {
   const [registrationResult, setRegistrationResult] = useState<RegistrationSuccessData | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const isVip = formData.ticketTier === 'VIP';
+  const formSteps: StepItem[] = isVip
+    ? [
+        { number: 1, label: 'Player Identity' },
+        { number: 2, label: 'Participation' },
+        { number: 3, label: 'ID Upload' },
+        { number: 4, label: 'VIP Payment' },
+        { number: 5, label: 'Verification' },
+      ]
+    : [
+        { number: 1, label: 'Player Identity' },
+        { number: 2, label: 'Participation' },
+        { number: 3, label: 'ID Upload' },
+        { number: 4, label: 'Verification' },
+      ];
+
+  const maxSteps = isVip ? 5 : 4;
+
   // Field updater
   const updateField = (field: string, value: string | boolean | number) => {
     setFormData((prev) => ({
@@ -86,7 +104,7 @@ export function RegistrationForm() {
   // Step navigation
   const goToNextStep = () => {
     setDirection(1);
-    setCurrentStep((prev) => Math.min(prev + 1, 4));
+    setCurrentStep((prev) => Math.min(prev + 1, maxSteps));
     setApiError(null);
   };
 
@@ -97,7 +115,7 @@ export function RegistrationForm() {
   };
 
   const jumpToStep = (targetStep: number) => {
-    if (targetStep >= 1 && targetStep <= 4) {
+    if (targetStep >= 1 && targetStep <= maxSteps) {
       setDirection(targetStep > currentStep ? 1 : -1);
       setCurrentStep(targetStep);
       setApiError(null);
@@ -148,7 +166,7 @@ export function RegistrationForm() {
     <div className="w-full">
       {/* Multi-step Progress Bar */}
       <div className="mb-8 sm:mb-10">
-        <ProgressBar currentStep={currentStep} steps={FORM_STEPS} />
+        <ProgressBar currentStep={currentStep} steps={formSteps} />
       </div>
 
       {/* Global Form Error Message / Toast */}
@@ -213,6 +231,7 @@ export function RegistrationForm() {
 
         <div className="relative z-10">
           <AnimatePresence mode="wait" custom={direction}>
+            {/* Step 1: Player Identity */}
             {currentStep === 1 && (
               <motion.div
                 key="step-1"
@@ -231,6 +250,7 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
+            {/* Step 2: Participation */}
             {currentStep === 2 && (
               <motion.div
                 key="step-2"
@@ -250,6 +270,7 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
+            {/* Step 3: ID Documents Upload */}
             {currentStep === 3 && (
               <motion.div
                 key="step-3"
@@ -269,9 +290,30 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {currentStep === 4 && (
+            {/* Step 4 (VIP Only): VIP Payment & Accounts */}
+            {isVip && currentStep === 4 && (
               <motion.div
-                key="step-4"
+                key="step-4-vip-payment"
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <StepVipPayment
+                  formData={formData}
+                  updateField={updateField}
+                  onNext={goToNextStep}
+                  onBack={goToPreviousStep}
+                />
+              </motion.div>
+            )}
+
+            {/* Final Step: Verification (Step 5 for VIP, Step 4 for Standard) */}
+            {((isVip && currentStep === 5) || (!isVip && currentStep === 4)) && (
+              <motion.div
+                key="step-verification"
                 custom={direction}
                 variants={slideVariants}
                 initial="enter"

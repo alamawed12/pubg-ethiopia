@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { EventPass } from '@/components/registration/EventPass';
 
 interface Registration {
   id: string;
@@ -20,6 +21,13 @@ interface Registration {
   idBackImage: string | null;
   ticketTier?: string;
   vipPrice?: number;
+  paymentMethod?: string | null;
+  paymentTxnCode?: string | null;
+  telegramUsername?: string | null;
+  paymentStatus?: string | null;
+  paymentApprovedAt?: string | null;
+  paymentApprovedBy?: string | null;
+  qrDataUrl?: string;
   status: string;
   phoneVerified: boolean;
   createdAt: string;
@@ -59,6 +67,7 @@ export default function RegistrationDetailPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState('');
+  const [copiedTxn, setCopiedTxn] = useState(false);
   const [idModalImage, setIdModalImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -73,7 +82,7 @@ export default function RegistrationDetailPage() {
   }, [params.id]);
 
   const updateStatus = async (status: string) => {
-    if (!confirm(`Set status to ${status}?`)) return;
+    if (!confirm(`Set attendee status to ${status}?`)) return;
     setActionLoading(status);
     try {
       const res = await fetch(`/api/admin/registrations/${params.id}`, {
@@ -83,10 +92,51 @@ export default function RegistrationDetailPage() {
       });
       if (res.ok) {
         const d = await res.json();
-        setReg(prev => prev ? { ...prev, ...d, status } : prev);
+        setReg((prev) => (prev ? { ...prev, ...d, status } : prev));
       }
-    } catch { /* ignore */ }
+    } catch {
+      // ignore
+    }
     setActionLoading('');
+  };
+
+  const updatePaymentStatus = async (paymentStatus: 'APPROVED' | 'REJECTED') => {
+    const actionLabel =
+      paymentStatus === 'APPROVED'
+        ? 'APPROVE VIP payment and issue official ticket'
+        : 'REJECT VIP payment';
+    if (!confirm(`Are you sure you want to ${actionLabel}?`)) return;
+
+    setActionLoading(paymentStatus);
+    try {
+      const res = await fetch(`/api/admin/registrations/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentStatus }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setReg((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...d,
+                paymentStatus,
+                status: paymentStatus === 'APPROVED' ? 'CONFIRMED' : 'REJECTED',
+              }
+            : prev
+        );
+      }
+    } catch {
+      // ignore
+    }
+    setActionLoading('');
+  };
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedTxn(true);
+    setTimeout(() => setCopiedTxn(false), 2000);
   };
 
   if (loading) {
@@ -94,7 +144,9 @@ export default function RegistrationDetailPage() {
       <div className="flex items-center justify-center py-20">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
-          <span style={{ color: '#999999', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>LOADING REGISTRATION...</span>
+          <span style={{ color: '#999999', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
+            LOADING REGISTRATION & PAYMENT AUDIT...
+          </span>
         </div>
       </div>
     );
@@ -104,7 +156,9 @@ export default function RegistrationDetailPage() {
     return (
       <div className="text-center py-20">
         <div className="text-4xl mb-3">⚠️</div>
-        <p style={{ color: '#ef4444', fontFamily: 'var(--font-heading)', fontSize: '18px' }}>Registration not found</p>
+        <p style={{ color: '#ef4444', fontFamily: 'var(--font-heading)', fontSize: '18px' }}>
+          Registration not found
+        </p>
         <button onClick={() => router.back()} className="mt-4 text-sm cursor-pointer" style={{ color: '#CCFF00' }}>
           ← Go Back
         </button>
@@ -112,12 +166,15 @@ export default function RegistrationDetailPage() {
     );
   }
 
+  const isVip = reg.ticketTier === 'VIP';
   const statusConfig = STATUS_CONFIG[reg.status] || STATUS_CONFIG.PENDING;
+  const telegramClean = reg.telegramUsername?.replace(/^@/, '') || '';
+  const telegramUrl = telegramClean ? `https://t.me/${telegramClean}` : null;
 
   return (
-    <div className="max-w-5xl">
+    <div className="max-w-5xl space-y-6">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm cursor-pointer hover:opacity-80 transition-opacity"
@@ -126,21 +183,21 @@ export default function RegistrationDetailPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          BACK
+          BACK TO REGISTRATIONS
         </button>
         <span className="text-xs" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
-          ID: {reg.id.slice(0, 8)}...
+          REF: {reg.referenceId}
         </span>
       </div>
 
       {/* Header Card */}
       <div
-        className="rounded-xl border p-6 mb-6"
-        style={{ backgroundColor: '#0a0a0a', borderColor: 'rgba(255,255,255,0.08)' }}
+        className="rounded-xl border p-6"
+        style={{ backgroundColor: '#0a0a0a', borderColor: isVip ? 'rgba(245,158,11,0.3)' : 'rgba(255,255,255,0.08)' }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1
                 className="text-2xl sm:text-3xl tracking-wider uppercase"
                 style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
@@ -153,14 +210,15 @@ export default function RegistrationDetailPage() {
               >
                 {statusConfig.label}
               </span>
-              {reg.ticketTier === 'VIP' && (
-                <span className="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-black bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                  ★ VIP PASS ({reg.vipPrice || 500} ETB)
+              {isVip && (
+                <span className="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-black bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.35)]">
+                  ★ VIP ALL-ACCESS ({reg.vipPrice || 500} ETB)
                 </span>
               )}
             </div>
+
             <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-sm" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
+              <span className="text-sm font-bold" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
                 {reg.referenceId}
               </span>
               <span className="text-xs" style={{ color: '#666666' }}>•</span>
@@ -173,15 +231,184 @@ export default function RegistrationDetailPage() {
               </span>
             </div>
           </div>
+
           <div className="text-right text-xs" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
-            <div>Registered</div>
+            <div>Registration Received</div>
             <div style={{ color: '#999999' }}>{new Date(reg.createdAt).toLocaleString()}</div>
           </div>
         </div>
       </div>
 
+      {/* ─── SPECIAL VIP PAYMENT AUDIT & APPROVAL PANEL (IF VIP) ─── */}
+      {isVip && (
+        <div className="rounded-xl border-2 border-amber-500/50 bg-gradient-to-br from-[#1c1810] via-[#12100d] to-[#0a0805] p-6 shadow-2xl space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/20 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">⭐</span>
+                <h2 className="font-heading font-black text-lg sm:text-xl text-white uppercase tracking-wider">
+                  VIP PAYMENT VERIFICATION & DISPATCH
+                </h2>
+              </div>
+              <p className="font-mono text-xs text-amber-300/80 mt-0.5">
+                Verify funds received via Telebirr or Awash Bank before issuing official VIP pass.
+              </p>
+            </div>
+
+            {/* Payment Status Pill */}
+            <div>
+              {reg.paymentStatus === 'APPROVED' ? (
+                <span className="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 font-heading font-black text-xs uppercase tracking-wider">
+                  ✓ PAYMENT VERIFIED & APPROVED
+                </span>
+              ) : reg.paymentStatus === 'REJECTED' ? (
+                <span className="px-3.5 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/50 font-heading font-black text-xs uppercase tracking-wider">
+                  ✗ PAYMENT REJECTED
+                </span>
+              ) : (
+                <span className="px-3.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/60 font-heading font-black text-xs uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  AWAITING HEAD ADMIN APPROVAL
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Payment Credentials Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-black/50 p-4 rounded-xl border border-amber-500/20 font-mono text-xs">
+            {/* Payment Method */}
+            <div>
+              <span className="text-neutral-400 uppercase text-[10px] block">PAYMENT DESTINATION</span>
+              <span className="text-white font-bold text-sm">
+                {reg.paymentMethod === 'AWASH_BANK' ? 'Awash Bank' : 'Telebirr'}
+              </span>
+              <span className="text-amber-400 text-[11px] block mt-0.5">
+                {reg.paymentMethod === 'AWASH_BANK'
+                  ? '013201378990300 (Tsige Dagne)'
+                  : '+251950986841 (Alamawed Begashawe)'}
+              </span>
+            </div>
+
+            {/* Amount */}
+            <div>
+              <span className="text-neutral-400 uppercase text-[10px] block">REQUIRED FEE</span>
+              <span className="text-amber-400 font-black text-lg">
+                {reg.vipPrice || 500} ETB
+              </span>
+              <span className="text-neutral-400 text-[11px] block">Full Admission</span>
+            </div>
+
+            {/* Transaction Reference Code */}
+            <div>
+              <span className="text-neutral-400 uppercase text-[10px] block">TRANSACTION REFERENCE</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-amber-300 font-bold text-sm bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">
+                  {reg.paymentTxnCode || 'NONE ENTERED'}
+                </span>
+                {reg.paymentTxnCode && (
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(reg.paymentTxnCode || '')}
+                    className="p-1 rounded bg-white/10 hover:bg-white/20 text-xs text-white"
+                    title="Copy Transaction Code"
+                  >
+                    {copiedTxn ? '✓' : '📋'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Telegram Username */}
+            <div>
+              <span className="text-neutral-400 uppercase text-[10px] block">DELIVERY TELEGRAM</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-sky-300 font-bold text-sm">
+                  {reg.telegramUsername || 'No Telegram'}
+                </span>
+                {telegramUrl && (
+                  <a
+                    href={telegramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] uppercase font-bold hover:bg-sky-500/30"
+                  >
+                    CHAT ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Approval Buttons */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            {reg.paymentStatus !== 'APPROVED' && (
+              <button
+                type="button"
+                onClick={() => updatePaymentStatus('APPROVED')}
+                disabled={!!actionLoading}
+                className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-heading font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {actionLoading === 'APPROVED' ? 'APPROVING...' : '✓ APPROVE PAYMENT & ISSUE VIP TICKET'}
+              </button>
+            )}
+
+            {reg.paymentStatus !== 'REJECTED' && (
+              <button
+                type="button"
+                onClick={() => updatePaymentStatus('REJECTED')}
+                disabled={!!actionLoading}
+                className="px-6 py-3 rounded-lg bg-red-950/70 border border-red-500/40 hover:bg-red-900 text-red-300 font-heading font-black text-sm uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
+              >
+                {actionLoading === 'REJECTED' ? 'REJECTING...' : '✗ REJECT TRANSACTION (INVALID CODE)'}
+              </button>
+            )}
+
+            {telegramUrl && (
+              <a
+                href={telegramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3 rounded-lg bg-sky-600/30 border border-sky-400/50 hover:bg-sky-600/50 text-sky-200 font-heading font-black text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+                <span>OPEN ATTENDEE TELEGRAM</span>
+              </a>
+            )}
+          </div>
+
+          {/* Official Pass Preview & Forwarding (Available once approved) */}
+          {(reg.paymentStatus === 'APPROVED' || reg.status === 'CONFIRMED') && (
+            <div className="mt-6 pt-6 border-t border-amber-500/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-heading font-bold text-xs uppercase tracking-wider text-amber-400">
+                  VERIFIED HORIZONTAL VIP PASS IMAGE (FOR TELEGRAM DISPATCH)
+                </span>
+                <span className="text-xs font-mono text-neutral-400">
+                  Ready to Download & Send
+                </span>
+              </div>
+
+              <div className="bg-black/60 p-4 rounded-xl border border-amber-500/30">
+                <EventPass
+                  referenceId={reg.referenceId}
+                  fullName={reg.fullName}
+                  inGameName={reg.inGameName}
+                  category={reg.category}
+                  status={reg.status}
+                  ticketTier={reg.ticketTier}
+                  qrDataUrl={reg.qrDataUrl}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── MAIN DETAILS GRID ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Details */}
+        {/* Left Column: Player, Participation & ID */}
         <div className="lg:col-span-2 space-y-6">
           {/* Player Details */}
           <div
@@ -200,7 +427,7 @@ export default function RegistrationDetailPage() {
               <Field label="PUBG UID" value={reg.pubgUid} mono />
               <Field label="Phone" value={`${reg.countryCode} ${reg.phoneNumber}`} mono />
               <Field label="City / Region" value={reg.cityRegion} />
-              <Field label="Phone Verified" value={reg.phoneVerified ? '✓ Verified' : '✗ Not Verified'} color={reg.phoneVerified ? '#22c55e' : '#f59e0b'} />
+              <Field label="Ticket Tier" value={reg.ticketTier === 'VIP' ? '★ VIP All-Access' : 'Standard'} color={reg.ticketTier === 'VIP' ? '#f59e0b' : '#CCFF00'} />
             </div>
           </div>
 
@@ -236,68 +463,55 @@ export default function RegistrationDetailPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
               </svg>
-              ID DOCUMENTS
+              NATIONAL ID DOCUMENTS
             </h2>
 
             {!reg.idFrontImage && !reg.idBackImage ? (
               <div className="text-center py-8 rounded-lg border border-dashed" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-                <svg className="w-10 h-10 mx-auto mb-2" style={{ color: '#666666' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
                 <p className="text-sm" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
                   NO ID DOCUMENTS UPLOADED
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Front of ID */}
+                {/* Front */}
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: '#999999', fontFamily: 'var(--font-mono)' }}>
+                  <p className="text-[11px] uppercase tracking-wider mb-2 font-mono text-[#999999]">
                     FRONT OF ID
                   </p>
                   {reg.idFrontImage ? (
                     <div
-                      className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors"
-                      style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: '#0a0a0a' }}
+                      className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors bg-black/40"
+                      style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                       onClick={() => setIdModalImage(reg.idFrontImage)}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={reg.idFrontImage} alt="Front of ID" className="w-full h-48 object-contain p-2" />
-                      <div className="px-3 py-2 text-center border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                        <span className="text-[10px] uppercase tracking-wider" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
-                          CLICK TO ENLARGE
-                        </span>
-                      </div>
+                      <img src={reg.idFrontImage} alt="Front of ID" className="w-full h-40 object-contain p-2" />
                     </div>
                   ) : (
-                    <div className="rounded-lg border border-dashed h-48 flex items-center justify-center" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-                      <span className="text-xs" style={{ color: '#666666' }}>Not uploaded</span>
+                    <div className="h-40 rounded-lg border border-dashed flex items-center justify-center text-xs text-[#666666]">
+                      Not uploaded
                     </div>
                   )}
                 </div>
 
-                {/* Back of ID */}
+                {/* Back */}
                 <div>
-                  <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: '#999999', fontFamily: 'var(--font-mono)' }}>
+                  <p className="text-[11px] uppercase tracking-wider mb-2 font-mono text-[#999999]">
                     BACK OF ID
                   </p>
                   {reg.idBackImage ? (
                     <div
-                      className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors"
-                      style={{ borderColor: 'rgba(255,255,255,0.1)', backgroundColor: '#0a0a0a' }}
+                      className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors bg-black/40"
+                      style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                       onClick={() => setIdModalImage(reg.idBackImage)}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={reg.idBackImage} alt="Back of ID" className="w-full h-48 object-contain p-2" />
-                      <div className="px-3 py-2 text-center border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                        <span className="text-[10px] uppercase tracking-wider" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
-                          CLICK TO ENLARGE
-                        </span>
-                      </div>
+                      <img src={reg.idBackImage} alt="Back of ID" className="w-full h-40 object-contain p-2" />
                     </div>
                   ) : (
-                    <div className="rounded-lg border border-dashed h-48 flex items-center justify-center" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-                      <span className="text-xs" style={{ color: '#666666' }}>Not uploaded</span>
+                    <div className="h-40 rounded-lg border border-dashed flex items-center justify-center text-xs text-[#666666]">
+                      Not uploaded
                     </div>
                   )}
                 </div>
@@ -305,28 +519,25 @@ export default function RegistrationDetailPage() {
             )}
           </div>
 
-          {/* Audit Log */}
+          {/* Audit Logs */}
           {auditLogs.length > 0 && (
             <div
               className="rounded-xl border p-5"
               style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
             >
               <h2 className="flex items-center gap-2 text-sm uppercase tracking-wider mb-4" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                AUDIT LOG
+                AUDIT TRAIL
               </h2>
               <div className="space-y-2">
                 {auditLogs.map((log) => (
                   <div key={log.id} className="flex items-start gap-3 py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                    <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: '#CCFF00' }} />
+                    <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-[#CCFF00]" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold uppercase" style={{ color: '#cccccc' }}>{log.action.replace(/_/g, ' ')}</span>
-                        <span className="text-[10px]" style={{ color: '#666666' }}>by {log.adminEmail}</span>
+                        <span className="text-xs font-bold uppercase text-[#cccccc]">{log.action.replace(/_/g, ' ')}</span>
+                        <span className="text-[10px] text-[#666666]">by {log.adminEmail}</span>
                       </div>
-                      <span className="text-[10px]" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                      <span className="text-[10px] text-[#666666] font-mono">
                         {new Date(log.createdAt).toLocaleString()}
                       </span>
                     </div>
@@ -337,114 +548,88 @@ export default function RegistrationDetailPage() {
           )}
         </div>
 
-        {/* Right Column: Actions & Quick Info */}
+        {/* Right Column: Actions */}
         <div className="space-y-6">
-          {/* Quick Actions */}
+          {/* General Actions */}
           <div
             className="rounded-xl border p-5"
             style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
           >
             <h2 className="text-sm uppercase tracking-wider mb-4" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-              ACTIONS
+              OVERALL STATUS
             </h2>
             <div className="space-y-2">
               {reg.status !== 'CONFIRMED' && (
                 <button
                   onClick={() => updateStatus('CONFIRMED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90"
-                  style={{ backgroundColor: '#22c55e', color: '#050505', fontFamily: 'var(--font-heading)' }}
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-emerald-500 text-black font-heading"
                 >
-                  {actionLoading === 'CONFIRMED' ? 'Processing...' : '✓ Approve'}
+                  {actionLoading === 'CONFIRMED' ? 'Processing...' : '✓ Set Confirmed'}
                 </button>
               )}
               {reg.status !== 'REJECTED' && (
                 <button
                   onClick={() => updateStatus('REJECTED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90"
-                  style={{ backgroundColor: '#ef4444', color: '#ffffff', fontFamily: 'var(--font-heading)' }}
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-red-600 text-white font-heading"
                 >
-                  {actionLoading === 'REJECTED' ? 'Processing...' : '✗ Reject'}
+                  {actionLoading === 'REJECTED' ? 'Processing...' : '✗ Set Rejected'}
                 </button>
               )}
               {reg.status !== 'WAITLISTED' && (
                 <button
                   onClick={() => updateStatus('WAITLISTED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase border cursor-pointer disabled:opacity-50 transition-all hover:opacity-90"
-                  style={{ borderColor: '#3b82f6', color: '#3b82f6', fontFamily: 'var(--font-heading)' }}
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase border cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 border-blue-500 text-blue-400 font-heading"
                 >
-                  {actionLoading === 'WAITLISTED' ? 'Processing...' : '⏳ Waitlist'}
+                  {actionLoading === 'WAITLISTED' ? 'Processing...' : '⏳ Set Waitlisted'}
                 </button>
               )}
             </div>
           </div>
 
-          {/* Check-in Status */}
+          {/* Check-in Info */}
           <div
             className="rounded-xl border p-5"
             style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
           >
-            <h2 className="text-sm uppercase tracking-wider mb-3" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-              CHECK-IN
+            <h2 className="text-sm uppercase tracking-wider mb-3 font-heading text-[#CCFF00]">
+              GATE CHECK-IN
             </h2>
             {reg.checkedInAt ? (
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#CCFF00' }} />
-                  <span className="text-sm font-bold" style={{ color: '#CCFF00' }}>CHECKED IN</span>
+                  <div className="w-2 h-2 rounded-full bg-[#CCFF00]" />
+                  <span className="text-sm font-bold text-[#CCFF00]">CHECKED IN</span>
                 </div>
-                <p className="text-xs" style={{ color: '#999999', fontFamily: 'var(--font-mono)' }}>
+                <p className="text-xs font-mono text-[#999999]">
                   {new Date(reg.checkedInAt).toLocaleString()}
                 </p>
                 {reg.checkedInBy && (
-                  <p className="text-xs mt-1" style={{ color: '#666666' }}>
+                  <p className="text-xs mt-1 text-[#666666]">
                     By: {reg.checkedInBy}
                   </p>
                 )}
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#666666' }} />
-                <span className="text-sm" style={{ color: '#666666' }}>Not checked in</span>
+                <div className="w-2 h-2 rounded-full bg-[#666666]" />
+                <span className="text-sm text-[#666666]">Not checked in</span>
               </div>
             )}
-          </div>
-
-          {/* Timestamps */}
-          <div
-            className="rounded-xl border p-5"
-            style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-          >
-            <h2 className="text-sm uppercase tracking-wider mb-3" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-              TIMESTAMPS
-            </h2>
-            <div className="space-y-2 text-xs" style={{ fontFamily: 'var(--font-mono)' }}>
-              <div>
-                <span style={{ color: '#666666' }}>Created: </span>
-                <span style={{ color: '#999999' }}>{new Date(reg.createdAt).toLocaleString()}</span>
-              </div>
-              {reg.updatedAt && (
-                <div>
-                  <span style={{ color: '#666666' }}>Updated: </span>
-                  <span style={{ color: '#999999' }}>{new Date(reg.updatedAt).toLocaleString()}</span>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
 
-      {/* ID Image Full-Screen Modal */}
+      {/* ID Full-Screen Modal */}
       {idModalImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
           onClick={() => setIdModalImage(null)}
         >
           <button
-            className="absolute top-6 right-6 text-white/60 hover:text-white cursor-pointer transition-colors"
+            className="absolute top-6 right-6 text-white/60 hover:text-white cursor-pointer"
             onClick={() => setIdModalImage(null)}
           >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -452,34 +637,25 @@ export default function RegistrationDetailPage() {
             </svg>
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={idModalImage}
-            alt="ID Document"
-            className="max-w-full max-h-[85vh] object-contain rounded-lg border"
-            style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <img src={idModalImage} alt="National ID Enlarged" className="max-w-full max-h-[90vh] object-contain rounded-lg" />
         </div>
       )}
     </div>
   );
 }
 
-function Field({ label, value, mono, color }: { label: string; value: string; mono?: boolean; color?: string }) {
+function Field({ label, value, mono = false, color }: { label: string; value: string; mono?: boolean; color?: string }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+      <span className="block text-[11px] uppercase tracking-wider text-[#999999] font-mono">
         {label}
-      </p>
-      <p
-        className="text-sm"
-        style={{
-          color: color || '#cccccc',
-          fontFamily: mono ? 'var(--font-mono)' : undefined,
-        }}
+      </span>
+      <span
+        className={`font-semibold text-sm ${mono ? 'font-mono' : ''}`}
+        style={{ color: color || '#ffffff' }}
       >
         {value}
-      </p>
+      </span>
     </div>
   );
 }

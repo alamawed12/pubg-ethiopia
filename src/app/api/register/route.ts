@@ -171,6 +171,10 @@ export async function POST(req: NextRequest) {
         idBackImage: (rawBody as Record<string, unknown>).idBackImage as string || null,
         ticketTier: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD',
         vipPrice: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
+        paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
+        paymentTxnCode: ((rawBody as Record<string, unknown>).paymentTxnCode as string) || null,
+        telegramUsername: ((rawBody as Record<string, unknown>).telegramUsername as string) || null,
+        paymentStatus: (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID',
         status: registrationStatus,
       },
     });
@@ -188,6 +192,11 @@ export async function POST(req: NextRequest) {
           inGameName: newRegistration.inGameName,
           category: newRegistration.category,
           ticketTier: newRegistration.ticketTier,
+          vipPrice: newRegistration.vipPrice,
+          paymentMethod: newRegistration.paymentMethod,
+          paymentTxnCode: newRegistration.paymentTxnCode,
+          telegramUsername: newRegistration.telegramUsername,
+          paymentStatus: newRegistration.paymentStatus,
         },
       },
       { status: 201 }

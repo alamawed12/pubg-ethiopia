@@ -1,0 +1,310 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+
+export interface StepVipPaymentProps {
+  formData: {
+    ticketTier: 'STANDARD' | 'VIP';
+    vipPrice: number;
+    paymentMethod?: string;
+    paymentTxnCode?: string;
+    telegramUsername?: string;
+  };
+  updateField: (field: string, value: string | boolean | number) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+export function StepVipPayment({
+  formData,
+  updateField,
+  onNext,
+  onBack,
+}: StepVipPaymentProps) {
+  const [selectedMethod, setSelectedMethod] = useState<'TELEBIRR' | 'AWASH_BANK'>(
+    (formData.paymentMethod as 'TELEBIRR' | 'AWASH_BANK') || 'TELEBIRR'
+  );
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ txnCode?: string; telegram?: string }>({});
+
+  const handleCopy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => {
+      setCopiedKey(null);
+    }, 2500);
+  };
+
+  const handleSelectMethod = (method: 'TELEBIRR' | 'AWASH_BANK') => {
+    setSelectedMethod(method);
+    updateField('paymentMethod', method);
+  };
+
+  const handleContinue = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const newErrors: { txnCode?: string; telegram?: string } = {};
+
+    if (!formData.paymentTxnCode || formData.paymentTxnCode.trim().length < 4) {
+      newErrors.txnCode = 'Please enter your payment transaction ID / reference code';
+    }
+
+    if (!formData.telegramUsername || formData.telegramUsername.trim().length < 3) {
+      newErrors.telegram = 'Please enter your Telegram username or phone number (e.g. @yourname)';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    if (!formData.paymentMethod) {
+      updateField('paymentMethod', selectedMethod);
+    }
+    onNext();
+  };
+
+  return (
+    <motion.form
+      onSubmit={handleContinue}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -18 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="space-y-6"
+      noValidate
+    >
+      {/* Step Header */}
+      <div>
+        <div className="font-mono text-xs font-semibold tracking-widest text-amber-400 uppercase flex items-center gap-1.5">
+          <span>⭐</span> STEP 04 • VIP PASS PAYMENT
+        </div>
+        <h2 className="mt-1 font-heading text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white">
+          VIP PAYMENT & APPROVAL
+        </h2>
+        <p className="mt-1 text-xs sm:text-sm text-[var(--color-silver,#999999)] leading-relaxed">
+          Transfer the VIP pass fee to an official account below. Our Head Admin will verify your transaction code and dispatch your luxury horizontal pass directly to your Telegram.
+        </p>
+      </div>
+
+      {/* Fee Badge Banner */}
+      <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent border border-amber-500/30">
+        <div>
+          <span className="block font-mono text-[10px] tracking-widest text-amber-300 uppercase">
+            VIP ALL-ACCESS ADMISSION FEE
+          </span>
+          <span className="font-heading text-2xl sm:text-3xl font-black text-amber-400">
+            {formData.vipPrice || 500} ETB
+          </span>
+        </div>
+        <div className="text-right">
+          <span className="inline-block px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono uppercase font-bold tracking-wider">
+            MANUAL ADMIN APPROVAL
+          </span>
+        </div>
+      </div>
+
+      {/* ─── PAYMENT ACCOUNTS WITH ONE-CLICK COPY ─── */}
+      <div className="space-y-3">
+        <label className="block text-xs uppercase font-mono tracking-wider text-[#cccccc]">
+          CHOOSE OFFICIAL PAYMENT ACCOUNT
+        </label>
+
+        {/* Account 1: Telebirr */}
+        <div
+          onClick={() => handleSelectMethod('TELEBIRR')}
+          className={`p-4 sm:p-5 rounded-xl border-2 transition-all cursor-pointer ${
+            selectedMethod === 'TELEBIRR'
+              ? 'border-amber-400 bg-[#161208] shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+              : 'border-white/10 bg-[#141414] hover:border-white/20'
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {/* Radio indicator */}
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  selectedMethod === 'TELEBIRR'
+                    ? 'border-amber-400 bg-amber-400/20'
+                    : 'border-white/30'
+                }`}
+              >
+                {selectedMethod === 'TELEBIRR' && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-black text-base sm:text-lg text-white uppercase tracking-wider">
+                    TELEBIRR
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-mono uppercase font-bold">
+                    INSTANT TRANSFER
+                  </span>
+                </div>
+                <div className="font-mono text-xs text-neutral-300 mt-0.5">
+                  Account Name: <strong className="text-white">Alamawed Begashawe</strong>
+                </div>
+                <div className="font-mono text-sm sm:text-base font-bold text-amber-400 mt-1">
+                  +251950986841
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Copy Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopy('+251950986841', 'telebirr');
+              }}
+              className="px-4 py-2.5 rounded-lg border text-xs font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 bg-black/60 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 active:scale-95"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>{copiedKey === 'telebirr' ? 'COPIED! ✅' : 'COPY NUMBER'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Account 2: Awash Bank */}
+        <div
+          onClick={() => handleSelectMethod('AWASH_BANK')}
+          className={`p-4 sm:p-5 rounded-xl border-2 transition-all cursor-pointer ${
+            selectedMethod === 'AWASH_BANK'
+              ? 'border-amber-400 bg-[#161208] shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+              : 'border-white/10 bg-[#141414] hover:border-white/20'
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {/* Radio indicator */}
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  selectedMethod === 'AWASH_BANK'
+                    ? 'border-amber-400 bg-amber-400/20'
+                    : 'border-white/30'
+                }`}
+              >
+                {selectedMethod === 'AWASH_BANK' && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-heading font-black text-base sm:text-lg text-white uppercase tracking-wider">
+                    AWASH BANK
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 text-[10px] font-mono uppercase font-bold">
+                    BANK TRANSFER
+                  </span>
+                </div>
+                <div className="font-mono text-xs text-neutral-300 mt-0.5">
+                  Account Name: <strong className="text-white">Tsige Dagne</strong>
+                </div>
+                <div className="font-mono text-sm sm:text-base font-bold text-amber-400 mt-1">
+                  013201378990300
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Copy Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopy('013201378990300', 'awash');
+              }}
+              className="px-4 py-2.5 rounded-lg border text-xs font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 bg-black/60 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 active:scale-95"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>{copiedKey === 'awash' ? 'COPIED! ✅' : 'COPY ACCOUNT'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── REQUIRED TRANSACTION DETAILS FORM ─── */}
+      <div className="space-y-4 pt-2">
+        <div>
+          <Input
+            label="Payment Transaction ID / Reference Code"
+            name="paymentTxnCode"
+            value={formData.paymentTxnCode || ''}
+            onChange={(e) => updateField('paymentTxnCode', e.target.value.toUpperCase())}
+            placeholder={
+              selectedMethod === 'TELEBIRR'
+                ? 'e.g. MP260312.1450.A00123'
+                : 'e.g. AWASH-98421038'
+            }
+            error={errors.txnCode}
+            required
+          />
+          <p className="mt-1 font-mono text-[11px] text-neutral-400">
+            Paste the reference ID or transaction code from your Telebirr SMS or Awash Mobile receipt.
+          </p>
+        </div>
+
+        <div>
+          <Input
+            label="Your Telegram Username or Contact"
+            name="telegramUsername"
+            value={formData.telegramUsername || ''}
+            onChange={(e) => updateField('telegramUsername', e.target.value)}
+            placeholder="e.g. @player_eth or +2519..."
+            error={errors.telegram}
+            required
+          />
+          <p className="mt-1 font-mono text-[11px] text-amber-400/90">
+            Important: Once the Head Admin verifies payment, your official Horizontal Luxury VIP Ticket will be sent directly to this Telegram contact.
+          </p>
+        </div>
+      </div>
+
+      {/* Security Info Card */}
+      <div className="p-3.5 rounded-lg bg-black/40 border border-white/10 flex items-start gap-3 text-xs text-neutral-300">
+        <span className="text-lg">🛡️</span>
+        <div>
+          <span className="font-heading uppercase font-bold text-white tracking-wider block mb-0.5">
+            ANTI-FRAUD VERIFICATION SYSTEM
+          </span>
+          <span>
+            Every transaction reference is verified against our merchant account records. Once confirmed by the Head Admin, your pass will be officially activated.
+          </span>
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          onClick={onBack}
+          className="w-full sm:w-auto min-w-[140px] order-2 sm:order-1"
+        >
+          BACK
+        </Button>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="w-full sm:flex-1 order-1 sm:order-2"
+        >
+          VERIFY & REVIEW DETAILS →
+        </Button>
+      </div>
+    </motion.form>
+  );
+}
+
+export default StepVipPayment;

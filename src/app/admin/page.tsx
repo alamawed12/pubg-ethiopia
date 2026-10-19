@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  let total = 0, pending = 0, confirmed = 0, checkedIn = 0, rejected = 0, waitlisted = 0;
+  let total = 0, pending = 0, confirmed = 0, checkedIn = 0, rejected = 0, waitlisted = 0, pendingVip = 0;
   let recent: { id: string; referenceId: string; fullName: string; inGameName: string; category: string; status: string; createdAt: Date }[] = [];
 
   try {
@@ -14,6 +14,15 @@ export default async function AdminDashboardPage() {
     checkedIn = await prisma.registration.count({ where: { status: 'CHECKED_IN' } });
     rejected = await prisma.registration.count({ where: { status: 'REJECTED' } });
     waitlisted = await prisma.registration.count({ where: { status: 'WAITLISTED' } });
+    pendingVip = await prisma.registration.count({
+      where: {
+        ticketTier: 'VIP',
+        OR: [
+          { paymentStatus: 'PENDING_APPROVAL' },
+          { paymentStatus: 'UNPAID', status: 'PENDING' },
+        ],
+      },
+    });
     recent = await prisma.registration.findMany({
       orderBy: { createdAt: 'desc' },
       take: 10,
@@ -46,7 +55,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-6xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#CCFF00' }} />
           <span className="text-[11px] uppercase tracking-widest" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
@@ -60,9 +69,38 @@ export default async function AdminDashboardPage() {
           COMMAND CENTER
         </h1>
         <p className="text-sm mt-1" style={{ color: '#666666' }}>
-          PUBG Mobile Community Assembly Ethiopia — Registration Overview
+          PUBG Mobile Community Assembly Ethiopia — Registration & VIP Payment Overview
         </p>
       </div>
+
+      {/* Priority VIP Payment Approval Alert */}
+      {pendingVip > 0 && (
+        <div className="mb-8 p-4 sm:p-5 rounded-xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_0_25px_rgba(245,158,11,0.25)]">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">⭐</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-heading font-black text-lg text-white uppercase tracking-wider">
+                  {pendingVip} VIP PAYMENT{pendingVip > 1 ? 'S' : ''} AWAITING VERIFICATION
+                </span>
+                <span className="px-2 py-0.5 rounded bg-amber-400 text-black font-black text-[10px] uppercase font-mono animate-pulse">
+                  ACTION REQUIRED
+                </span>
+              </div>
+              <p className="text-xs font-mono text-amber-200/90 mt-0.5">
+                Attendees have provided Telebirr / Awash Bank transaction codes. Confirm funds and dispatch their passes.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/admin/registrations?tier=VIP&status=PENDING"
+            className="px-5 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-black font-heading font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] whitespace-nowrap cursor-pointer shrink-0"
+          >
+            REVIEW VIP PAYMENTS →
+          </Link>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">

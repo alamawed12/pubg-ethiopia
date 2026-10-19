@@ -22,6 +22,9 @@ export interface RegistrationReviewData {
   idBackImage: string;
   ticketTier?: 'STANDARD' | 'VIP';
   vipPrice?: number;
+  paymentMethod?: string;
+  paymentTxnCode?: string;
+  telegramUsername?: string;
 }
 
 export interface StepVerificationProps {
@@ -44,6 +47,8 @@ export function StepVerification({
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
   const [agreedToMarketing, setAgreedToMarketing] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
+
+  const isVip = formData.ticketTier === 'VIP';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,13 +76,15 @@ export function StepVerification({
       {/* Step Header */}
       <div>
         <div className="font-mono text-xs font-semibold tracking-widest text-[var(--color-lime,#CCFF00)] uppercase">
-          STEP 04
+          {isVip ? 'STEP 05' : 'STEP 04'}
         </div>
         <h2 className="mt-1 font-heading text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white">
           REVIEW & CONFIRM
         </h2>
         <p className="mt-1 text-xs sm:text-sm text-[var(--color-silver,#999999)]">
-          Verify your details before generating your official PUBG Mobile Community Assembly pass.
+          {isVip
+            ? 'Verify all player, ID, and VIP transaction details before submitting for Head Admin confirmation.'
+            : 'Verify your details before generating your official PUBG Mobile Community Assembly pass.'}
         </p>
       </div>
 
@@ -186,7 +193,7 @@ export function StepVerification({
               <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
                 Access Pass Tier
               </span>
-              {formData.ticketTier === 'VIP' ? (
+              {isVip ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-mono text-xs border border-amber-500/40">
                   ★ VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
                 </span>
@@ -231,7 +238,7 @@ export function StepVerification({
                 onClick={() => onEditStep(3)}
                 className="font-mono text-xs uppercase tracking-wider text-[var(--color-lime,#CCFF00)] hover:text-white transition-colors cursor-pointer"
               >
-                {'[ EDIT ]'}
+                [ EDIT ]
               </button>
             )}
           </div>
@@ -265,9 +272,61 @@ export function StepVerification({
             )}
           </div>
         </div>
+
+        {/* Section 4 (VIP Only): Payment Verification Details */}
+        {isVip && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+              <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                <span>04.</span> VIP PAYMENT DETAILS
+              </h3>
+              {onEditStep && (
+                <button
+                  type="button"
+                  onClick={() => onEditStep(4)}
+                  className="font-mono text-xs uppercase tracking-wider text-amber-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  [ EDIT ]
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm bg-black/40 p-4 rounded-lg border border-amber-500/20">
+              <div>
+                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
+                  Payment Method
+                </span>
+                <span className="font-bold text-white uppercase">
+                  {formData.paymentMethod === 'AWASH_BANK' ? 'Awash Bank (Tsige Dagne)' : 'Telebirr (Alamawed Begashawe)'}
+                </span>
+              </div>
+
+              <div>
+                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
+                  Transaction Code / Ref
+                </span>
+                <span className="font-mono font-bold text-amber-400">
+                  {formData.paymentTxnCode || 'Not provided'}
+                </span>
+              </div>
+
+              <div className="sm:col-span-2">
+                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
+                  Telegram Delivery Contact
+                </span>
+                <span className="font-mono font-bold text-white">
+                  {formData.telegramUsername || 'Not provided'}
+                </span>
+                <p className="font-mono text-[10px] text-amber-400/80 mt-1">
+                  * Head Admin will confirm receipt of funds and deliver your verified VIP pass to this Telegram.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
 
-      {/* Phone verification note (Info box with blue/silver styling) */}
+      {/* Info notice */}
       <div className="flex items-start gap-3 rounded-sm border border-sky-500/30 bg-sky-950/20 p-4 text-sky-200">
         <svg
           className="h-5 w-5 shrink-0 text-sky-400 mt-0.5"
@@ -285,10 +344,12 @@ export function StepVerification({
         </svg>
         <div className="text-xs font-mono space-y-1">
           <p className="font-semibold text-sky-300 uppercase tracking-wide">
-            VERIFICATION NOTICE
+            {isVip ? 'VIP APPROVAL TIMELINE' : 'VERIFICATION NOTICE'}
           </p>
           <p className="text-sky-200/80 leading-relaxed">
-            Phone verification via OTP is not yet configured. Your phone number will be verified at check-in by assembly staff.
+            {isVip
+              ? 'VIP tickets are issued manually once payment is verified in our Telebirr or Awash Bank account. Keep your transaction reference code handy.'
+              : 'Phone verification via OTP is not yet configured. Your phone number will be verified at check-in by assembly staff.'}
           </p>
         </div>
       </div>
@@ -314,7 +375,7 @@ export function StepVerification({
             >
               Registration and Privacy Policy
             </Link>
-            . I confirm that the information I provide is accurate. <span className="text-red-400">*</span>
+            . I confirm that the information and transaction reference I provide are accurate and truthful. <span className="text-red-400">*</span>
           </span>
         </label>
 
@@ -395,7 +456,7 @@ export function StepVerification({
           disabled={isSubmitting}
           className="w-full sm:w-auto min-w-[220px]"
         >
-          COMPLETE REGISTRATION
+          {isVip ? 'SUBMIT FOR VIP APPROVAL →' : 'COMPLETE REGISTRATION'}
         </Button>
       </div>
     </motion.form>
