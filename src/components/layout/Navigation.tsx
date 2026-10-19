@@ -86,8 +86,15 @@ export function Navigation() {
             aria-label="PUBG Mobile Community Assembly Ethiopia"
           >
             <div className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 transition-transform duration-300 group-hover:scale-125 group-hover:shadow-[0_0_10px_#CCFF00]" />
-            <span className="font-heading font-black text-xl md:text-2xl tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
-              {'PUBG·M '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+            <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
+              {/* Short version on mobile and tablets */}
+              <span className="inline xl:hidden text-lg sm:text-xl">
+                {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+              </span>
+              {/* Full long version on large screens */}
+              <span className="hidden xl:inline text-lg xl:text-xl">
+                {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+              </span>
             </span>
           </Link>
 
@@ -222,7 +229,7 @@ export function Navigation() {
             {/* Top Bar inside Mobile Menu */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <span className="font-heading font-black text-xl tracking-wider text-[#CCFF00] uppercase">
-                {'PUBG·M '}<span className="text-white/40">{'//'}</span>{' ET'}
+                {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
               </span>
               <button
                 type="button"

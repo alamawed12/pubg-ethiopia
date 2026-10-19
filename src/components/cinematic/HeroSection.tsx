@@ -4,7 +4,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import { ParticleField } from './ParticleField';
-import { TacticalHUD } from './TacticalHUD';
 import { useSoundContext } from '../sound/SoundManager';
 
 export function HeroSection() {
@@ -113,9 +112,6 @@ export function HeroSection() {
         }}
       />
 
-      {/* 7. Tactical HUD Overlay in Corners */}
-      <TacticalHUD />
-
       {/* ─── Center Hero Content ─── */}
       <div className="relative z-20 w-full max-w-5xl mx-auto my-auto flex flex-col items-center text-center">
         <motion.div
@@ -137,7 +133,7 @@ export function HeroSection() {
           </motion.div>
 
           {/* Main Headline: 3 Staggered Lines */}
-          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
             <motion.h1 variants={itemVariants} className="text-[#cccccc] drop-shadow-sm">
               THE NEXT CHAPTER
             </motion.h1>

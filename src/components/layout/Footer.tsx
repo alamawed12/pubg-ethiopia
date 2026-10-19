@@ -29,8 +29,13 @@ export function Footer() {
           <div className="flex flex-col gap-4 lg:col-span-1">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 shadow-[0_0_8px_#CCFF00]" />
-              <span className="font-heading font-black text-2xl tracking-wider text-[#CCFF00] uppercase">
-                {'PUBG·M '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+              <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase">
+                <span className="inline lg:hidden text-xl">
+                  {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                </span>
+                <span className="hidden lg:inline text-xl">
+                  {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                </span>
               </span>
             </div>
 
