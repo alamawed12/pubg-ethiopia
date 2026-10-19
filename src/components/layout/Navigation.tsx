@@ -12,7 +12,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'HOME', href: '/#hero' },
-  { label: 'THE ASSEMBLY', href: '/#assembly' },
+  { label: 'REGISTRATION', href: '/register' },
   { label: 'TOURNAMENT', href: '/#tournament' },
   { label: 'FAQ', href: '/#faq' },
 ];

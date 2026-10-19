@@ -193,8 +193,8 @@ export function HeroSection() {
             </Link>
 
             {/* Secondary Ghost Button */}
-            <a
-              href="#assembly"
+            <Link
+              href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
               className="w-full sm:w-auto px-8 py-4 border border-white/20 hover:border-[#CCFF00] bg-black/40 hover:bg-[#CCFF00]/5 text-white hover:text-[#CCFF00] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 backdrop-blur-sm text-center"
@@ -204,7 +204,7 @@ export function HeroSection() {
               }}
             >
               EXPLORE THE PROGRAM
-            </a>
+            </Link>
           </motion.div>
 
           {/* Three Key Data Points */}
@@ -260,11 +260,14 @@ export function HeroSection() {
         </div>
 
         {/* Scroll Indicator */}
-        <a
-          href="#assembly"
-          onClick={() => playSound('click')}
+        <button
+          type="button"
+          onClick={() => {
+            playSound('click');
+            window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+          }}
           className="flex items-center gap-2 font-mono text-[11px] text-[#999999] hover:text-[#CCFF00] tracking-widest uppercase transition-colors group cursor-pointer"
-          aria-label="Scroll to Assembly details"
+          aria-label="Scroll down"
         >
           <span>SCROLL</span>
           <svg
@@ -276,7 +279,7 @@ export function HeroSection() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
-        </a>
+        </button>
       </div>
     </section>
   );
