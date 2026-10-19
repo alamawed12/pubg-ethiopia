@@ -1,16 +1,81 @@
 'use client';
 
+import React from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
 
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: '◈' },
-  { href: '/admin/registrations', label: 'Registrations', icon: '◉' },
-  { href: '/admin/check-in', label: 'Check-In', icon: '⬡' },
-  { href: '/admin/announcements', label: 'Announcements', icon: '◆' },
-  { href: '/admin/export', label: 'Export', icon: '↓' },
+interface NavItem {
+  href: string;
+  label: string;
+  shortLabel: string;
+  icon: React.ReactNode;
+}
+
+const navItems: NavItem[] = [
+  {
+    href: '/admin',
+    label: 'Dashboard',
+    shortLabel: 'Stats',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/admin/registrations',
+    label: 'Registrations',
+    shortLabel: 'Players',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/admin/check-in',
+    label: 'Ticket Scanner',
+    shortLabel: 'Scanner',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/admin/settings',
+    label: 'VIP & Settings',
+    shortLabel: 'Settings',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/admin/announcements',
+    label: 'Announcements',
+    shortLabel: 'News',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+      </svg>
+    ),
+  },
+  {
+    href: '/admin/export',
+    label: 'Export Data',
+    shortLabel: 'Export',
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+  },
 ];
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
@@ -22,89 +87,132 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#0a0a0a' }}>
-      {/* Sidebar */}
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#0a0a0a] text-white">
+      {/* ─── Desktop Sidebar ─── */}
       <aside
-        className="w-64 flex-shrink-0 border-r hidden md:flex flex-col"
-        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        className="w-64 flex-shrink-0 border-r hidden md:flex flex-col justify-between"
+        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
       >
-        <div className="p-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <Link href="/" className="block">
-            <span
-              className="text-lg tracking-wider"
-              style={{ fontFamily: 'var(--font-heading)', color: '#CCFF00' }}
-            >
-              PUBG·M // ETH
-            </span>
-          </Link>
-          <span
-            className="text-xs tracking-[0.2em] uppercase block mt-1"
-            style={{ fontFamily: 'var(--font-mono)', color: '#666666' }}
-          >
-            ADMIN PANEL
-          </span>
+        <div>
+          {/* Brand Header */}
+          <div className="p-5 border-b border-white/10 flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-9 w-auto object-contain"
+            />
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading text-base font-black tracking-wider text-white uppercase">
+                  ADMIN HQ
+                </span>
+                <span className="px-1.5 py-0.5 rounded bg-[#CCFF00]/15 border border-[#CCFF00]/40 text-[#CCFF00] font-mono text-[9px] uppercase">
+                  OFFICIAL
+                </span>
+              </div>
+              <p className="font-mono text-[9px] text-[#999999] uppercase tracking-wider mt-0.5">
+                PMCA ETHIOPIA COMMAND
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <nav className="p-3 space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#CCFF00] text-[#050505] font-bold shadow-[0_0_15px_rgba(204,255,0,0.25)]'
+                      : 'text-[#999999] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className={isActive ? 'text-[#050505]' : 'text-[#CCFF00]'}>{item.icon}</span>
+                  <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        <nav className="flex-1 py-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-6 py-3 text-sm transition-colors duration-200"
-              style={{
-                color: pathname === item.href ? '#CCFF00' : '#999999',
-                backgroundColor: pathname === item.href ? 'rgba(204,255,0,0.05)' : 'transparent',
-                borderRight: pathname === item.href ? '2px solid #CCFF00' : '2px solid transparent',
-              }}
-            >
-              <span>{item.icon}</span>
-              <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                {item.label}
-              </span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="p-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <p className="text-xs truncate mb-2" style={{ color: '#999999' }}>
-            {session?.user?.email}
+        {/* Desktop Sidebar Footer */}
+        <div className="p-4 border-t border-white/10 bg-black/40">
+          <p className="text-xs truncate font-mono text-[#999999] mb-3">
+            {session?.user?.email || 'pubgmethiopia.et'}
           </p>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="text-xs uppercase tracking-wider cursor-pointer transition-colors duration-200 hover:text-white"
-            style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-400 font-heading text-xs uppercase tracking-wider transition-colors cursor-pointer"
           >
-            Sign Out
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>SIGN OUT</span>
           </button>
         </div>
       </aside>
 
-      {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 border-b px-4 py-3 flex items-center justify-between"
-        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+      {/* ─── Mobile Top Header ─── */}
+      <header
+        className="md:hidden fixed top-0 left-0 right-0 z-50 border-b px-4 py-2.5 flex items-center justify-between"
+        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
       >
-        <span className="text-sm" style={{ fontFamily: 'var(--font-heading)', color: '#CCFF00' }}>
-          ADMIN
-        </span>
-        <div className="flex gap-3">
-          {navItems.map((item) => (
+        <div className="flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/pubg-mobile-logo.png"
+            alt="PUBG Mobile"
+            className="h-7 w-auto object-contain"
+          />
+          <span className="font-heading font-black text-sm tracking-wider text-white uppercase">
+            ADMIN HQ
+          </span>
+        </div>
+
+        <button
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
+          className="px-2.5 py-1 rounded bg-red-950/50 border border-red-500/30 text-red-400 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1"
+        >
+          <span>LOGOUT</span>
+        </button>
+      </header>
+
+      {/* ─── Mobile Bottom App Bar (Clear Icons + Readable Labels) ─── */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t flex items-center justify-around py-1.5 px-1 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]"
+        style={{ backgroundColor: '#0d0d0d', borderColor: 'rgba(255,255,255,0.1)' }}
+      >
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
             <Link
               key={item.href}
               href={item.href}
-              className="text-xs px-2 py-1 rounded"
-              style={{
-                color: pathname === item.href ? '#CCFF00' : '#999999',
-                backgroundColor: pathname === item.href ? 'rgba(204,255,0,0.1)' : 'transparent',
-              }}
+              className={`flex flex-col items-center justify-center py-1 px-1.5 rounded-lg transition-all min-w-[52px] ${
+                isActive
+                  ? 'text-[#CCFF00] font-bold bg-[#CCFF00]/10'
+                  : 'text-[#888888] hover:text-[#cccccc]'
+              }`}
             >
-              {item.icon}
+              <span className={`transition-transform ${isActive ? 'scale-110 text-[#CCFF00]' : 'text-[#888888]'}`}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] font-heading uppercase tracking-tight mt-0.5 whitespace-nowrap">
+                {item.shortLabel}
+              </span>
             </Link>
-          ))}
-        </div>
-      </div>
+          );
+        })}
+      </nav>
 
-      {/* Main content */}
-      <main className="flex-1 p-6 md:p-10 md:pt-10 pt-16 overflow-auto">
+      {/* ─── Main Content Container ─── */}
+      <main className="flex-1 p-4 sm:p-6 md:p-10 pt-16 md:pt-8 pb-20 md:pb-10 overflow-y-auto">
         {children}
       </main>
     </div>

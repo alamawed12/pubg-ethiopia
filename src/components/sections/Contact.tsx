@@ -95,11 +95,37 @@ export function Contact() {
           </motion.div>
         </div>
 
+        {/* Final Call to Action */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6, duration: 0.7 }}
+          className="mt-20 p-8 sm:p-12 rounded-2xl border border-[var(--color-lime,#CCFF00)]/30 bg-black/60 text-center shadow-[0_0_40px_rgba(204,255,0,0.1)] relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-[#CCFF00] shadow-[0_0_15px_#CCFF00]" />
+          <h3
+            className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-white mb-3"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            BE PART OF THE COMMUNITY.
+          </h3>
+          <p className="text-[#cccccc] text-base sm:text-lg max-w-xl mx-auto mb-8 font-body">
+            Register your interest and join the gathering of Ethiopia&rsquo;s PUBG MOBILE community.
+          </p>
+          <a
+            href="/register"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-base sm:text-lg tracking-wider uppercase rounded transition-all duration-300 shadow-[0_0_25px_rgba(204,255,0,0.4)] hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <span>REGISTER FOR THE EVENT</span>
+            <span>→</span>
+          </a>
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="text-center mt-16 text-sm"
+          className="text-center mt-12 text-sm"
           style={{ color: '#666666' }}
         >
           Have questions? Reach out to the organizing team through any of our community channels.

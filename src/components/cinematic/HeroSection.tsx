@@ -142,30 +142,28 @@ export function HeroSection() {
             <span className="inline-block w-1.5 h-3.5 bg-[#CCFF00] animate-pulse ml-0.5" />
           </motion.div>
 
-          {/* Main Headline: 3 Staggered Lines */}
-          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-4xl sm:text-6xl md:text-7xl lg:text-8xl">
-            <motion.h1 variants={itemVariants} className="text-[#cccccc] drop-shadow-sm">
-              THE NEXT CHAPTER
+          {/* Main Headline: Exact 3 Lines */}
+          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-center">
+            <motion.h1 variants={itemVariants} className="text-white drop-shadow-sm">
+              PUBG MOBILE
             </motion.h1>
             <motion.div
               variants={itemVariants}
               className="text-[#CCFF00] drop-shadow-[0_0_35px_rgba(204,255,0,0.35)] py-1 md:py-2"
             >
-              OF ETHIOPIAN PUBG MOBILE
+              COMMUNITY ASSEMBLY
             </motion.div>
-            <motion.div variants={itemVariants} className="text-white drop-shadow-sm">
-              STARTS HERE.
+            <motion.div variants={itemVariants} className="text-[#cccccc] drop-shadow-sm">
+              ETHIOPIA
             </motion.div>
           </div>
 
           {/* Supporting Copy */}
           <motion.p
             variants={itemVariants}
-            className="mt-6 md:mt-8 max-w-2xl text-base sm:text-lg text-[#999999] leading-relaxed font-body font-normal"
+            className="mt-6 md:mt-8 max-w-2xl text-base sm:text-lg text-[#cccccc] leading-relaxed font-body font-normal text-center"
           >
-            Uniting elite squads, rising competitors, and devoted gaming fans for the
-            premier in-person PUBG Mobile assembly in the Horn of Africa. Experience
-            high-stakes esports, showcase matches, and community celebration.
+            &ldquo;Bringing Ethiopia&rsquo;s PUBG MOBILE community together through competition, collaboration, and a shared vision for the future of esports.&rdquo;
           </motion.p>
 
           {/* Action Buttons */}
@@ -185,7 +183,7 @@ export function HeroSection() {
               }}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                <span>SECURE YOUR REGISTRATION</span>
+                <span>REGISTER NOW</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
@@ -205,7 +203,7 @@ export function HeroSection() {
                   'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
               }}
             >
-              EXPLORE THE ASSEMBLY
+              EXPLORE THE PROGRAM
             </a>
           </motion.div>
 
@@ -247,17 +245,17 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      {/* ─── Hero Footer / TBA Status & Scroll Indicator ─── */}
+      {/* ─── Hero Footer / Coming Soon Status & Scroll Indicator ─── */}
       <div className="relative z-20 w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5">
-        {/* TBA Labels */}
+        {/* Status Labels */}
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 md:gap-8 font-mono text-[11px] md:text-xs text-[#999999]/70 tracking-wider">
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>DATE: <strong className="text-white">TO BE ANNOUNCED</strong></span>
+            <span>DATE: <strong className="text-white">COMING SOON</strong></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>VENUE: <strong className="text-white">TO BE ANNOUNCED</strong></span>
+            <span>VENUE: <strong className="text-white">ADDIS ABABA, ETHIOPIA</strong></span>
           </div>
         </div>
 

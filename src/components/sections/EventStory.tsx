@@ -83,8 +83,8 @@ export function EventStory() {
 
       <div className="max-w-6xl mx-auto relative z-10" ref={ref}>
         <SectionHeading
-          title="THIS IS BIGGER THAN A MATCH"
-          subtitle="A community-driven movement to elevate Ethiopian esports"
+          title="ABOUT THE ASSEMBLY"
+          subtitle="The PUBG MOBILE COMMUNITY ASSEMBLY is designed to bring players, teams, and esports community members together to discuss opportunities, strengthen relationships, encourage fair competition, and contribute to the growth of Ethiopia’s gaming community."
           size="2xl"
           align="center"
         />
