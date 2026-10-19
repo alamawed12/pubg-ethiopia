@@ -64,16 +64,16 @@ export default function AdminLoginPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-xs uppercase tracking-wider mb-2" style={{ color: '#999999' }}>
-              Email
+              Email / Username
             </label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-lg border text-sm text-white outline-none transition-colors duration-300 focus:border-[#CCFF00]"
               style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)' }}
-              placeholder="admin@pubg-ethiopia.com"
+              placeholder="pubgmethiopia.et"
             />
           </div>
 
