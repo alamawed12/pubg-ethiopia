@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundContext } from '../sound/SoundManager';
 
@@ -10,10 +11,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'HOME', href: '#hero' },
-  { label: 'THE ASSEMBLY', href: '#assembly' },
-  { label: 'TOURNAMENT', href: '#tournament' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'HOME', href: '/#hero' },
+  { label: 'THE ASSEMBLY', href: '/#assembly' },
+  { label: 'TOURNAMENT', href: '/#tournament' },
+  { label: 'FAQ', href: '/#faq' },
 ];
 
 export function Navigation() {
@@ -33,7 +34,6 @@ export function Navigation() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial check
-
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -52,14 +52,17 @@ export function Navigation() {
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       playSound('click');
-      if (href.startsWith('#')) {
-        const target = document.querySelector(href);
+      const hash = href.includes('#') ? '#' + href.split('#')[1] : null;
+      if (hash && (window.location.pathname === '/' || window.location.pathname === '')) {
+        const target = document.querySelector(hash);
         if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: 'smooth' });
           setIsMobileMenuOpen(false);
+          return;
         }
       }
+      setIsMobileMenuOpen(false);
     },
     [playSound]
   );
@@ -75,9 +78,9 @@ export function Navigation() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* ─── Left: Wordmark ─── */}
-          <a
-            href="#hero"
-            onClick={(e) => handleLinkClick(e, '#hero')}
+          <Link
+            href="/"
+            onClick={() => playSound('click')}
             onMouseEnter={() => playSound('hover')}
             className="group flex items-center gap-2 cursor-pointer select-none"
             aria-label="PUBG Mobile Community Assembly Ethiopia"
@@ -86,7 +89,7 @@ export function Navigation() {
             <span className="font-heading font-black text-xl md:text-2xl tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
               {'PUBG·M '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
             </span>
-          </a>
+          </Link>
 
           {/* ─── Center: Desktop Navigation Links ─── */}
           <nav
@@ -161,9 +164,9 @@ export function Navigation() {
             </button>
 
             {/* Desktop Register Button */}
-            <a
-              href="#register"
-              onClick={(e) => handleLinkClick(e, '#register')}
+            <Link
+              href="/register"
+              onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
               className="hidden sm:inline-flex items-center justify-center px-4 md:px-5 py-2 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_15px_rgba(204,255,0,0.4)] active:scale-95 cursor-pointer"
               style={{
@@ -172,7 +175,7 @@ export function Navigation() {
               }}
             >
               REGISTER
-            </a>
+            </Link>
 
             {/* Mobile Hamburger Button */}
             <button
@@ -265,13 +268,16 @@ export function Navigation() {
 
             {/* Bottom Actions inside Mobile Menu */}
             <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
-              <a
-                href="#register"
-                onClick={(e) => handleLinkClick(e, '#register')}
+              <Link
+                href="/register"
+                onClick={() => {
+                  playSound('click');
+                  setIsMobileMenuOpen(false);
+                }}
                 className="w-full py-4 text-center bg-[#CCFF00] text-[#050505] font-heading font-black text-base tracking-widest uppercase hover:bg-[#b8e600] transition-colors"
               >
                 REGISTER NOW
-              </a>
+              </Link>
 
               <div className="flex items-center justify-between text-xs font-mono text-[#999999]">
                 <span>TACTICAL AUDIO:</span>

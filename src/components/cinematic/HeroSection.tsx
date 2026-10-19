@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
+import Link from 'next/link';
 import { ParticleField } from './ParticleField';
 import { TacticalHUD } from './TacticalHUD';
 import { useSoundContext } from '../sound/SoundManager';
@@ -167,8 +168,8 @@ export function HeroSection() {
             className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center max-w-md sm:max-w-none"
           >
             {/* Primary Button */}
-            <a
-              href="#register"
+            <Link
+              href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
               className="relative group overflow-hidden w-full sm:w-auto px-8 py-4 bg-[#CCFF00] text-[#050505] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:scale-[1.02] active:scale-[0.98] text-center"
@@ -185,7 +186,7 @@ export function HeroSection() {
               </span>
               {/* Shimmer sweep */}
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-            </a>
+            </Link>
 
             {/* Secondary Ghost Button */}
             <a

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useSoundContext } from '../sound/SoundManager';
 
 export function Footer() {
@@ -10,8 +11,9 @@ export function Footer() {
 
   const handleLinkClick = (href: string) => {
     playSound('click');
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
+    const hash = href.includes('#') ? '#' + href.split('#')[1] : null;
+    if (hash && typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '')) {
+      const element = document.querySelector(hash);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
@@ -50,54 +52,54 @@ export function Footer() {
             </h2>
             <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
               <li>
-                <a
-                  href="#hero"
-                  onClick={() => handleLinkClick('#hero')}
+                <Link
+                  href="/#hero"
+                  onClick={() => handleLinkClick('/#hero')}
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
                   {'// HOME'}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#assembly"
-                  onClick={() => handleLinkClick('#assembly')}
+                <Link
+                  href="/#assembly"
+                  onClick={() => handleLinkClick('/#assembly')}
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
                   {'// THE ASSEMBLY'}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#tournament"
-                  onClick={() => handleLinkClick('#tournament')}
+                <Link
+                  href="/#tournament"
+                  onClick={() => handleLinkClick('/#tournament')}
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
                   {'// TOURNAMENT RULES'}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#faq"
-                  onClick={() => handleLinkClick('#faq')}
+                <Link
+                  href="/#faq"
+                  onClick={() => handleLinkClick('/#faq')}
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
                   {'// FREQUENTLY ASKED'}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#register"
-                  onClick={() => handleLinkClick('#register')}
+                <Link
+                  href="/register"
+                  onClick={() => playSound('click')}
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5 text-[#CCFF00]"
                 >
                   {'// REGISTRATION PORTAL'}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -230,16 +232,13 @@ export function Footer() {
             </div>
 
             <div className="flex items-center gap-6">
-              <a
-                href="#privacy"
-                onClick={(e) => {
-                  e.preventDefault();
-                  playSound('click');
-                }}
+              <Link
+                href="/privacy"
+                onClick={() => playSound('click')}
                 className="hover:text-[#CCFF00] transition-colors"
               >
                 PRIVACY POLICY
-              </a>
+              </Link>
               <span className="text-white/20">/</span>
               <a
                 href="#terms"
