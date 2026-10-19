@@ -9,7 +9,10 @@ import path from 'path';
  * The only writable directory in serverless environments is /tmp.
  */
 function prepareDatabaseForServerless() {
-  const currentDbUrl = process.env.DATABASE_URL || 'file:./dev.db';
+  if (!process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = 'file:./dev.db';
+  }
+  const currentDbUrl = process.env.DATABASE_URL;
 
   // Only apply when using local SQLite file: on Vercel or AWS Lambda
   if (currentDbUrl.startsWith('file:') && (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)) {
