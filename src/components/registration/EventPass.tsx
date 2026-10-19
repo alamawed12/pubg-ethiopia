@@ -153,16 +153,16 @@ export function EventPass({
           qrImage.src = qrDataUrl;
         });
 
-        // QR Background box
-        ctx.fillStyle = '#050505';
+        // QR Background box (crisp white for 100% optical camera detection)
+        ctx.fillStyle = '#FFFFFF';
         drawRoundRect(170, 265, 260, 260, 16);
         ctx.fill();
-        ctx.strokeStyle = '#222222';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#CCFF00';
+        ctx.lineWidth = 3;
         ctx.stroke();
 
         // Draw the QR image on top of the background box
-        ctx.drawImage(qrImage, 185, 280, 230, 230);
+        ctx.drawImage(qrImage, 180, 275, 240, 240);
       }
 
       // Attendee Info Section
@@ -285,26 +285,26 @@ export function EventPass({
             </span>
           </div>
 
-          {/* QR Code Container */}
-          <div className="relative mx-auto mb-5 flex h-44 w-44 items-center justify-center rounded-xl bg-black/60 p-3 border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.9)]">
+          {/* QR Code Container (Crisp white background for instant optical detection) */}
+          <div className="relative mx-auto mb-5 flex h-48 w-48 items-center justify-center rounded-2xl bg-white p-3 border-2 border-[var(--color-lime,#CCFF00)] shadow-[0_0_25px_rgba(204,255,0,0.25)]">
             {qrDataUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={qrDataUrl}
                 alt={`Check-in QR Code for ${referenceId}`}
-                width={160}
-                height={160}
-                className="h-38 w-38 object-contain rounded filter contrast-125 select-none"
+                width={172}
+                height={172}
+                className="h-full w-full object-contain rounded select-none"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center font-mono text-xs text-[var(--color-silver,#999999)]">
+              <div className="flex h-full w-full items-center justify-center font-mono text-xs text-neutral-500">
                 QR Code Loading...
               </div>
             )}
 
             {/* Scanning radar indicator dot */}
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[var(--color-lime,#CCFF00)] animate-ping" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[var(--color-lime,#CCFF00)]" />
+            <span className="absolute -top-1.5 -right-1.5 h-3 w-3 rounded-full bg-[var(--color-lime,#CCFF00)] animate-ping" />
+            <span className="absolute -top-1.5 -right-1.5 h-3 w-3 rounded-full bg-[var(--color-lime,#CCFF00)]" />
           </div>
 
           {/* Attendee Details */}

@@ -146,10 +146,10 @@ export async function POST(req: NextRequest) {
     });
 
     const qrDataUrl = await generateQRDataURL(qrPayload, {
-      width: 240,
-      margin: 2,
-      darkColor: '#CCFF00',
-      lightColor: '#00000000',
+      width: 320,
+      margin: 3,
+      darkColor: '#000000',
+      lightColor: '#FFFFFF',
     });
 
     // 7. Persist to SQLite Database via Prisma

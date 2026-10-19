@@ -29,12 +29,12 @@ export async function generateQRDataURL(
   }
 
   const qrOptions: QRCode.QRCodeToDataURLOptions = {
-    width: options?.width ?? 200,
-    margin: options?.margin ?? 2,
+    width: options?.width ?? 300,
+    margin: options?.margin ?? 3,
     errorCorrectionLevel: options?.errorCorrectionLevel ?? 'M',
     color: {
-      dark: options?.darkColor ?? '#CCFF00',
-      light: options?.lightColor ?? '#00000000', // fully transparent background
+      dark: options?.darkColor ?? '#000000', // high contrast solid black modules
+      light: options?.lightColor ?? '#FFFFFF', // solid white background for optical detection
     },
   };
 

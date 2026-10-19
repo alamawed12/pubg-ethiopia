@@ -34,12 +34,39 @@ export default function CheckInPage() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
+  const [availableCameras, setAvailableCameras] = useState<{ id: string; label: string }[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const isProcessingRef = useRef<boolean>(false);
+
+  // Load available cameras on mount
+  useEffect(() => {
+    Html5Qrcode.getCameras()
+      .then((cameras) => {
+        if (cameras && cameras.length > 0) {
+          setAvailableCameras(cameras.map((c) => ({ id: c.id, label: c.label || `Camera ${c.id.slice(0, 5)}...` })));
+          // Prefer environment (back) camera if found in label
+          const backCam = cameras.find((c) => /back|rear|environment/i.test(c.label));
+          setSelectedCameraId(backCam ? backCam.id : cameras[0].id);
+        }
+      })
+      .catch(() => {
+        // Fall back to facingMode constraint
+      });
+  }, []);
 
   // Play audio tones for instant auditory feedback
   const playFeedbackSound = (type: 'success' | 'warning' | 'error') => {
     try {
+      if (type === 'success' && typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      } else if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(300);
+      }
+
       const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -81,15 +108,19 @@ export default function CheckInPage() {
     setLoading(true);
     setResult(null);
 
-    // Clean ticketId (support JSON payload or plain ref)
+    // Clean ticketId (support JSON payload, raw reference ID, or URL)
     let cleanId = ticketId.trim();
     try {
-      if (cleanId.startsWith('{') && cleanId.endsWith('}')) {
-        const parsed = JSON.parse(cleanId);
+      const parsed = JSON.parse(cleanId);
+      if (parsed && typeof parsed === 'object') {
         cleanId = parsed.ref || parsed.token || cleanId;
       }
     } catch {
-      // Not JSON, use raw string
+      // Not JSON, check if it contains a reference ID format: PUBG-ET-...
+      const match = cleanId.match(/PUBG-ET-[A-Z0-9]+/i);
+      if (match) {
+        cleanId = match[0].toUpperCase();
+      }
     }
 
     try {
@@ -139,33 +170,53 @@ export default function CheckInPage() {
     }
   }, []);
 
-  const startScanner = async () => {
+  const startScanner = async (overrideCameraId?: string) => {
     setCameraError(null);
     setResult(null);
 
     try {
-      const qrScanner = new Html5Qrcode('qr-reader-container');
+      if (html5QrCodeRef.current) {
+        try {
+          await html5QrCodeRef.current.stop();
+        } catch {
+          // ignore
+        }
+      }
+
+      const qrScanner = new Html5Qrcode('qr-reader-container', {
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true,
+        },
+        verbose: false,
+      });
       html5QrCodeRef.current = qrScanner;
 
+      const camToUse = overrideCameraId || selectedCameraId;
+      const cameraConfig = camToUse ? camToUse : { facingMode: 'environment' };
+
       await qrScanner.start(
-        { facingMode: 'environment' },
+        cameraConfig,
         {
-          fps: 10,
-          qrbox: { width: 260, height: 260 },
+          fps: 15,
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edge = Math.max(180, Math.floor(minEdge * 0.8));
+            return { width: edge, height: edge };
+          },
           aspectRatio: 1.0,
         },
         (decodedText) => {
           processCheckIn(decodedText);
         },
         () => {
-          // Frame scanner parse errors ignored
+          // Frame parse error ignored
         }
       );
 
       setScanning(true);
     } catch (err) {
       console.error('Camera initialization error:', err);
-      setCameraError('Unable to open camera. Please grant camera permissions or use manual entry below.');
+      setCameraError('Unable to open camera. Please ensure permissions are granted, or select another camera / upload a pass screenshot below.');
       setScanning(false);
     }
   };
@@ -181,6 +232,29 @@ export default function CheckInPage() {
       html5QrCodeRef.current = null;
     }
     setScanning(false);
+  };
+
+  // Handle uploading and decoding a QR image or photo
+  const handlePhotoScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingPhoto(true);
+    setCameraError(null);
+    try {
+      const scanner = html5QrCodeRef.current || new Html5Qrcode('qr-reader-container');
+      const decodedText = await scanner.scanFile(file, true);
+      processCheckIn(decodedText);
+    } catch (err) {
+      console.error('File scan error:', err);
+      playFeedbackSound('error');
+      setCameraError('No valid QR code could be detected in this photo. Please ensure it is well lit, or enter the Reference ID manually.');
+    } finally {
+      setIsUploadingPhoto(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   useEffect(() => {
@@ -225,17 +299,54 @@ export default function CheckInPage() {
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={scanning ? stopScanner : startScanner}
-            className={`px-6 py-3 rounded-lg font-heading text-sm font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${
-              scanning
-                ? 'bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30'
-                : 'bg-[#CCFF00] text-[#050505] hover:bg-[#b8e600] shadow-[0_0_20px_rgba(204,255,0,0.35)]'
-            }`}
-          >
-            {scanning ? '⏹ STOP CAMERA' : '📷 OPEN CAMERA SCANNER'}
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {availableCameras.length > 1 && (
+              <select
+                value={selectedCameraId}
+                onChange={(e) => {
+                  setSelectedCameraId(e.target.value);
+                  if (scanning) {
+                    startScanner(e.target.value);
+                  }
+                }}
+                className="px-3 py-2.5 rounded-lg bg-[#1a1a1a] border border-white/20 text-xs font-mono text-[#cccccc] outline-none hover:border-[#CCFF00]/50"
+              >
+                {availableCameras.map((cam) => (
+                  <option key={cam.id} value={cam.id}>
+                    📷 {cam.label}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingPhoto}
+              className="px-4 py-2.5 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-mono text-white tracking-wider uppercase transition-colors cursor-pointer"
+            >
+              {isUploadingPhoto ? '⏳ SCANNING PHOTO...' : '📁 SCAN FROM PHOTO'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoScan}
+            />
+
+            <button
+              type="button"
+              onClick={scanning ? stopScanner : () => startScanner()}
+              className={`px-6 py-3 rounded-lg font-heading text-sm font-bold tracking-widest uppercase transition-all duration-300 cursor-pointer ${
+                scanning
+                  ? 'bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30'
+                  : 'bg-[#CCFF00] text-[#050505] hover:bg-[#b8e600] shadow-[0_0_20px_rgba(204,255,0,0.35)]'
+              }`}
+            >
+              {scanning ? '⏹ STOP CAMERA' : '📷 OPEN CAMERA SCANNER'}
+            </button>
+          </div>
         </div>
 
         {cameraError && (
@@ -253,6 +364,11 @@ export default function CheckInPage() {
         >
           <div id="qr-reader-container" className="w-full h-full" />
 
+          {/* Laser scanning line animation when active */}
+          {scanning && (
+            <div className="pointer-events-none absolute inset-x-0 top-1/3 h-0.5 bg-gradient-to-r from-transparent via-[#CCFF00] to-transparent shadow-[0_0_12px_#CCFF00] animate-pulse" />
+          )}
+
           {!scanning && (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
               <svg className="w-12 h-12 text-[#666666] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -267,6 +383,10 @@ export default function CheckInPage() {
             </div>
           )}
         </div>
+
+        <p className="text-center text-[11px] font-mono text-[#666666] mt-3">
+          💡 Hold QR code 15–25cm away. If glare or focus is an issue, tap &quot;Scan From Photo&quot; or switch camera lens above.
+        </p>
       </div>
 
       {/* Manual Reference ID Form */}

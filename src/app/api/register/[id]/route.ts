@@ -62,10 +62,10 @@ export async function GET(
     let qrDataUrl = '';
     try {
       qrDataUrl = await generateQRDataURL(qrPayload, {
-        width: 240,
-        margin: 2,
-        darkColor: '#CCFF00',
-        lightColor: '#00000000',
+        width: 320,
+        margin: 3,
+        darkColor: '#000000',
+        lightColor: '#FFFFFF',
       });
     } catch {
       // Non-fatal if QR fails to generate in GET view
