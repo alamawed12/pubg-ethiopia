@@ -1,0 +1,273 @@
+'use client';
+
+import React from 'react';
+import { useSoundContext } from '../sound/SoundManager';
+
+export function Footer() {
+  const { playSound } = useSoundContext();
+
+  const currentYear = new Date().getFullYear();
+
+  const handleLinkClick = (href: string) => {
+    playSound('click');
+    if (href.startsWith('#')) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  return (
+    <footer className="w-full bg-[#050505] border-t border-white/5 select-none relative z-20">
+      {/* ─── Top Section ─── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
+          {/* Column 1: Brand & Mission */}
+          <div className="flex flex-col gap-4 lg:col-span-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 shadow-[0_0_8px_#CCFF00]" />
+              <span className="font-heading font-black text-2xl tracking-wider text-[#CCFF00] uppercase">
+                {'PUBG·M '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+              </span>
+            </div>
+
+            <p className="text-[#999999] text-sm leading-relaxed font-body">
+              The premier in-person assembly uniting competitive squads, rising
+              talents, and passionate fans across Ethiopia. One community. One battleground.
+            </p>
+
+            <div className="mt-2 font-mono text-xs text-[#999999]/60 flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]/50 animate-pulse" />
+              <span>{'ADDIS ABABA // 9.0249° N, 38.7469° E'}</span>
+            </div>
+          </div>
+
+          {/* Column 2: Quick Links */}
+          <div className="flex flex-col gap-3">
+            <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
+              QUICK NAVIGATION
+            </h2>
+            <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
+              <li>
+                <a
+                  href="#hero"
+                  onClick={() => handleLinkClick('#hero')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
+                >
+                  {'// HOME'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#assembly"
+                  onClick={() => handleLinkClick('#assembly')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
+                >
+                  {'// THE ASSEMBLY'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#tournament"
+                  onClick={() => handleLinkClick('#tournament')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
+                >
+                  {'// TOURNAMENT RULES'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#faq"
+                  onClick={() => handleLinkClick('#faq')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
+                >
+                  {'// FREQUENTLY ASKED'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#register"
+                  onClick={() => handleLinkClick('#register')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5 text-[#CCFF00]"
+                >
+                  {'// REGISTRATION PORTAL'}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Community Channels */}
+          <div className="flex flex-col gap-3">
+            <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
+              COMMUNITY CHANNELS
+            </h2>
+            <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
+              <li>
+                <a
+                  href="https://t.me"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>TELEGRAM COMMUNITY</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://discord.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>DISCORD DISPATCH</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://tiktok.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>TIKTOK CLIPS & HUBS</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>YOUTUBE BROADCASTS</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>INSTAGRAM UPDATES</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Event Status & Advisory */}
+          <div className="flex flex-col gap-3">
+            <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
+              STATUS & PROTOCOLS
+            </h2>
+            <div className="bg-[#111111] p-3 border border-white/5 flex flex-col gap-2 font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[#999999]">REGISTRATION:</span>
+                <span className="text-[#CCFF00] font-bold">OPENING SOON</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#999999]">PLATFORM:</span>
+                <span className="text-white">MOBILE (BYOD)</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#999999]">ENTRY:</span>
+                <span className="text-[#cccccc]">REGISTERED ATTENDEES</span>
+              </div>
+            </div>
+            <p className="font-mono text-[11px] text-[#999999]/70 leading-normal">
+              For partnership or squad inquiries, contact community organizers via official
+              channels.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Bottom Section: Disclaimers & Copyright ─── */}
+      <div className="border-t border-white/5 bg-[#0a0a0a]/60 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs font-mono text-[#999999]/70">
+          {/* Official Disclaimer */}
+          <p className="leading-relaxed border-l-2 border-[#CCFF00]/40 pl-3">
+            This is an independently organized community event. Not officially operated
+            by or affiliated with PUBG MOBILE or Krafton, Inc. PUBG MOBILE is a registered
+            trademark of Krafton, Inc. and Proxima Beta Pte. Limited.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <div>
+              &copy; {currentYear} PUBG Mobile Community Assembly Ethiopia. All rights
+              reserved.
+            </div>
+
+            <div className="flex items-center gap-6">
+              <a
+                href="#privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playSound('click');
+                }}
+                className="hover:text-[#CCFF00] transition-colors"
+              >
+                PRIVACY POLICY
+              </a>
+              <span className="text-white/20">/</span>
+              <a
+                href="#terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playSound('click');
+                }}
+                className="hover:text-[#CCFF00] transition-colors"
+              >
+                TERMS OF EVENT
+              </a>
+              <span className="text-white/20">/</span>
+              <a
+                href="#conduct"
+                onClick={(e) => {
+                  e.preventDefault();
+                  playSound('click');
+                }}
+                className="hover:text-[#CCFF00] transition-colors"
+              >
+                CODE OF CONDUCT
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default Footer;

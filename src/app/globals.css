@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   PUBG MOBILE Community Assembly — Ethiopia
+   Global Design System
+   ═══════════════════════════════════════════════ */
+
+@theme {
+  --color-void: #050505;
+  --color-abyss: #0a0a0a;
+  --color-charcoal: #111111;
+  --color-graphite: #1a1a1a;
+  --color-slate: #222222;
+  --color-military: #0d1a0d;
+  --color-military-light: #1a2e1a;
+  --color-lime: #CCFF00;
+  --color-lime-dim: #99cc00;
+  --color-lime-glow: #CCFF0044;
+  --color-silver: #999999;
+  --color-silver-light: #cccccc;
+
+  --font-heading: 'Oswald', 'Impact', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Base ─── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-lime) var(--color-charcoal);
+}
+
+body {
+  background-color: var(--color-abyss);
+  color: #e0e0e0;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-lime);
+  color: var(--color-void);
+}
+
+/* ─── Custom Scrollbar (Webkit) ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-charcoal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-lime-dim);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-lime);
+}
+
+/* ─── Film Grain Overlay ─── */
+.film-grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ─── Scan Line Animation ─── */
+@keyframes scanLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200vw); }
+}
+
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-lime), transparent);
+  animation: scanLine 3s ease-in-out;
+  pointer-events: none;
+}
+
+/* ─── Atmospheric Fog ─── */
+@keyframes fogDrift {
+  0%, 100% { transform: translateX(0) translateY(0); opacity: 0.15; }
+  25% { transform: translateX(30px) translateY(-10px); opacity: 0.25; }
+  50% { transform: translateX(-20px) translateY(5px); opacity: 0.1; }
+  75% { transform: translateX(15px) translateY(-5px); opacity: 0.2; }
+}
+
+.fog-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, var(--color-lime-glow), transparent 70%);
+  animation: fogDrift 12s ease-in-out infinite;
+}
+
+.fog-layer-2 {
+  animation-delay: -4s;
+  animation-duration: 16s;
+  background: radial-gradient(ellipse at 30% 70%, rgba(10, 10, 10, 0.5), transparent 60%);
+}
+
+/* ─── Glow Pulse ─── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px var(--color-lime-glow), inset 0 0 20px rgba(204, 255, 0, 0.05); }
+  50% { box-shadow: 0 0 40px var(--color-lime-glow), inset 0 0 40px rgba(204, 255, 0, 0.1); }
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* ─── Holographic Shimmer ─── */
+@keyframes holoShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.holo-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(204, 255, 0, 0.08) 30%,
+    rgba(204, 255, 0, 0.15) 50%,
+    rgba(204, 255, 0, 0.08) 70%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: holoShimmer 4s ease-in-out infinite;
+}
+
+/* ─── Light Sweep ─── */
+@keyframes lightSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.light-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.light-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: lightSweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ─── Border Glow Rotation ─── */
+@keyframes borderRotate {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.animated-border {
+  border: 1px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  animation: borderRotate 4s linear infinite;
+  background-image:
+    linear-gradient(var(--color-charcoal), var(--color-charcoal)),
+    conic-gradient(from var(--angle), var(--color-lime), transparent, var(--color-lime));
+}
+
+/* ─── Fade In Up ─── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+/* ─── Tactical Grid ─── */
+.tactical-grid {
+  background-image:
+    linear-gradient(rgba(204, 255, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204, 255, 0, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── Text Gradient ─── */
+.text-gradient-lime {
+  background: linear-gradient(135deg, var(--color-lime), var(--color-lime-dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
