@@ -4,28 +4,35 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const total = await prisma.registration.count();
-  const pending = await prisma.registration.count({ where: { status: 'PENDING' } });
-  const confirmed = await prisma.registration.count({ where: { status: 'CONFIRMED' } });
-  const checkedIn = await prisma.registration.count({ where: { status: 'CHECKED_IN' } });
-  const rejected = await prisma.registration.count({ where: { status: 'REJECTED' } });
-  const waitlisted = await prisma.registration.count({ where: { status: 'WAITLISTED' } });
+  let total = 0, pending = 0, confirmed = 0, checkedIn = 0, rejected = 0, waitlisted = 0;
+  let recent: { id: string; referenceId: string; fullName: string; inGameName: string; category: string; status: string; createdAt: Date }[] = [];
+
+  try {
+    total = await prisma.registration.count();
+    pending = await prisma.registration.count({ where: { status: 'PENDING' } });
+    confirmed = await prisma.registration.count({ where: { status: 'CONFIRMED' } });
+    checkedIn = await prisma.registration.count({ where: { status: 'CHECKED_IN' } });
+    rejected = await prisma.registration.count({ where: { status: 'REJECTED' } });
+    waitlisted = await prisma.registration.count({ where: { status: 'WAITLISTED' } });
+    recent = await prisma.registration.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        referenceId: true,
+        fullName: true,
+        inGameName: true,
+        category: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+  } catch (err) {
+    console.error('[ADMIN_DASHBOARD_DB_ERROR]', err);
+  }
+
   const capacity = 300;
   const capacityPct = Math.round((total / capacity) * 100);
-
-  const recent = await prisma.registration.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-    select: {
-      id: true,
-      referenceId: true,
-      fullName: true,
-      inGameName: true,
-      category: true,
-      status: true,
-      createdAt: true,
-    },
-  });
 
   const stats = [
     { label: 'Total Registered', value: total, color: '#CCFF00', icon: '📊' },

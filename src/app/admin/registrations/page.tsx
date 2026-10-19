@@ -23,17 +23,27 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
     ];
   }
 
-  const [registrations, total] = await Promise.all([
-    prisma.registration.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: perPage,
-    }),
-    prisma.registration.count({ where }),
-  ]);
+  type RegistrationItem = Awaited<ReturnType<typeof prisma.registration.findMany>>[number];
+  let registrations: RegistrationItem[] = [];
+  let total = 0;
 
-  const totalPages = Math.ceil(total / perPage);
+  try {
+    const result = await Promise.all([
+      prisma.registration.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: perPage,
+      }),
+      prisma.registration.count({ where }),
+    ]);
+    registrations = result[0];
+    total = result[1];
+  } catch (err) {
+    console.error('[REGISTRATIONS_PAGE_DB_ERROR]', err);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   const statusColors: Record<string, { bg: string; text: string }> = {
     PENDING: { bg: 'rgba(245,158,11,0.15)', text: '#f59e0b' },

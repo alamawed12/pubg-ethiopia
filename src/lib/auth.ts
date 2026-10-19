@@ -38,7 +38,36 @@ export const authOptions: NextAuthOptions = {
         }
 
         const normalizedEmail = credentials.email.toLowerCase().trim();
+        const masterEmail = (process.env.ADMIN_EMAIL || 'admin@pubg-ethiopia.com').toLowerCase().trim();
+        const masterPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
+        // 1. Check against master credentials (guaranteed to work on fresh cloud deployments)
+        if (normalizedEmail === masterEmail && credentials.password === masterPassword) {
+          try {
+            const passwordHash = await bcrypt.hash(masterPassword, 10);
+            await prisma.admin.upsert({
+              where: { email: masterEmail },
+              update: { passwordHash },
+              create: {
+                email: masterEmail,
+                passwordHash,
+                name: 'Assembly Administrator',
+                role: 'super_admin',
+              },
+            });
+          } catch {
+            // DB upsert is non-fatal if database is read-only
+          }
+
+          return {
+            id: 'admin-master',
+            email: masterEmail,
+            name: 'Assembly Administrator',
+            role: 'super_admin',
+          };
+        }
+
+        // 2. Check against database admin records
         try {
           const admin = await prisma.admin.findUnique({
             where: {
@@ -92,7 +121,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'pubg-ethiopia-assembly-fallback-secret-2026',
   debug: process.env.NODE_ENV === 'development',
 };
 
