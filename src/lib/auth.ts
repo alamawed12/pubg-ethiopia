@@ -3,11 +3,11 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 
-/**
- * NextAuth configuration for PUBG Mobile Community Assembly Ethiopia.
- * Authenticates admin users against the Admin table using bcryptjs password hashing.
- * Adds admin `id` and `role` to both the JWT token and the active session.
- */
+// Automatically configure NextAuth URL in serverless Vercel environments if user imported localhost .env
+if (process.env.VERCEL_URL && (!process.env.NEXTAUTH_URL || process.env.NEXTAUTH_URL.includes('localhost'))) {
+  process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',

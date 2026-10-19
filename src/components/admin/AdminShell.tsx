@@ -67,7 +67,7 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function AdminShell({ children, adminName, adminEmail: _adminEmail, adminRole }: AdminShellProps) {
+export function AdminShell({ children, adminName, adminEmail, adminRole }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -159,7 +159,7 @@ export function AdminShell({ children, adminName, adminEmail: _adminEmail, admin
                 {adminName}
               </p>
               <p className="font-mono text-[10px] text-[var(--color-silver,#999999)] truncate">
-                {adminRole.toUpperCase()}
+                {adminEmail || adminRole.toUpperCase()}
               </p>
             </div>
           </div>

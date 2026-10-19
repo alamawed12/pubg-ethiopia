@@ -14,7 +14,45 @@ interface StepIdUploadProps {
   onBack: () => void;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+function compressImage(file: File, maxWidth = 1280, maxHeight = 1280, quality = 0.8): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => reject(new Error('Failed to load image for processing'));
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
 
 function ImageUploadZone({
   label,
@@ -32,25 +70,24 @@ function ImageUploadZone({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [compressing, setCompressing] = useState(false);
 
   const processFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
       if (!file.type.startsWith('image/')) {
         setError('Please upload an image file (JPG, PNG, or WebP)');
         return;
       }
-      if (file.size > MAX_FILE_SIZE) {
-        setError(`File too large. Maximum size is 5MB. Your file: ${(file.size / 1024 / 1024).toFixed(1)}MB`);
-        return;
+      try {
+        setCompressing(true);
+        const compressed = await compressImage(file, 1280, 1280, 0.82);
+        onUpload(compressed);
+      } catch {
+        setError('Failed to process image. Please try another photo.');
+      } finally {
+        setCompressing(false);
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (result) onUpload(result);
-      };
-      reader.onerror = () => setError('Failed to read file. Please try again.');
-      reader.readAsDataURL(file);
     },
     [onUpload]
   );
@@ -118,31 +155,42 @@ function ImageUploadZone({
           }
         `}
       >
-        {/* Camera/Upload Icon */}
-        <div className={`p-3 rounded-full ${dragOver ? 'bg-[#CCFF00]/10' : 'bg-white/5'} transition-colors`}>
-          <svg
-            className={`w-8 h-8 ${dragOver ? 'text-[#CCFF00]' : 'text-[#999999]'} transition-colors`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-          </svg>
-        </div>
+        {compressing ? (
+          <div className="flex flex-col items-center gap-2 py-4">
+            <div className="w-7 h-7 border-2 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
+            <span className="font-mono text-xs text-[#CCFF00] tracking-wider uppercase">
+              OPTIMIZING PHOTO...
+            </span>
+          </div>
+        ) : (
+          <>
+            {/* Camera/Upload Icon */}
+            <div className={`p-3 rounded-full ${dragOver ? 'bg-[#CCFF00]/10' : 'bg-white/5'} transition-colors`}>
+              <svg
+                className={`w-8 h-8 ${dragOver ? 'text-[#CCFF00]' : 'text-[#999999]'} transition-colors`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+              </svg>
+            </div>
 
-        <div className="text-center">
-          <p className="font-heading text-sm font-bold uppercase tracking-wider text-white">
-            {label}
-          </p>
-          <p className="text-[10px] font-mono text-[#999999] mt-1">
-            {sublabel}
-          </p>
-          <p className="text-[10px] font-mono text-[#999999]/60 mt-1">
-            JPG, PNG, WebP • Max 5MB
-          </p>
-        </div>
+            <div className="text-center">
+              <p className="font-heading text-sm font-bold uppercase tracking-wider text-white">
+                {label}
+              </p>
+              <p className="text-[10px] font-mono text-[#999999] mt-1">
+                {sublabel}
+              </p>
+              <p className="text-[10px] font-mono text-[#999999]/60 mt-1">
+                JPG, PNG, WebP • Auto-optimized
+              </p>
+            </div>
+          </>
+        )}
 
         <input
           ref={inputRef}
