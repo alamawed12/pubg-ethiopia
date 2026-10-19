@@ -42,12 +42,13 @@ export function StepVerification({
   apiError,
 }: StepVerificationProps) {
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+  const [agreedToMarketing, setAgreedToMarketing] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreedToPrivacy) {
-      setConsentError('Please agree to the privacy policy and data processing terms to proceed.');
+      setConsentError('Please agree to the Registration and Privacy Policy to proceed.');
       return;
     }
     setConsentError(null);
@@ -292,8 +293,8 @@ export function StepVerification({
         </div>
       </div>
 
-      {/* Privacy Consent Checkbox */}
-      <div className="space-y-1.5 pt-1">
+      {/* Registration & Privacy Policy Consent Checkbox */}
+      <div className="space-y-3 pt-1">
         <label className="flex items-start gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -302,24 +303,37 @@ export function StepVerification({
               setAgreedToPrivacy(e.target.checked);
               if (consentError) setConsentError(null);
             }}
-            className="mt-1 h-4 w-4 rounded border-white/20 bg-[var(--color-charcoal,#111111)] text-[var(--color-lime,#CCFF00)] accent-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer"
+            className="mt-1 h-4 w-4 rounded border-white/20 bg-[var(--color-charcoal,#111111)] text-[var(--color-lime,#CCFF00)] accent-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer shrink-0"
           />
           <span className="text-xs sm:text-sm text-[var(--color-silver,#999999)] leading-relaxed">
-            I agree to the collection and processing of my personal and gaming data for event registration purposes. View our{' '}
+            I have read and agree to the{' '}
             <Link
               href="/privacy"
               target="_blank"
               className="text-[var(--color-lime,#CCFF00)] underline hover:text-white transition-colors"
             >
-              Privacy Policy
+              Registration and Privacy Policy
             </Link>
-            .
+            . I confirm that the information I provide is accurate. <span className="text-red-400">*</span>
           </span>
         </label>
 
         {consentError && (
           <p className="font-mono text-xs text-red-400 pl-7">{consentError}</p>
         )}
+
+        {/* Optional Marketing Checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={agreedToMarketing}
+            onChange={(e) => setAgreedToMarketing(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-white/20 bg-[var(--color-charcoal,#111111)] text-[var(--color-lime,#CCFF00)] accent-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer shrink-0"
+          />
+          <span className="text-xs sm:text-sm text-[var(--color-silver,#999999)]/80 leading-relaxed">
+            I agree to receive future event announcements and promotional updates. <span className="text-[#666666] font-mono text-[11px]">(Optional; not required to register.)</span>
+          </span>
+        </label>
       </div>
 
       {/* API Submission Error Banner */}

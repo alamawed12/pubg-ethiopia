@@ -120,6 +120,16 @@ export function HeroSection() {
           animate={isInView ? 'visible' : 'hidden'}
           className="flex flex-col items-center w-full"
         >
+          {/* Official PUBG Mobile Hero Logo */}
+          <motion.div variants={itemVariants} className="mb-5 flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-14 sm:h-20 md:h-24 w-auto object-contain drop-shadow-[0_0_30px_rgba(204,255,0,0.35)]"
+            />
+          </motion.div>
+
           {/* Pre-heading: Mono Terminal Tag */}
           <motion.div
             variants={itemVariants}

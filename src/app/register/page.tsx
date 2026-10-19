@@ -47,9 +47,18 @@ export default function RegisterPage() {
 
         {/* Page Header */}
         <header className="mb-10 text-center space-y-3">
+          <div className="flex justify-center mb-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-12 sm:h-14 w-auto object-contain drop-shadow-[0_0_20px_rgba(204,255,0,0.3)]"
+            />
+          </div>
+
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-lime,#CCFF00)]/30 bg-[var(--color-lime,#CCFF00)]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[var(--color-lime,#CCFF00)]">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-lime,#CCFF00)] animate-pulse" />
-            OFFICIAL EVENT REGISTRATION • LIMITED CAPACITY
+            OFFICIAL PUBG MOBILE TEAM REGISTRATION • LIMITED CAPACITY
           </div>
 
           <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-wider text-white">

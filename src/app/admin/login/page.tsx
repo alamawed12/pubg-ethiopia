@@ -41,14 +41,22 @@ export default function AdminLoginPage() {
         style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
       >
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-14 w-auto object-contain drop-shadow-[0_0_25px_rgba(204,255,0,0.35)]"
+            />
+          </div>
           <h1
-            className="text-3xl tracking-wider uppercase"
-            style={{ fontFamily: 'var(--font-heading)', color: '#CCFF00' }}
+            className="text-2xl sm:text-3xl font-black tracking-wider uppercase text-[#CCFF00]"
+            style={{ fontFamily: 'var(--font-heading)' }}
           >
-            ADMIN ACCESS
+            ADMIN COMMAND HQ
           </h1>
-          <p className="text-sm mt-2" style={{ color: '#999999' }}>
-            Authorized personnel only
+          <p className="text-xs font-mono tracking-wider uppercase mt-1.5 text-[#999999]">
+            Official PUBG Mobile Team Authorized Access
           </p>
         </div>
 

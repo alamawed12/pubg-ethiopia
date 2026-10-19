@@ -77,15 +77,20 @@ export function Navigation() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* ─── Left: Wordmark ─── */}
+          {/* ─── Left: Logo & Wordmark ─── */}
           <Link
             href="/"
             onClick={() => playSound('click')}
             onMouseEnter={() => playSound('hover')}
-            className="group flex items-center gap-2 cursor-pointer select-none"
+            className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
             aria-label="PUBG Mobile Community Assembly Ethiopia"
           >
-            <div className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 transition-transform duration-300 group-hover:scale-125 group-hover:shadow-[0_0_10px_#CCFF00]" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
             <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
               {/* Short version on mobile and tablets */}
               <span className="inline xl:hidden text-lg sm:text-xl">
@@ -97,7 +102,7 @@ export function Navigation() {
               </span>
             </span>
 
-            <span className="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[9px] tracking-wider uppercase">
+            <span className="hidden sm:inline-flex items-center gap-1 ml-1.5 px-2 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[9px] tracking-wider uppercase">
               <span className="w-1 h-1 rounded-full bg-[#CCFF00] animate-pulse" />
               OFFICIAL TEAM
             </span>
