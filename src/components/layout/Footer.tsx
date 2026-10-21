@@ -35,7 +35,7 @@ export function Footer() {
                 className="h-9 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(204,255,0,0.3)]"
               />
               <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase text-lg">
-                PUBG MOBILE
+                COMMUNITY ASSEMBLY
               </span>
             </div>
 
