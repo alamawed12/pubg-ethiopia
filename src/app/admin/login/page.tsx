@@ -41,13 +41,12 @@ export default function AdminLoginPage() {
         style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
       >
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4 relative">
-            <div className="absolute inset-0 bg-[#CCFF00]/20 blur-xl rounded-full scale-110 pointer-events-none" />
+          <div className="flex justify-center mb-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/community-assembly-logo.png"
-              alt="PUBG Mobile Community Assembly Ethiopia"
-              className="relative h-16 w-auto object-contain filter drop-shadow-[0_0_20px_rgba(204,255,0,0.45)]"
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-14 w-auto object-contain drop-shadow-[0_0_25px_rgba(204,255,0,0.35)]"
             />
           </div>
           <h1

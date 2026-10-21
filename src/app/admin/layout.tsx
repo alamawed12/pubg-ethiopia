@@ -105,9 +105,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           <div className="p-5 border-b border-white/10 flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/community-assembly-logo.png"
-              alt="PUBG Mobile Community Assembly Ethiopia"
-              className="h-10 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(204,255,0,0.4)]"
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-9 w-auto object-contain"
             />
             <div>
               <div className="flex items-center gap-1.5">
@@ -177,9 +177,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/community-assembly-logo.png"
-            alt="PUBG Mobile Community Assembly Ethiopia"
-            className="h-8 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]"
+            src="/images/pubg-mobile-logo.png"
+            alt="PUBG Mobile"
+            className="h-7 w-auto object-contain"
           />
           <span className="font-heading font-black text-sm tracking-wider text-white uppercase">
             {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}

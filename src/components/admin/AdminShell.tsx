@@ -115,9 +115,9 @@ export function AdminShell({ children, adminName, adminEmail, adminRole }: Admin
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/community-assembly-logo.png"
-                alt="PUBG Mobile Community Assembly Ethiopia"
-                className="h-10 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(204,255,0,0.4)]"
+                src="/images/pubg-mobile-logo.png"
+                alt="PUBG Mobile"
+                className="h-9 w-auto object-contain"
               />
               <div>
                 <div className="flex items-center gap-1.5">
@@ -220,9 +220,9 @@ export function AdminShell({ children, adminName, adminEmail, adminRole }: Admin
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/community-assembly-logo.png"
-              alt="PUBG Mobile Community Assembly Ethiopia"
-              className="h-8 w-auto object-contain lg:hidden filter drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]"
+              src="/images/pubg-mobile-logo.png"
+              alt="PUBG Mobile"
+              className="h-7 w-auto object-contain lg:hidden"
             />
 
             <span className="font-mono text-xs text-[var(--color-silver,#999999)] uppercase hidden sm:inline">

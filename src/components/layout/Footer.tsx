@@ -30,17 +30,12 @@ export function Footer() {
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/community-assembly-logo.png"
-                alt="Community Assembly Ethiopia"
-                className="h-10 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(204,255,0,0.5)]"
+                src="/images/pubg-mobile-logo.png"
+                alt="PUBG Mobile"
+                className="h-9 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(204,255,0,0.3)]"
               />
-              <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase">
-                <span className="inline lg:hidden text-lg">
-                  {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
-                </span>
-                <span className="hidden lg:inline text-lg">
-                  {'COMMUNITY ASSEMBLY '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
-                </span>
+              <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase text-lg">
+                PUBG MOBILE
               </span>
             </div>
 
