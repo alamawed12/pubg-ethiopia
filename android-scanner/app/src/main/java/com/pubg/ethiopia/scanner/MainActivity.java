@@ -98,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadConfiguration() {
         serverUrl = prefs.getString(SettingsActivity.KEY_SERVER_URL, getString(R.string.default_server_url));
+        if (serverUrl != null && serverUrl.contains("pubg-ethiopia.vercel.app")) {
+            serverUrl = serverUrl.replace("pubg-ethiopia.vercel.app", "pubgmethiopia.vercel.app");
+            prefs.edit().putString(SettingsActivity.KEY_SERVER_URL, serverUrl).apply();
+        }
         secretKey = prefs.getString(SettingsActivity.KEY_SECRET_KEY, getString(R.string.default_secret_key));
         staffName = prefs.getString(SettingsActivity.KEY_STAFF_NAME, getString(R.string.default_staff_name));
 

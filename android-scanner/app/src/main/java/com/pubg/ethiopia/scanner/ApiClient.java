@@ -74,6 +74,22 @@ public class ApiClient {
             // Fallback to default TLS
         }
 
+        // Automatic redirect handler for HTTP 307 / 308 (e.g. Vercel domain alias canonicalization)
+        builder.addInterceptor(chain -> {
+            Request originalRequest = chain.request();
+            Response response = chain.proceed(originalRequest);
+            int code = response.code();
+            if (code == 301 || code == 302 || code == 307 || code == 308) {
+                String location = response.header("Location");
+                if (location != null && !location.isEmpty()) {
+                    response.close();
+                    Request.Builder redirectBuilder = originalRequest.newBuilder().url(location);
+                    return chain.proceed(redirectBuilder.build());
+                }
+            }
+            return response;
+        });
+
         this.client = builder.build();
     }
 
@@ -84,13 +100,24 @@ public class ApiClient {
         return instance;
     }
 
+    private String normalizeUrl(String url) {
+        String clean = url.trim();
+        if (clean.endsWith("/")) {
+            clean = clean.substring(0, clean.length() - 1);
+        }
+        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
+            clean = "https://" + clean;
+        }
+        if (clean.contains("pubg-ethiopia.vercel.app")) {
+            clean = clean.replace("pubg-ethiopia.vercel.app", "pubgmethiopia.vercel.app");
+        }
+        return clean;
+    }
+
     public void checkInTicket(String serverUrl, String ticketPayload, String staffName, String secretKey, ApiCallback callback) {
         executor.execute(() -> {
             try {
-                String cleanBaseUrl = serverUrl.trim();
-                if (cleanBaseUrl.endsWith("/")) {
-                    cleanBaseUrl = cleanBaseUrl.substring(0, cleanBaseUrl.length() - 1);
-                }
+                String cleanBaseUrl = normalizeUrl(serverUrl);
                 String endpoint = cleanBaseUrl + "/api/scanner/check-in";
 
                 JSONObject json = new JSONObject();
@@ -166,10 +193,7 @@ public class ApiClient {
     public void testConnection(String serverUrl, String secretKey, ConnectionTestCallback callback) {
         executor.execute(() -> {
             try {
-                String cleanBaseUrl = serverUrl.trim();
-                if (cleanBaseUrl.endsWith("/")) {
-                    cleanBaseUrl = cleanBaseUrl.substring(0, cleanBaseUrl.length() - 1);
-                }
+                String cleanBaseUrl = normalizeUrl(serverUrl);
                 String endpoint = cleanBaseUrl + "/api/settings";
 
                 Request request = new Request.Builder()

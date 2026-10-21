@@ -42,7 +42,12 @@ public class SettingsActivity extends AppCompatActivity {
         Button btnResetCounter = findViewById(R.id.btnResetCounter);
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        etServerUrl.setText(prefs.getString(KEY_SERVER_URL, getString(R.string.default_server_url)));
+        String initialUrl = prefs.getString(KEY_SERVER_URL, getString(R.string.default_server_url));
+        if (initialUrl != null && initialUrl.contains("pubg-ethiopia.vercel.app")) {
+            initialUrl = initialUrl.replace("pubg-ethiopia.vercel.app", "pubgmethiopia.vercel.app");
+            prefs.edit().putString(KEY_SERVER_URL, initialUrl).apply();
+        }
+        etServerUrl.setText(initialUrl);
         etSecretKey.setText(prefs.getString(KEY_SECRET_KEY, getString(R.string.default_secret_key)));
         etStaffName.setText(prefs.getString(KEY_STAFF_NAME, getString(R.string.default_staff_name)));
 
