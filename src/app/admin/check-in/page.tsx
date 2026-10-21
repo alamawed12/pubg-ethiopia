@@ -289,6 +289,33 @@ export default function CheckInPage() {
         </p>
       </div>
 
+      {/* Native Android APK Download Banner */}
+      <div className="p-4 rounded-xl border border-[#CCFF00]/30 bg-[#0d140d] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">📱</span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-bold text-sm text-white uppercase tracking-wider">
+                PMCA ANDROID SCANNER APP (ANDROID 5.0+)
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40">
+                OFFLINE &amp; ONLINE
+              </span>
+            </div>
+            <p className="text-xs text-[#888888] font-mono mt-0.5">
+              Native APK for Android phones (Lollipop 5.0 to Android 15). High-speed camera autofocus, torch &amp; haptic feedback.
+            </p>
+          </div>
+        </div>
+        <a
+          href="/downloads/pmca-gate-scanner.apk"
+          download="pmca-gate-scanner.apk"
+          className="px-4 py-2 rounded-lg bg-[#CCFF00] hover:bg-[#b8e600] text-black font-heading font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_12px_rgba(204,255,0,0.3)] whitespace-nowrap cursor-pointer shrink-0"
+        >
+          DOWNLOAD APK DIRECT →
+        </a>
+      </div>
+
       {/* Camera Scanner Controls */}
       <div
         className="p-6 rounded-xl border"
