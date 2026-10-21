@@ -322,12 +322,10 @@ export function StepVerification({
 
             <div className="rounded-lg border border-white/10 bg-black/40 p-3 flex flex-col justify-center text-xs font-mono">
               <span className="text-white font-bold block mb-1">
-                {isVip ? 'VIP PASS AUDIT' : '⚡ INSTANT PASS APPROVAL'}
+                ⚡ INSTANT {isVip ? 'VIP' : 'STANDARD'} PASS APPROVAL
               </span>
               <span className="text-[#888888] text-[11px] leading-relaxed">
-                {isVip
-                  ? 'Face match confirmed. VIP pass will be activated upon admin confirmation of payment receipt.'
-                  : 'Face and ID match verified. Your official admission pass will be issued immediately upon completing registration!'}
+                Face and ID match verified. Your official {isVip ? 'VIP All-Access Pass' : 'admission pass'} will be issued immediately upon completing registration!
               </span>
             </div>
           </div>
@@ -377,9 +375,6 @@ export function StepVerification({
                 <span className="font-mono font-bold text-white">
                   {formData.telegramUsername || 'Not provided'}
                 </span>
-                <p className="font-mono text-[10px] text-amber-400/80 mt-1">
-                  * Head Admin will confirm receipt of funds and deliver your verified VIP pass to this Telegram.
-                </p>
               </div>
             </div>
           </div>
@@ -404,12 +399,10 @@ export function StepVerification({
         </svg>
         <div className="text-xs font-mono space-y-1">
           <p className="font-semibold text-sky-300 uppercase tracking-wide">
-            {isVip ? 'VIP APPROVAL TIMELINE' : 'PASS ISSUANCE'}
+            {isVip ? 'INSTANT VIP PASS ISSUANCE' : 'PASS ISSUANCE'}
           </p>
           <p className="text-sky-200/80 leading-relaxed">
-            {isVip
-              ? 'VIP tickets are issued once payment is verified in our Telebirr or Awash Bank account. Keep your transaction reference code handy.'
-              : 'Your identity and National ID have been matched by AI. Once you click complete, your digital pass will be instantly generated!'}
+            Your identity and National ID have been matched by AI. Once you click complete, your official {isVip ? 'VIP All-Access Pass' : 'admission pass'} will be instantly generated!
           </p>
         </div>
       </div>

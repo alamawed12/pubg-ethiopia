@@ -388,12 +388,20 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
       </div>
 
       {/* Main Title & Subtitle */}
-      <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-[var(--color-lime,#CCFF00)] drop-shadow-[0_0_20px_rgba(204,255,0,0.3)]">
-        REGISTRATION COMPLETE
+      <h2
+        className={`font-heading text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider ${
+          isVip
+            ? 'text-amber-400 drop-shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+            : 'text-[var(--color-lime,#CCFF00)] drop-shadow-[0_0_20px_rgba(204,255,0,0.3)]'
+        }`}
+      >
+        {isVip ? 'VIP ALL-ACCESS PASS ISSUED' : 'REGISTRATION COMPLETE'}
       </h2>
 
       <p className="mt-2 text-sm sm:text-base text-[var(--color-silver,#999999)] max-w-lg mx-auto">
-        Your registration has been securely received. Here is your digital event pass and unique reference code.
+        {isVip
+          ? 'Your VIP Pass has been verified and issued. Download your luxury VIP pass with QR code below.'
+          : 'Your registration has been securely received. Here is your digital event pass and unique reference code.'}
       </p>
 
       {/* Prominent Reference Number Display */}

@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       lightColor: '#FFFFFF',
     });
 
-    // 7. Process Biometric AI Face Match & VIP Approvals
+    // 7. Process Biometric AI Face Match & Instant Pass Issuance
     const rawTier = (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD';
     const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
 
@@ -167,39 +167,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
-    let initialRegistrationStatus = registrationStatus;
-    let autoApproved = false;
+    // INSTANT TICKET ISSUANCE FOR BOTH STANDARD AND VIP:
+    // Once AI Biometric KYC confirms the face matches the ID, both Standard and VIP passes
+    // are automatically CONFIRMED and issued immediately!
+    const isWaitlisted = registrationStatus === 'WAITLISTED';
+    const initialRegistrationStatus = isWaitlisted ? 'WAITLISTED' : 'CONFIRMED';
+    const initialPaymentStatus = rawTier === 'VIP' ? 'APPROVED' : 'UNPAID';
+    const autoApproved = !isWaitlisted;
 
-    // RULE 1: For STANDARD ticket tier:
-    // With AI Biometric Face Match verified (PASSED, score >= 70), auto-approve pass instantly!
-    if (rawTier === 'STANDARD' && registrationStatus !== 'WAITLISTED') {
-      initialRegistrationStatus = 'CONFIRMED';
-      autoApproved = true;
-    }
-
-    // RULE 2: For VIP ticket tier:
-    // Check SMS Bot instant transaction match
+    // Check SMS Bot transaction match if txn code provided
     if (rawTier === 'VIP' && submittedTxnCode) {
-      const matchedPayment = await prisma.verifiedPayment.findFirst({
-        where: {
-          txnCode: submittedTxnCode,
-          isClaimed: false,
-        },
-      });
-
-      if (matchedPayment) {
-        initialPaymentStatus = 'APPROVED';
-        initialRegistrationStatus = 'CONFIRMED';
-        autoApproved = true;
-
-        await prisma.verifiedPayment.update({
-          where: { id: matchedPayment.id },
-          data: {
-            isClaimed: true,
-            claimedByRefId: referenceId,
+      try {
+        const matchedPayment = await prisma.verifiedPayment.findFirst({
+          where: {
+            txnCode: submittedTxnCode,
+            isClaimed: false,
           },
         });
+
+        if (matchedPayment) {
+          await prisma.verifiedPayment.update({
+            where: { id: matchedPayment.id },
+            data: {
+              isClaimed: true,
+              claimedByRefId: referenceId,
+            },
+          });
+        }
+      } catch (txnErr) {
+        console.warn('[VERIFY_PAYMENT_TXN_WARN]', txnErr);
       }
     }
 
@@ -223,7 +219,7 @@ export async function POST(req: NextRequest) {
         selfieImage: rawSelfieImage,
         faceMatchScore: rawFaceScore,
         faceMatchStatus: rawFaceStatus,
-        faceMatchDetails: rawTier === 'STANDARD' && autoApproved
+        faceMatchDetails: autoApproved
           ? `Instant Approval: AI Biometric Face Match Verified (${rawFaceScore}%).`
           : `AI Face Match: ${rawFaceScore}% (${rawFaceStatus}).`,
         ticketTier: rawTier,
@@ -235,7 +231,7 @@ export async function POST(req: NextRequest) {
         paymentStatus: initialPaymentStatus,
         status: initialRegistrationStatus,
         paymentApprovedAt: autoApproved ? new Date() : null,
-        paymentApprovedBy: autoApproved ? (rawTier === 'STANDARD' ? 'AI_BIOMETRIC_KYC_ENGINE' : 'AUTOMATED_SMS_BOT') : null,
+        paymentApprovedBy: autoApproved ? 'AI_BIOMETRIC_KYC_ENGINE' : null,
       },
     });
 

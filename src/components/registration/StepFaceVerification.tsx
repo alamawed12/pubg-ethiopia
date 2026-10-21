@@ -923,22 +923,12 @@ export function StepFaceVerification({
                   {matchResult.details}
                 </p>
 
-                {/* Instant issuance notice for Standard ticket */}
-                {isVerified && ticketTier === 'STANDARD' && (
+                {/* Instant issuance notice for Standard & VIP ticket */}
+                {isVerified && (
                   <div className="mt-2 pt-2 border-t border-green-500/20 flex items-center gap-2 text-xs font-mono text-[#CCFF00]">
                     <span>⚡</span>
                     <span>
-                      <strong>Instant Pass Approved:</strong> Because your live face matches your National ID, your Standard Admission Ticket will be generated and issued immediately upon submission!
-                    </span>
-                  </div>
-                )}
-
-                {/* VIP notice */}
-                {isVerified && ticketTier === 'VIP' && (
-                  <div className="mt-2 pt-2 border-t border-green-500/20 flex items-center gap-2 text-xs font-mono text-amber-300">
-                    <span>★</span>
-                    <span>
-                      <strong>VIP Biometrics Verified:</strong> Your AI match is confirmed ({matchResult.score}%). Next, enter your Telebirr / Awash Bank transfer receipt for VIP ticket activation.
+                      <strong>Instant Pass Approved:</strong> Because your live face matches your National ID, your {ticketTier === 'VIP' ? 'VIP All-Access Pass' : 'Standard Admission Ticket'} will be generated and issued immediately upon submission!
                     </span>
                   </div>
                 )}
