@@ -24,6 +24,7 @@ interface Registration {
   paymentMethod?: string | null;
   paymentTxnCode?: string | null;
   telegramUsername?: string | null;
+  paymentReceiptImage?: string | null;
   paymentStatus?: string | null;
   paymentApprovedAt?: string | null;
   paymentApprovedBy?: string | null;
@@ -337,6 +338,53 @@ export default function RegistrationDetailPage() {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Uploaded Payment Receipt Screenshot */}
+          <div className="p-4 rounded-xl bg-black/60 border border-amber-500/30">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-amber-300 uppercase text-xs font-mono font-bold tracking-wider flex items-center gap-2">
+                <span>📸</span> PAYMENT RECEIPT SCREENSHOT (UPLOADED BY ATTENDEE)
+              </span>
+              {reg.paymentReceiptImage && (
+                <button
+                  type="button"
+                  onClick={() => setIdModalImage(reg.paymentReceiptImage!)}
+                  className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono uppercase font-bold hover:bg-amber-500/30"
+                >
+                  CLICK TO ENLARGE 🔍
+                </button>
+              )}
+            </div>
+
+            {reg.paymentReceiptImage ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div
+                  onClick={() => setIdModalImage(reg.paymentReceiptImage!)}
+                  className="relative group cursor-pointer overflow-hidden rounded-lg border-2 border-amber-500/40 hover:border-amber-400 transition-all shadow-md bg-black max-w-[280px]"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={reg.paymentReceiptImage}
+                    alt="Payment Receipt Screenshot"
+                    className="max-h-48 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs font-mono text-white font-bold">
+                    Click to View Full Size
+                  </div>
+                </div>
+
+                <div className="text-xs font-mono text-neutral-300 space-y-1">
+                  <div className="text-emerald-400 font-bold">✓ Screenshot successfully submitted</div>
+                  <div className="text-neutral-400">Match the amount ({reg.vipPrice || 500} ETB) &amp; timestamp with your Telebirr / Awash statement.</div>
+                  <div className="text-neutral-400">Transaction Code: <strong className="text-amber-400">{reg.paymentTxnCode || 'Not specified'}</strong></div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg bg-neutral-900 border border-white/10 text-xs font-mono text-neutral-400">
+                No payment screenshot uploaded (manual entry only).
+              </div>
+            )}
           </div>
 
           {/* Action Approval Buttons */}

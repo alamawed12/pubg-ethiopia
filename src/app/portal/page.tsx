@@ -279,8 +279,32 @@ export default function AttendeePortalPage() {
                     Your registration application could not be approved at this time. This is commonly due to duplicate player credentials or unverified ID images. Please contact event staff for assistance.
                   </p>
                 </div>
+              ) : attendee.ticketTier === 'VIP' ? (
+                /* VIP PENDING STATE */
+                <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-[#1c1810] via-[#12100d] to-[#0a0805] border-2 border-amber-500/40 text-center max-w-lg mx-auto space-y-5 shadow-2xl">
+                  <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center mx-auto text-2xl text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                    ⭐
+                  </div>
+                  <div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-400 font-mono text-[10px] tracking-widest uppercase mb-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                      VIP PRIORITY VERIFICATION QUEUE
+                    </div>
+                    <h3 className="font-heading text-2xl sm:text-3xl font-black uppercase text-white tracking-wider">
+                      VIP Payment Under Review
+                    </h3>
+                  </div>
+                  <p className="text-sm text-amber-200/90 leading-relaxed font-body">
+                    Welcome, <strong className="text-white">{attendee.fullName}</strong>. Your payment receipt screenshot has been received and queued for Head Admin priority review.
+                  </p>
+                  <div className="p-4 rounded-xl bg-black/60 border border-amber-500/20 text-xs font-mono text-neutral-300 text-left space-y-1.5">
+                    <div className="text-amber-400 font-bold">• <strong>VIP Status:</strong> Awaiting Head Admin Verification</div>
+                    <div>• <strong>Pass Clearance:</strong> Your Luxury Horizontal VIP Pass &amp; Gate QR will unlock here automatically once approved.</div>
+                    <div>• <strong>Keep Track:</strong> Refresh or log in anytime with your name and phone number.</div>
+                  </div>
+                </div>
               ) : (
-                /* PENDING / UNDER REVIEW STATE */
+                /* STANDARD PENDING STATE */
                 <div className="p-8 sm:p-12 rounded-2xl bg-[#111111] border border-amber-500/30 text-center max-w-lg mx-auto space-y-5">
                   <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-2xl text-amber-400 animate-pulse">
                     ⏳

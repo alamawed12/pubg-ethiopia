@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -12,10 +12,51 @@ export interface StepVipPaymentProps {
     paymentMethod?: string;
     paymentTxnCode?: string;
     telegramUsername?: string;
+    paymentReceiptImage?: string;
   };
   updateField: (field: string, value: string | boolean | number) => void;
   onNext: () => void;
   onBack: () => void;
+}
+
+function compressImage(file: File, maxWidth = 1280, maxHeight = 1280, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => reject(new Error('Failed to load image for processing'));
+    };
+    reader.onerror = (error) => reject(error);
+  });
 }
 
 export function StepVipPayment({
@@ -28,7 +69,10 @@ export function StepVipPayment({
     (formData.paymentMethod as 'TELEBIRR' | 'AWASH_BANK') || 'TELEBIRR'
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [errors, setErrors] = useState<{ txnCode?: string; telegram?: string }>({});
+  const [errors, setErrors] = useState<{ txnCode?: string; telegram?: string; receipt?: string }>({});
+  const [dragOver, setDragOver] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -43,13 +87,39 @@ export function StepVipPayment({
     updateField('paymentMethod', method);
   };
 
+  const handleFileProcess = useCallback(
+    async (file: File) => {
+      if (!file.type.startsWith('image/')) {
+        setErrors((prev) => ({ ...prev, receipt: 'Please upload an image file (JPG, PNG, WebP)' }));
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, receipt: 'Image file size must be under 10MB' }));
+        return;
+      }
+
+      try {
+        setIsCompressing(true);
+        setErrors((prev) => ({ ...prev, receipt: undefined }));
+        const compressed = await compressImage(file, 1280, 1280, 0.85);
+        updateField('paymentReceiptImage', compressed);
+      } catch (err) {
+        console.error(err);
+        setErrors((prev) => ({ ...prev, receipt: 'Failed to process image. Please try another photo.' }));
+      } finally {
+        setIsCompressing(false);
+      }
+    },
+    [updateField]
+  );
+
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: { txnCode?: string; telegram?: string } = {};
+    const newErrors: { txnCode?: string; telegram?: string; receipt?: string } = {};
 
-    if (!formData.paymentTxnCode || formData.paymentTxnCode.trim().length < 4) {
-      newErrors.txnCode = 'Please enter your payment transaction ID / reference code';
+    if (!formData.paymentReceiptImage) {
+      newErrors.receipt = 'Please upload a screenshot of your payment transfer for admin approval';
     }
 
     if (!formData.telegramUsername || formData.telegramUsername.trim().length < 3) {
@@ -87,7 +157,7 @@ export function StepVipPayment({
           VIP PAYMENT & APPROVAL
         </h2>
         <p className="mt-1 text-xs sm:text-sm text-[var(--color-silver,#999999)] leading-relaxed">
-          Transfer the VIP pass fee to an official account below. Our Head Admin will verify your transaction code and dispatch your luxury horizontal pass directly to your Telegram.
+          Transfer the VIP pass fee to an official account below and upload your payment screenshot. Our Head Admin will review your payment to approve and unlock your VIP Pass in your Attendee Portal.
         </p>
       </div>
 
@@ -103,7 +173,7 @@ export function StepVipPayment({
         </div>
         <div className="text-right">
           <span className="inline-block px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono uppercase font-bold tracking-wider">
-            MANUAL ADMIN APPROVAL
+            PRIORITY ADMIN APPROVAL
           </span>
         </div>
       </div>
@@ -168,7 +238,7 @@ export function StepVipPayment({
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
               </svg>
-              <span>{copiedKey === 'telebirr' ? 'COPIED! ✅' : 'COPY NUMBER'}</span>
+              <span>{copiedKey === 'telebirr' ? 'COPIED! ✓' : 'COPY NUMBER'}</span>
             </button>
           </div>
         </div>
@@ -227,17 +297,102 @@ export function StepVipPayment({
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
               </svg>
-              <span>{copiedKey === 'awash' ? 'COPIED! ✅' : 'COPY ACCOUNT'}</span>
+              <span>{copiedKey === 'awash' ? 'COPIED! ✓' : 'COPY ACCOUNT'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* ─── REQUIRED TRANSACTION DETAILS FORM ─── */}
+      {/* ─── UPLOAD PAYMENT RECEIPT SCREENSHOT (REQUIRED) ─── */}
+      <div className="space-y-2 pt-2">
+        <label className="block text-xs uppercase font-mono tracking-wider text-amber-300 font-bold flex items-center justify-between">
+          <span>UPLOAD PAYMENT SCREENSHOT (REQUIRED) *</span>
+          {formData.paymentReceiptImage && (
+            <span className="text-emerald-400 text-[10px]">✓ Screenshot Attached</span>
+          )}
+        </label>
+
+        {formData.paymentReceiptImage ? (
+          <div className="relative p-3 rounded-xl border-2 border-emerald-500/50 bg-[#0d1a0d] flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={formData.paymentReceiptImage}
+                alt="Payment Receipt Preview"
+                className="w-16 h-16 object-cover rounded-lg border border-emerald-500/30"
+              />
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-400 block">
+                  ✓ Receipt Attached Successfully
+                </span>
+                <span className="text-[11px] font-mono text-neutral-400">
+                  Ready for admin payment verification
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => updateField('paymentReceiptImage', '')}
+              className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-950/40 text-red-300 text-xs font-mono hover:bg-red-900/60 transition-colors"
+            >
+              REMOVE
+            </button>
+          </div>
+        ) : (
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOver(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) handleFileProcess(file);
+            }}
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-6 sm:p-8 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
+              dragOver
+                ? 'border-amber-400 bg-amber-400/10'
+                : errors.receipt
+                ? 'border-red-500/60 bg-red-950/20'
+                : 'border-amber-500/40 bg-[#161208] hover:border-amber-400 hover:bg-amber-500/5'
+            }`}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileProcess(file);
+              }}
+            />
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl text-amber-400">
+                📸
+              </div>
+              <div className="font-heading font-black text-sm uppercase text-white tracking-wider">
+                {isCompressing ? 'OPTIMIZING SCREENSHOT...' : 'CLICK OR DRAG TO UPLOAD RECEIPT SCREENSHOT'}
+              </div>
+              <p className="font-mono text-[11px] text-[#999999] max-w-sm">
+                Take a screenshot of your Telebirr confirmation or bank transfer receipt and upload it here (JPG, PNG, WebP)
+              </p>
+            </div>
+          </div>
+        )}
+        {errors.receipt && (
+          <p className="font-mono text-xs text-red-400 mt-1">{errors.receipt}</p>
+        )}
+      </div>
+
+      {/* ─── OPTIONAL TRANSACTION DETAILS ─── */}
       <div className="space-y-4 pt-2">
         <div>
           <Input
-            label="Payment Transaction ID / Reference Code"
+            label="Payment Transaction ID / Reference Code (Optional)"
             name="paymentTxnCode"
             value={formData.paymentTxnCode || ''}
             onChange={(e) => updateField('paymentTxnCode', e.target.value.toUpperCase())}
@@ -246,17 +401,15 @@ export function StepVipPayment({
                 ? 'e.g. MP260312.1450.A00123'
                 : 'e.g. AWASH-98421038'
             }
-            error={errors.txnCode}
-            required
           />
           <p className="mt-1 font-mono text-[11px] text-neutral-400">
-            Paste the reference ID or transaction code from your Telebirr SMS or Awash Mobile receipt.
+            If visible on your receipt, entering your transaction ID helps speed up verification.
           </p>
         </div>
 
         <div>
           <Input
-            label="Your Telegram Username or Contact"
+            label="Your Telegram Username or Contact Number"
             name="telegramUsername"
             value={formData.telegramUsername || ''}
             onChange={(e) => updateField('telegramUsername', e.target.value)}
@@ -265,7 +418,7 @@ export function StepVipPayment({
             required
           />
           <p className="mt-1 font-mono text-[11px] text-amber-400/90">
-            Important: Once the Head Admin verifies payment, your official Horizontal Luxury VIP Ticket will be sent directly to this Telegram contact.
+            Our Head Admin will use this contact to message you directly about your VIP admission.
           </p>
         </div>
       </div>
@@ -275,10 +428,10 @@ export function StepVipPayment({
         <span className="text-lg">🛡️</span>
         <div>
           <span className="font-heading uppercase font-bold text-white tracking-wider block mb-0.5">
-            ANTI-FRAUD VERIFICATION SYSTEM
+            PRIORITY VIP APPROVAL SYSTEM
           </span>
           <span>
-            Every transaction reference is verified against our merchant account records. Once confirmed by the Head Admin, your pass will be officially activated.
+            Once submitted, your screenshot will be reviewed by the Head Admin. You will be redirected to your Attendee Portal where you can check your live VIP pass status.
           </span>
         </div>
       </div>

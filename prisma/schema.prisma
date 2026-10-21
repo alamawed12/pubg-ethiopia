@@ -38,6 +38,7 @@ model Registration {
   paymentMethod       String?   // TELEBIRR, AWASH_BANK, FREE
   paymentTxnCode      String?   // Transaction Reference / SMS receipt code
   telegramUsername    String?   // @username or phone for sending VIP pass
+  paymentReceiptImage String?   // base64 data URL of payment screenshot
   paymentStatus       String    @default("UNPAID") // UNPAID, PENDING_APPROVAL, APPROVED, REJECTED
   paymentApprovedAt   DateTime?
   paymentApprovedBy   String?

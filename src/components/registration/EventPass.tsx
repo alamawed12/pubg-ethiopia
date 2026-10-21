@@ -45,17 +45,17 @@ export function EventPass({
     });
   };
 
-  // Helper to wait for font before rendering canvas
+  // Helper to wait for Montserrat font before canvas rendering
   const ensureFontLoaded = async () => {
     if (typeof document !== 'undefined' && 'fonts' in document) {
       try {
         await Promise.all([
-          document.fonts.load('900 32px Montserrat'),
+          document.fonts.load('900 34px Montserrat'),
           document.fonts.load('800 20px Montserrat'),
           document.fonts.load('700 14px Montserrat'),
         ]);
       } catch {
-        // Fallback gracefully if font loading fails
+        // Fallback gracefully
       }
     }
   };
@@ -93,6 +93,56 @@ export function EventPass({
         }
       }
 
+      // Load PMCA logo for centering inside QR
+      let pmcaLogoImg: HTMLImageElement | null = null;
+      try {
+        pmcaLogoImg = await loadImage('/images/community-assembly-logo.png');
+      } catch {
+        // Optional fallback
+      }
+
+      // Helper to draw text that wraps or scales
+      const drawAttendeeName = (
+        nameText: string,
+        startX: number,
+        startY: number,
+        maxWidth: number,
+        baseSize: number
+      ): number => {
+        let fontSize = baseSize;
+        if (nameText.length > 26) {
+          fontSize = Math.round(baseSize * 0.65);
+        } else if (nameText.length > 18) {
+          fontSize = Math.round(baseSize * 0.8);
+        }
+
+        ctx.font = `900 ${fontSize}px Montserrat, sans-serif`;
+        ctx.fillStyle = '#FFFFFF';
+
+        const words = nameText.split(' ');
+        let line = '';
+        let y = startY;
+        const lineHeight = fontSize + 4;
+
+        if (ctx.measureText(nameText).width > maxWidth && words.length > 1) {
+          for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n] + ' ';
+            if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+              ctx.fillText(line.trim(), startX, y);
+              line = words[n] + ' ';
+              y += lineHeight;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line.trim(), startX, y);
+          return y + 10;
+        } else {
+          ctx.fillText(nameText, startX, y);
+          return y + 10;
+        }
+      };
+
       if (isVip) {
         // ══════════════════════════════════════════════════════════════
         // ─── VIP HORIZONTAL / LANDSCAPE PASS (960 x 540) ──────────────
@@ -111,6 +161,23 @@ export function EventPass({
           const qrX = 546 + (300 - qrW) / 2;
           const qrY = 118 + (302 - qrH) / 2;
           ctx.drawImage(qrImg, qrX, qrY, qrW, qrH);
+
+          // Draw PMCA logo in the exact center of QR code
+          if (pmcaLogoImg && pmcaLogoImg.naturalWidth > 0) {
+            const logoW = 54;
+            const logoH = 27;
+            const logoX = qrX + (qrW - logoW) / 2;
+            const logoY = qrY + (qrH - logoH) / 2;
+
+            ctx.fillStyle = '#050505';
+            drawRoundRect(logoX - 4, logoY - 4, logoW + 8, logoH + 8, 6);
+            ctx.fill();
+            ctx.strokeStyle = '#CCFF00';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.drawImage(pmcaLogoImg, logoX, logoY, logoW, logoH);
+          }
         }
 
         // Draw Attendee Details into the blank space on the left
@@ -118,7 +185,7 @@ export function EventPass({
 
         // Reference ID Badge
         ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        drawRoundRect(68, 125, 200, 32, 6);
+        drawRoundRect(68, 120, 200, 32, 6);
         ctx.fill();
         ctx.strokeStyle = 'rgba(204, 255, 0, 0.5)';
         ctx.lineWidth = 1.2;
@@ -126,30 +193,28 @@ export function EventPass({
 
         ctx.font = '700 11px Montserrat, sans-serif';
         ctx.fillStyle = '#999999';
-        ctx.fillText('REF:', 82, 146);
+        ctx.fillText('REF:', 82, 141);
         ctx.font = '800 12px Montserrat, monospace';
         ctx.fillStyle = '#CCFF00';
-        ctx.fillText(referenceId, 115, 146);
+        ctx.fillText(referenceId, 115, 141);
 
-        // Attendee Full Name (Bold Montserrat)
-        ctx.font = '900 34px Montserrat, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(fullName.toUpperCase(), 68, 208);
+        // Attendee Full Name (Bold Montserrat with multi-line/auto-scale support)
+        const nextY = drawAttendeeName(fullName.toUpperCase(), 68, 195, 450, 34);
 
         // In-Game Name (IGN)
         ctx.font = '800 20px Montserrat, sans-serif';
         ctx.fillStyle = '#CCFF00';
-        ctx.fillText(`IGN: ${inGameName}`, 68, 250);
+        ctx.fillText(`IGN: ${inGameName}`, 68, nextY + 24);
 
         // Category / Role
         ctx.font = '700 14px Montserrat, sans-serif';
         ctx.fillStyle = '#cccccc';
-        ctx.fillText(`ROLE: ${categoryLabel.toUpperCase()}`, 68, 290);
+        ctx.fillText(`ROLE: ${categoryLabel.toUpperCase()}`, 68, nextY + 54);
 
         // Status Badge Pill
         const isConfirmed = status.toUpperCase() === 'CONFIRMED' || status.toUpperCase() === 'CHECKED_IN';
         ctx.fillStyle = isConfirmed ? 'rgba(13, 40, 24, 0.9)' : 'rgba(45, 30, 2, 0.9)';
-        drawRoundRect(68, 320, 160, 28, 14);
+        drawRoundRect(68, nextY + 76, 160, 28, 14);
         ctx.fill();
         ctx.strokeStyle = isConfirmed ? '#10b981' : '#f59e0b';
         ctx.lineWidth = 1;
@@ -157,7 +222,7 @@ export function EventPass({
 
         ctx.font = '800 11px Montserrat, sans-serif';
         ctx.fillStyle = isConfirmed ? '#34d399' : '#fbbf24';
-        ctx.fillText(status.toUpperCase(), 86, 338);
+        ctx.fillText(status.toUpperCase(), 86, nextY + 94);
       } else {
         // ══════════════════════════════════════════════════════════════
         // ─── STANDARD VERTICAL TACTICAL PASS (600 x 960) ─────────────
@@ -176,6 +241,23 @@ export function EventPass({
           const qrX = 68 + (300 - qrW) / 2;
           const qrY = 548 + (302 - qrH) / 2;
           ctx.drawImage(qrImg, qrX, qrY, qrW, qrH);
+
+          // Draw PMCA logo in the exact center of QR code
+          if (pmcaLogoImg && pmcaLogoImg.naturalWidth > 0) {
+            const logoW = 54;
+            const logoH = 27;
+            const logoX = qrX + (qrW - logoW) / 2;
+            const logoY = qrY + (qrH - logoH) / 2;
+
+            ctx.fillStyle = '#050505';
+            drawRoundRect(logoX - 4, logoY - 4, logoW + 8, logoH + 8, 6);
+            ctx.fill();
+            ctx.strokeStyle = '#CCFF00';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.drawImage(pmcaLogoImg, logoX, logoY, logoW, logoH);
+          }
         }
 
         // Draw Attendee Details into the blank space above the QR box
@@ -183,7 +265,7 @@ export function EventPass({
 
         // Reference ID Badge
         ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        drawRoundRect(68, 210, 200, 32, 6);
+        drawRoundRect(68, 200, 200, 32, 6);
         ctx.fill();
         ctx.strokeStyle = 'rgba(204, 255, 0, 0.5)';
         ctx.lineWidth = 1.2;
@@ -191,30 +273,28 @@ export function EventPass({
 
         ctx.font = '700 11px Montserrat, sans-serif';
         ctx.fillStyle = '#999999';
-        ctx.fillText('REF:', 82, 231);
+        ctx.fillText('REF:', 82, 221);
         ctx.font = '800 12px Montserrat, monospace';
         ctx.fillStyle = '#CCFF00';
-        ctx.fillText(referenceId, 115, 231);
+        ctx.fillText(referenceId, 115, 221);
 
-        // Attendee Full Name (Bold Montserrat)
-        ctx.font = '900 32px Montserrat, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(fullName.toUpperCase(), 68, 290);
+        // Attendee Full Name (Bold Montserrat with multi-line/auto-scale support)
+        const nextY = drawAttendeeName(fullName.toUpperCase(), 68, 275, 460, 32);
 
         // In-Game Name (IGN)
         ctx.font = '800 20px Montserrat, sans-serif';
         ctx.fillStyle = '#CCFF00';
-        ctx.fillText(`IGN: ${inGameName}`, 68, 332);
+        ctx.fillText(`IGN: ${inGameName}`, 68, nextY + 24);
 
         // Category / Role
         ctx.font = '700 14px Montserrat, sans-serif';
         ctx.fillStyle = '#cccccc';
-        ctx.fillText(`CATEGORY: ${categoryLabel.toUpperCase()}`, 68, 372);
+        ctx.fillText(`CATEGORY: ${categoryLabel.toUpperCase()}`, 68, nextY + 54);
 
         // Status Badge Pill
         const isConfirmed = status.toUpperCase() === 'CONFIRMED' || status.toUpperCase() === 'CHECKED_IN';
         ctx.fillStyle = isConfirmed ? 'rgba(13, 40, 24, 0.9)' : 'rgba(45, 30, 2, 0.9)';
-        drawRoundRect(68, 402, 160, 28, 14);
+        drawRoundRect(68, nextY + 76, 160, 28, 14);
         ctx.fill();
         ctx.strokeStyle = isConfirmed ? '#10b981' : '#f59e0b';
         ctx.lineWidth = 1;
@@ -222,7 +302,7 @@ export function EventPass({
 
         ctx.font = '800 11px Montserrat, sans-serif';
         ctx.fillStyle = isConfirmed ? '#34d399' : '#fbbf24';
-        ctx.fillText(status.toUpperCase(), 86, 420);
+        ctx.fillText(status.toUpperCase(), 86, nextY + 94);
       }
 
       // Trigger automatic file download
@@ -264,17 +344,26 @@ export function EventPass({
           }}
         >
           {/* Left Column Attendee Details (Blank Space Area) */}
-          <div className="absolute left-[7%] top-[23%] w-[46%] flex flex-col justify-center text-left">
+          <div className="absolute left-[7%] top-[22%] w-[46%] flex flex-col justify-center text-left">
             {/* Reference ID Pill */}
-            <div className="inline-flex items-center gap-1.5 self-start px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md bg-black/75 border border-[#CCFF00]/40 backdrop-blur-sm mb-1.5 sm:mb-2.5">
+            <div className="inline-flex items-center gap-1.5 self-start px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md bg-black/75 border border-[#CCFF00]/40 backdrop-blur-sm mb-1 sm:mb-2">
               <span className="font-montserrat font-bold text-[8px] sm:text-[10px] text-[#999999] uppercase">REF:</span>
               <span className="font-montserrat font-black text-[9px] sm:text-xs tracking-wider text-[#CCFF00]">
                 {referenceId}
               </span>
             </div>
 
-            {/* Attendee Full Name (Bold Montserrat) */}
-            <h2 className="font-montserrat font-black text-sm sm:text-2xl md:text-3xl text-white uppercase tracking-tight leading-tight drop-shadow-md truncate">
+            {/* Attendee Full Name (Bold Montserrat with multi-line/auto-size support) */}
+            <h2
+              className={clsx(
+                'font-montserrat font-black text-white uppercase tracking-tight leading-tight drop-shadow-md break-words',
+                fullName.length > 25
+                  ? 'text-xs sm:text-base md:text-lg'
+                  : fullName.length > 15
+                  ? 'text-sm sm:text-lg md:text-2xl'
+                  : 'text-base sm:text-2xl md:text-3xl'
+              )}
+            >
               {fullName}
             </h2>
 
@@ -284,12 +373,12 @@ export function EventPass({
             </div>
 
             {/* Role & Category */}
-            <div className="font-montserrat font-bold text-[9px] sm:text-xs md:text-sm text-neutral-300 mt-1 truncate">
+            <div className="font-montserrat font-bold text-[9px] sm:text-xs md:text-sm text-neutral-300 mt-0.5 sm:mt-1 truncate">
               ROLE: <span className="text-white font-extrabold">{categoryLabel}</span>
             </div>
 
             {/* Status Pill */}
-            <div className="mt-2 sm:mt-3 flex items-center gap-2">
+            <div className="mt-1.5 sm:mt-2.5 flex items-center gap-2">
               <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[10px] font-montserrat font-black tracking-wider uppercase bg-[#CCFF00]/20 border border-[#CCFF00] text-[#CCFF00]">
                 {status.toUpperCase()}
               </span>
@@ -298,15 +387,28 @@ export function EventPass({
 
           {/* Right Column: QR Code aligned directly inside the pre-designed white rounded square */}
           <div
-            className="absolute left-[56.875%] top-[21.85%] w-[31.25%] h-[55.93%] flex items-center justify-center p-[4%]"
+            className="absolute left-[56.875%] top-[21.85%] w-[31.25%] h-[55.93%] flex items-center justify-center p-[4%] relative"
           >
             {qrDataUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={qrDataUrl}
-                alt={`VIP Pass QR Code for ${referenceId}`}
-                className="w-full h-full object-contain select-none"
-              />
+              <div className="relative w-full h-full flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrDataUrl}
+                  alt={`VIP Pass QR Code for ${referenceId}`}
+                  className="w-full h-full object-contain select-none"
+                />
+                {/* Embedded PMCA Logo Badge in center of QR */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-[#050505] p-1 rounded-md border border-[#CCFF00] shadow-[0_2px_8px_rgba(0,0,0,0.9)] flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/community-assembly-logo.png"
+                      alt="PMCA"
+                      className="h-4 sm:h-5 w-auto object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="flex h-full w-full items-center justify-center font-montserrat font-bold text-[9px] sm:text-xs text-neutral-500 text-center px-2">
                 {status === 'CONFIRMED' || status === 'CHECKED_IN' ? 'LOADING QR...' : 'PASS PENDING'}
@@ -356,17 +458,26 @@ export function EventPass({
         }}
       >
         {/* Attendee Details in Blank Space (Above the QR Box) */}
-        <div className="absolute left-[11%] top-[22%] right-[11%] flex flex-col text-left">
+        <div className="absolute left-[11%] top-[21%] right-[11%] flex flex-col text-left">
           {/* Reference ID Pill */}
-          <div className="inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-md bg-black/75 border border-[#CCFF00]/40 backdrop-blur-sm mb-2.5">
+          <div className="inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-md bg-black/75 border border-[#CCFF00]/40 backdrop-blur-sm mb-2">
             <span className="font-montserrat font-bold text-[9px] sm:text-[11px] text-[#999999] uppercase">REF:</span>
             <span className="font-montserrat font-black text-[10px] sm:text-xs tracking-wider text-[#CCFF00]">
               {referenceId}
             </span>
           </div>
 
-          {/* Attendee Full Name (Bold Montserrat) */}
-          <h2 className="font-montserrat font-black text-xl sm:text-2xl md:text-3xl text-white uppercase tracking-tight leading-tight drop-shadow-md truncate">
+          {/* Attendee Full Name (Bold Montserrat with multi-line/auto-size support) */}
+          <h2
+            className={clsx(
+              'font-montserrat font-black text-white uppercase tracking-tight leading-tight drop-shadow-md break-words',
+              fullName.length > 25
+                ? 'text-sm sm:text-base md:text-xl'
+                : fullName.length > 15
+                ? 'text-base sm:text-xl md:text-2xl'
+                : 'text-lg sm:text-2xl md:text-3xl'
+            )}
+          >
             {fullName}
           </h2>
 
@@ -376,12 +487,12 @@ export function EventPass({
           </div>
 
           {/* Category / Role */}
-          <div className="font-montserrat font-bold text-[10px] sm:text-xs text-neutral-300 mt-1.5 truncate">
+          <div className="font-montserrat font-bold text-[10px] sm:text-xs text-neutral-300 mt-1 truncate">
             CATEGORY: <span className="text-white font-extrabold">{categoryLabel}</span>
           </div>
 
           {/* Status Badge */}
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-2.5 flex items-center gap-2">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-montserrat font-black tracking-wider uppercase bg-[#CCFF00]/20 border border-[#CCFF00] text-[#CCFF00]">
               {status.toUpperCase()}
             </span>
@@ -390,15 +501,28 @@ export function EventPass({
 
         {/* QR Code Container aligned directly inside the pre-designed white rounded square */}
         <div
-          className="absolute left-[11.33%] top-[57.08%] w-[50%] h-[31.46%] flex items-center justify-center p-[4%]"
+          className="absolute left-[11.33%] top-[57.08%] w-[50%] h-[31.46%] flex items-center justify-center p-[4%] relative"
         >
           {qrDataUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={qrDataUrl}
-              alt={`Standard Pass QR Code for ${referenceId}`}
-              className="w-full h-full object-contain select-none"
-            />
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrDataUrl}
+                alt={`Standard Pass QR Code for ${referenceId}`}
+                className="w-full h-full object-contain select-none"
+              />
+              {/* Embedded PMCA Logo Badge in center of QR */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-[#050505] p-1 rounded-md border border-[#CCFF00] shadow-[0_2px_8px_rgba(0,0,0,0.9)] flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/community-assembly-logo.png"
+                    alt="PMCA"
+                    className="h-4 sm:h-5 w-auto object-contain"
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="flex h-full w-full items-center justify-center font-montserrat font-bold text-[10px] sm:text-xs text-neutral-500 text-center px-2">
               {status === 'CONFIRMED' || status === 'CHECKED_IN' ? 'LOADING QR...' : 'PASS PENDING'}

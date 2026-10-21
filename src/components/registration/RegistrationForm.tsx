@@ -29,6 +29,7 @@ export interface RegistrationFormData {
   paymentMethod: string;
   paymentTxnCode: string;
   telegramUsername: string;
+  paymentReceiptImage: string;
 }
 
 const INITIAL_FORM_DATA: RegistrationFormData = {
@@ -49,6 +50,7 @@ const INITIAL_FORM_DATA: RegistrationFormData = {
   paymentMethod: 'TELEBIRR',
   paymentTxnCode: '',
   telegramUsername: '',
+  paymentReceiptImage: '',
 };
 
 const slideVariants = {
@@ -143,6 +145,19 @@ export function RegistrationForm() {
           result.error ||
             'Registration could not be completed. Please check your input and try again.'
         );
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(
+            'pmca_attendee_session',
+            JSON.stringify({
+              referenceId: result.data.referenceId,
+              fullName: result.data.fullName,
+              phoneNumber: formData.phoneNumber,
+            })
+          );
+        } catch {}
       }
 
       setRegistrationResult(result.data);

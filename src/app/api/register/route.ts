@@ -211,6 +211,7 @@ export async function POST(req: NextRequest) {
         paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
         paymentTxnCode: submittedTxnCode || null,
         telegramUsername: ((rawBody as Record<string, unknown>).telegramUsername as string) || null,
+        paymentReceiptImage: ((rawBody as Record<string, unknown>).paymentReceiptImage as string) || null,
         paymentStatus: initialPaymentStatus,
         status: initialRegistrationStatus,
         paymentApprovedAt: autoApproved ? new Date() : null,
