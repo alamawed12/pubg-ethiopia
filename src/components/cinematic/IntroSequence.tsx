@@ -15,7 +15,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   const [isExiting, setIsExiting] = useState(false);
 
   const ethLetters = useMemo(() => 'ETHIOPIA'.split(''), []);
-  const assemblyLetters = useMemo(() => 'COMMUNITY ASSEMBLY'.split(''), []);
+  const assemblyWords = useMemo(() => ['COMMUNITY', 'ASSEMBLY'], []);
 
   const handleFinish = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -28,12 +28,12 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     setIsExiting(true);
     setTimeout(() => {
       onComplete?.();
-    }, 700);
+    }, 600);
   }, [onComplete]);
 
   useEffect(() => {
     setMounted(true);
-    // Check sessionStorage
+
     try {
       const seen = sessionStorage.getItem('intro-seen');
       if (seen === 'true') {
@@ -49,32 +49,32 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     // Check prefers-reduced-motion
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
-      setPhase(3); // Jump straight to creed / summary
+      setPhase(4); // Jump directly to logo reveal
       const timer = setTimeout(() => {
         handleFinish();
-      }, 1000);
+      }, 1200);
       return () => clearTimeout(timer);
     }
 
-    // Sequence timelines
-    // 0.5s: scan line
-    const tScan = setTimeout(() => setPhase(1), 500);
-    // 1.0s: Ethiopia reveals
-    const tEth = setTimeout(() => setPhase(2), 1000);
-    // 1.5s: Community Assembly reveals
-    const tAssembly = setTimeout(() => setPhase(2.5), 1500);
-    // 2.5s: Creed slams in
-    const tCreed = setTimeout(() => setPhase(3), 2500);
-    // 4.0s: Fade out
+    // Sequence timelines - smoothly orchestrated to prevent frame drops
+    // 0.4s: Laser scanline sweep
+    const tScan = setTimeout(() => setPhase(1), 400);
+    // 0.9s: ETHIOPIA // COMMUNITY ASSEMBLY reveals
+    const tEth = setTimeout(() => setPhase(2), 900);
+    // 2.2s: ONE COMMUNITY. ONE BATTLEGROUND. converges
+    const tCreed = setTimeout(() => setPhase(3), 2200);
+    // 3.6s: MORPH text into official PUBG MOBILE logo!
+    const tLogo = setTimeout(() => setPhase(4), 3600);
+    // 5.2s: Seamless fade out into homepage hero
     const tExit = setTimeout(() => {
       handleFinish();
-    }, 4000);
+    }, 5200);
 
     return () => {
       clearTimeout(tScan);
       clearTimeout(tEth);
-      clearTimeout(tAssembly);
       clearTimeout(tCreed);
+      clearTimeout(tLogo);
       clearTimeout(tExit);
     };
   }, [handleFinish, onComplete]);
@@ -90,102 +90,172 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         <motion.div
           key="intro-overlay"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#050505] overflow-hidden select-none"
+          exit={{ opacity: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505] overflow-hidden select-none"
+          style={{ transform: 'translateZ(0)' }}
         >
-          {/* Subtle background particle field */}
-          <ParticleField particleCount={80} opacity={0.4} />
+          {/* Subtle background particle field - reduced count for 60fps mobile stability */}
+          <ParticleField particleCount={60} opacity={0.35} />
 
-          {/* Vignette & scanline gradient */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#050505_90%)] pointer-events-none" />
+          {/* Vignette background */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#050505_90%)] pointer-events-none" />
 
-          {/* Phase 1: Thin green horizontal scanline sweep */}
+          {/* Phase 1: Thin green horizontal laser scanline sweep (GPU transform only) */}
           {phase >= 1 && phase < 3 && (
             <motion.div
               initial={{ x: '-100vw' }}
               animate={{ x: '100vw' }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
-              className="absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#CCFF00] to-transparent pointer-events-none shadow-[0_0_15px_#CCFF00]"
+              transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#CCFF00] to-transparent pointer-events-none shadow-[0_0_12px_#CCFF00]"
+              style={{ willChange: 'transform' }}
             />
           )}
 
-          {/* Phase 2: Letter by letter Title "ETHIOPIA // COMMUNITY ASSEMBLY" */}
-          <AnimatePresence>
-            {phase >= 2 && phase < 3 && (
+          {/* ══════════════════════════════════════════════════════════════════════ */}
+          {/* Phase 2: "ETHIOPIA // COMMUNITY ASSEMBLY" Staggered Hardware Reveal */}
+          {/* ══════════════════════════════════════════════════════════════════════ */}
+          <AnimatePresence mode="wait">
+            {phase === 2 && (
               <motion.div
-                key="title-group"
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.4 } }}
+                key="phase-2-title"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.3, ease: 'easeIn' } }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl mx-auto"
+                style={{ willChange: 'transform, opacity' }}
               >
-                {/* ETHIOPIA letters */}
-                <h1 className="font-heading text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-[#cccccc] tracking-[0.15em] sm:tracking-[0.25em] md:tracking-[0.3em] uppercase flex flex-wrap justify-center font-bold max-w-full">
+                {/* Pre-tag */}
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="font-mono text-[10px] sm:text-xs text-[#CCFF00] tracking-[0.25em] uppercase mb-2"
+                >
+                  {'// ADDIS ABABA GATHERING'}
+                </motion.div>
+
+                {/* ETHIOPIA Letters (Hardware Accelerated without blur filters) */}
+                <h1 className="font-heading text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-[#ffffff] tracking-[0.14em] sm:tracking-[0.22em] uppercase flex flex-wrap justify-center font-bold max-w-full">
                   {ethLetters.map((char, index) => (
                     <motion.span
                       key={`eth-${index}`}
-                      initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.35,
-                        delay: index * 0.05,
-                        ease: [0.22, 1, 0.36, 1],
+                        duration: 0.3,
+                        delay: index * 0.04,
+                        ease: [0.16, 1, 0.3, 1],
                       }}
                       className="inline-block"
+                      style={{ willChange: 'transform, opacity' }}
                     >
                       {char}
                     </motion.span>
                   ))}
                 </h1>
 
-                {/* COMMUNITY ASSEMBLY letters */}
-                {phase >= 2.5 && (
-                  <h2 className="mt-3 sm:mt-4 font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl text-[#999999] tracking-[0.12em] sm:tracking-[0.2em] md:tracking-[0.25em] uppercase flex flex-wrap justify-center font-medium max-w-full">
-                    {assemblyLetters.map((char, index) => (
-                      <motion.span
-                        key={`ca-${index}`}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.25,
-                          delay: index * 0.03,
-                          ease: 'easeOut',
-                        }}
-                        className="inline-block"
-                      >
-                        {char === ' ' ? '\u00A0' : char}
-                      </motion.span>
-                    ))}
-                  </h2>
-                )}
+                {/* COMMUNITY ASSEMBLY words */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="mt-2 sm:mt-4 font-heading text-base sm:text-2xl md:text-4xl text-[#999999] tracking-[0.15em] sm:tracking-[0.22em] uppercase flex flex-wrap justify-center gap-2 font-medium max-w-full"
+                >
+                  {assemblyWords.map((word, wIdx) => (
+                    <span key={`word-${wIdx}`} className="inline-block">
+                      {word}
+                    </span>
+                  ))}
+                </motion.div>
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {/* Phase 3: Creed slam in */}
-          <AnimatePresence>
-            {phase >= 3 && (
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {/* Phase 3: Creed "ONE COMMUNITY. ONE BATTLEGROUND."                */}
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {phase === 3 && (
               <motion.div
-                key="creed-group"
-                initial={{ opacity: 0, scale: 1.15 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+                key="phase-3-creed"
+                initial={{ opacity: 0, scale: 1.08 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.75,
+                  transition: { duration: 0.45, ease: [0.32, 0, 0.67, 0] },
                 }}
-                exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl mx-auto leading-tight"
+                style={{ willChange: 'transform, opacity' }}
               >
-                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#CCFF00] tracking-normal sm:tracking-wider uppercase drop-shadow-[0_0_35px_rgba(204,255,0,0.4)]">
+                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#CCFF00] tracking-tight sm:tracking-wider uppercase">
                   ONE COMMUNITY.
                 </div>
-                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-normal sm:tracking-wider uppercase mt-1 sm:mt-2 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight sm:tracking-wider uppercase mt-1 sm:mt-2">
                   ONE BATTLEGROUND.
                 </div>
               </motion.div>
             )}
+
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {/* Phase 4: MORPH TEXT INTO OFFICIAL PUBG MOBILE LOGO!               */}
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {phase === 4 && (
+              <motion.div
+                key="phase-4-logo-morph"
+                initial={{ opacity: 0, scale: 0.55 }}
+                animate={{
+                  opacity: 1,
+                  scale: [0.55, 1.06, 1],
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 1.1,
+                  transition: { duration: 0.4, ease: 'easeOut' },
+                }}
+                transition={{
+                  duration: 0.65,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-md mx-auto"
+                style={{ willChange: 'transform, opacity' }}
+              >
+                {/* Expanding Lime Energy Ring Pulse */}
+                <motion.div
+                  initial={{ scale: 0.3, opacity: 0.9 }}
+                  animate={{ scale: [0.3, 1.4, 1.9], opacity: [0.9, 0.4, 0] }}
+                  transition={{ duration: 1.4, ease: 'easeOut' }}
+                  className="absolute w-44 h-44 sm:w-60 sm:h-60 rounded-full border-2 border-[#CCFF00] pointer-events-none"
+                  style={{ willChange: 'transform, opacity' }}
+                />
+
+                {/* PUBG MOBILE Official Logo */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/pubg-mobile-logo.png"
+                  alt="PUBG Mobile Official Logo"
+                  className="h-24 sm:h-32 md:h-36 w-auto object-contain drop-shadow-[0_0_35px_rgba(204,255,0,0.55)] select-none"
+                />
+
+                {/* Tactical Assembly Title below morph */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                  className="mt-4 flex flex-col items-center gap-1"
+                >
+                  <span className="font-heading font-black text-sm sm:text-base md:text-lg tracking-[0.25em] text-[#CCFF00] uppercase">
+                    COMMUNITY ASSEMBLY
+                  </span>
+                  <span className="font-mono text-[10px] sm:text-xs tracking-[0.3em] text-[#999999] uppercase">
+                    ADDIS ABABA // ETHIOPIA
+                  </span>
+                </motion.div>
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* Skip button in bottom-right */}
+          {/* Skip button in bottom-right (Always available) */}
           <button
             onClick={handleFinish}
             type="button"

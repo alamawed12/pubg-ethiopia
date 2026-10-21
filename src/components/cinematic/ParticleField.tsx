@@ -115,19 +115,8 @@ export function ParticleField({
         const effectiveAlpha = Math.min(Math.max(p.alpha * opacity, 0), 1);
 
         if (p.isBright && effectiveAlpha > 0.05) {
-          // Draw subtle glow around bright particles
-          const glowGradient = ctx.createRadialGradient(
-            p.x,
-            p.y,
-            0,
-            p.x,
-            p.y,
-            p.glowRadius
-          );
-          glowGradient.addColorStop(0, `rgba(204, 255, 0, ${effectiveAlpha * 0.6})`);
-          glowGradient.addColorStop(1, 'rgba(204, 255, 0, 0)');
-
-          ctx.fillStyle = glowGradient;
+          // Draw soft glow without creating expensive dynamic radial gradients on every frame
+          ctx.fillStyle = `rgba(204, 255, 0, ${effectiveAlpha * 0.25})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.glowRadius, 0, Math.PI * 2);
           ctx.fill();
