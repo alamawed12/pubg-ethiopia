@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function AdminSettingsPage() {
   const [maxCapacity, setMaxCapacity] = useState(300);
+  const [heroAttendeesDisplay, setHeroAttendeesDisplay] = useState('100-1000');
   const [vipPrice, setVipPrice] = useState(500);
   const [vipEnabled, setVipEnabled] = useState(true);
   const [stats, setStats] = useState({ vipCount: 0, standardCount: 0, totalRegistrations: 0, estimatedVipRevenue: 0 });
@@ -18,6 +19,7 @@ export default function AdminSettingsPage() {
       .then((d) => {
         if (d.success) {
           if (d.maxCapacity !== undefined) setMaxCapacity(d.maxCapacity);
+          if (d.heroAttendeesDisplay !== undefined) setHeroAttendeesDisplay(d.heroAttendeesDisplay);
           setVipPrice(d.vipPrice);
           setVipEnabled(d.vipEnabled);
           if (d.stats) setStats(d.stats);
@@ -39,6 +41,7 @@ export default function AdminSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           maxCapacity: Number(maxCapacity),
+          heroAttendeesDisplay: heroAttendeesDisplay.trim(),
           vipPrice: Number(vipPrice),
           vipEnabled,
         }),
@@ -171,6 +174,29 @@ export default function AdminSettingsPage() {
         )}
 
         <form onSubmit={handleSave} className="space-y-6">
+          {/* Hero Section Display Text (Range or Number) */}
+          <div className="pb-6 border-b border-white/10">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-2 text-amber-300 font-bold">
+              HERO STATISTIC DISPLAY (EXPECTED ATTENDEES TEXT)
+            </label>
+            <div className="flex items-center gap-3 max-w-md">
+              <input
+                type="text"
+                placeholder="e.g. 100-1000 or 1000+ or 200-300"
+                value={heroAttendeesDisplay}
+                onChange={(e) => setHeroAttendeesDisplay(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border text-lg font-bold text-[#CCFF00] outline-none focus:border-[#CCFF00] font-mono tracking-wider"
+                style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(204,255,0,0.3)' }}
+              />
+              <span className="text-xs font-mono text-[#999999] whitespace-nowrap">
+                EXPECTED ATTENDEES
+              </span>
+            </div>
+            <p className="text-xs text-[#999999] mt-2">
+              Controls the exact headline number/range shown on the homepage hero (e.g. <strong className="text-white">100-1000</strong>, <strong className="text-white">1000</strong>, or <strong className="text-white">200-300</strong>).
+            </p>
+          </div>
+
           {/* Max Capacity Section */}
           <div className="pb-6 border-b border-white/10">
             <label className="block text-xs font-mono uppercase tracking-wider mb-2 text-[#cccccc]">

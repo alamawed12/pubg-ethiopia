@@ -122,10 +122,10 @@ export default async function AdminDashboardPage() {
           </div>
 
           <Link
-            href="/admin/registrations?tier=VIP&status=PENDING"
+            href="/admin/payments"
             className="px-5 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-black font-heading font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(245,158,11,0.4)] whitespace-nowrap cursor-pointer shrink-0"
           >
-            REVIEW VIP PAYMENTS →
+            AUDIT VIP PAYMENTS →
           </Link>
         </div>
       )}
@@ -154,6 +154,76 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
+      {/* Quick Command Hubs */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <Link
+          href="/admin/payments"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-amber-400/50 bg-[#14120a] group"
+          style={{ borderColor: 'rgba(251,191,36,0.25)' }}
+        >
+          <span className="text-xl">💳</span>
+          <div>
+            <p className="text-xs font-bold uppercase text-amber-300" style={{ fontFamily: 'var(--font-heading)' }}>VIP Payments</p>
+            <p className="text-[9px] text-[#888888]">Receipt clearing</p>
+          </div>
+        </Link>
+        <Link
+          href="/admin/registrations"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="text-xl">📋</span>
+          <div>
+            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Registrations</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Players & passes</p>
+          </div>
+        </Link>
+        <Link
+          href="/admin/teams"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="text-xl">🏆</span>
+          <div>
+            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Squads &amp; Teams</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Esports rosters</p>
+          </div>
+        </Link>
+        <Link
+          href="/admin/gate-monitor"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="text-xl">🛡️</span>
+          <div>
+            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Gate Monitor</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Live check-ins</p>
+          </div>
+        </Link>
+        <Link
+          href="/admin/check-in"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="text-xl">📱</span>
+          <div>
+            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Scanner</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Scan QR tickets</p>
+          </div>
+        </Link>
+        <Link
+          href="/admin/settings"
+          className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="text-xl">⚙️</span>
+          <div>
+            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Settings</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Capacity &amp; VIP</p>
+          </div>
+        </Link>
+      </div>
+
       {/* Capacity Bar */}
       <div
         className="rounded-xl border p-5 mb-8"
@@ -165,7 +235,7 @@ export default async function AdminDashboardPage() {
               VENUE CAPACITY
             </h3>
             <p className="text-xs mt-0.5" style={{ color: '#666666' }}>
-              Maximum capacity: {capacity} attendees
+              Maximum capacity quota: {capacity} attendees
             </p>
           </div>
           <div className="text-right">
@@ -195,54 +265,6 @@ export default async function AdminDashboardPage() {
             ⚠ APPROACHING MAXIMUM CAPACITY
           </p>
         )}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        <Link
-          href="/admin/registrations"
-          className="flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
-          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-        >
-          <span className="text-xl">📋</span>
-          <div>
-            <p className="text-sm font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Registrations</p>
-            <p className="text-[10px]" style={{ color: '#666666' }}>View & manage</p>
-          </div>
-        </Link>
-        <Link
-          href="/admin/check-in"
-          className="flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
-          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-        >
-          <span className="text-xl">📱</span>
-          <div>
-            <p className="text-sm font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Check-In</p>
-            <p className="text-[10px]" style={{ color: '#666666' }}>Scan passes</p>
-          </div>
-        </Link>
-        <Link
-          href="/admin/announcements"
-          className="flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
-          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-        >
-          <span className="text-xl">📢</span>
-          <div>
-            <p className="text-sm font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Announcements</p>
-            <p className="text-[10px]" style={{ color: '#666666' }}>Post updates</p>
-          </div>
-        </Link>
-        <Link
-          href="/admin/export"
-          className="flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
-          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-        >
-          <span className="text-xl">📥</span>
-          <div>
-            <p className="text-sm font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Export</p>
-            <p className="text-[10px]" style={{ color: '#666666' }}>Download CSV</p>
-          </div>
-        </Link>
       </div>
 
       {/* Recent Registrations Table */}

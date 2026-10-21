@@ -11,15 +11,17 @@ export function HeroSection() {
   const isInView = useInView(containerRef, { once: true, margin: '-50px' });
   const { playSound } = useSoundContext();
   const [mousePos, setMousePos] = useState({ x: '50%', y: '40%' });
-  const [capacity, setCapacity] = useState<number | null>(null);
+  const [heroDisplay, setHeroDisplay] = useState<string>('100-1000');
 
   // Fetch dynamic capacity setting configured by admin
   useEffect(() => {
     fetch('/api/settings')
       .then((res) => res.json())
       .then((data) => {
-        if (data?.maxCapacity && typeof data.maxCapacity === 'number') {
-          setCapacity(data.maxCapacity);
+        if (data?.heroAttendeesDisplay) {
+          setHeroDisplay(data.heroAttendeesDisplay);
+        } else if (data?.maxCapacity && typeof data.maxCapacity === 'number') {
+          setHeroDisplay(`${data.maxCapacity}+`);
         }
       })
       .catch(() => {});
@@ -222,8 +224,8 @@ export function HeroSection() {
           >
             {/* Stat 1 */}
             <div className="flex flex-col items-center justify-center sm:border-r sm:border-white/10 px-4">
-              <span className="font-heading text-3xl md:text-4xl font-extrabold text-[#CCFF00] tracking-tight">
-                {capacity ? `${capacity.toLocaleString()}+` : '300+'}
+              <span className="font-heading text-3xl md:text-4xl font-extrabold text-[#CCFF00] tracking-tight whitespace-nowrap">
+                {heroDisplay}
               </span>
               <span className="font-mono text-xs text-[#999999] tracking-widest uppercase mt-1">
                 EXPECTED ATTENDEES

@@ -15,6 +15,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')?.trim();
     const status = searchParams.get('status')?.trim();
     const category = searchParams.get('category')?.trim();
+    const ticketTier = searchParams.get('ticketTier')?.trim();
+    const paymentStatus = searchParams.get('paymentStatus')?.trim();
 
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)));
@@ -30,13 +32,22 @@ export async function GET(request: NextRequest) {
       where.category = category;
     }
 
+    if (ticketTier && ticketTier !== 'ALL') {
+      where.ticketTier = ticketTier;
+    }
+
+    if (paymentStatus && paymentStatus !== 'ALL') {
+      where.paymentStatus = paymentStatus;
+    }
+
     if (search) {
       where.OR = [
-        { fullName: { contains: search } },
-        { inGameName: { contains: search } },
-        { pubgUid: { contains: search } },
-        { phoneNumber: { contains: search } },
-        { referenceId: { contains: search } },
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { inGameName: { contains: search, mode: 'insensitive' } },
+        { pubgUid: { contains: search, mode: 'insensitive' } },
+        { phoneNumber: { contains: search, mode: 'insensitive' } },
+        { referenceId: { contains: search, mode: 'insensitive' } },
+        { teamName: { contains: search, mode: 'insensitive' } },
       ];
     }
 

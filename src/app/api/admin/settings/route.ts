@@ -13,10 +13,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [priceSetting, enabledSetting, capacitySetting, vipCount, standardCount, totalRegistrations] = await Promise.all([
+    const [priceSetting, enabledSetting, capacitySetting, heroDisplaySetting, vipCount, standardCount, totalRegistrations] = await Promise.all([
       prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_price' } }),
       prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_enabled' } }),
       prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'hero_attendees_display' } }),
       prisma.registration.count({ where: { ticketTier: 'VIP' } }),
       prisma.registration.count({ where: { ticketTier: 'STANDARD' } }),
       prisma.registration.count(),
@@ -25,12 +26,14 @@ export async function GET() {
     const vipPrice = priceSetting ? parseInt(priceSetting.value, 10) : 500;
     const vipEnabled = enabledSetting ? enabledSetting.value === 'true' : true;
     const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : 300;
+    const heroAttendeesDisplay = heroDisplaySetting?.value || (capacitySetting ? `${capacitySetting.value}+` : '300+');
 
     return NextResponse.json({
       success: true,
       vipPrice: isNaN(vipPrice) ? 500 : vipPrice,
       vipEnabled,
       maxCapacity: isNaN(maxCapacity) ? 300 : maxCapacity,
+      heroAttendeesDisplay,
       stats: {
         vipCount,
         standardCount,
@@ -52,7 +55,16 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { vipPrice, vipEnabled, maxCapacity } = body;
+    const { vipPrice, vipEnabled, maxCapacity, heroAttendeesDisplay } = body;
+
+    if (heroAttendeesDisplay !== undefined) {
+      const displayVal = String(heroAttendeesDisplay).trim();
+      await prisma.systemSetting.upsert({
+        where: { key: 'hero_attendees_display' },
+        update: { value: displayVal },
+        create: { key: 'hero_attendees_display', value: displayVal },
+      });
+    }
 
     if (maxCapacity !== undefined) {
       const parsedCapacity = parseInt(String(maxCapacity), 10);
