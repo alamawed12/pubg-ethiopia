@@ -113,14 +113,14 @@ function ImageUploadZone({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative rounded-lg overflow-hidden border border-[#CCFF00]/30 bg-[#0a0a0a]"
+        className="relative rounded-2xl overflow-hidden border border-[#CCFF00]/30 bg-[#0a0a0a]"
       >
         <div className="p-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt={label}
-            className="w-full h-48 object-contain rounded"
+            className="w-full h-48 object-contain rounded-xl"
           />
         </div>
         <div className="flex items-center justify-between px-3 py-2 bg-[#111111] border-t border-white/10">
@@ -147,7 +147,7 @@ function ImageUploadZone({
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={`
-          relative flex flex-col items-center justify-center gap-3 p-6 rounded-lg cursor-pointer
+          relative flex flex-col items-center justify-center gap-3 p-6 rounded-2xl cursor-pointer
           border-2 border-dashed transition-all duration-200
           ${dragOver
             ? 'border-[#CCFF00] bg-[#CCFF00]/5'

@@ -190,7 +190,7 @@ export function EventDashboard() {
               className="text-sm tracking-[0.3em] uppercase mb-4"
               style={{ fontFamily: 'var(--font-mono)', color: '#CCFF00' }}
             >
-              {'// LATEST ANNOUNCEMENTS'}
+              {'LATEST ANNOUNCEMENTS'}
             </h3>
             <div className="space-y-3">
               {announcements.map((a) => (

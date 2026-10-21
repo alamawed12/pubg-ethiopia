@@ -244,7 +244,7 @@ export function EventPass({
         ctx.fillText('Official admission ticket. Must be presented with valid ID at VIP check-in.', 45, 470);
         ctx.font = '600 10px "JetBrains Mono", monospace';
         ctx.fillStyle = '#F59E0B';
-        ctx.fillText('OFFICIAL COMMUNITY ASSEMBLY // ADDIS ABABA, ETHIOPIA', 45, 492);
+        ctx.fillText('OFFICIAL COMMUNITY ASSEMBLY • ADDIS ABABA, ETHIOPIA', 45, 492);
 
         // ─── Right Column: QR Code Container ───
         // Crisp white QR Box with Gold Border
@@ -456,7 +456,7 @@ export function EventPass({
 
         ctx.font = '600 11px "JetBrains Mono", monospace';
         ctx.fillStyle = '#CCFF00';
-        ctx.fillText('OFFICIAL COMMUNITY ASSEMBLY // PUBG MOBILE ET', 300, 840);
+        ctx.fillText('OFFICIAL COMMUNITY ASSEMBLY • PUBG MOBILE ET', 300, 840);
       }
 
       // Trigger automatic file download

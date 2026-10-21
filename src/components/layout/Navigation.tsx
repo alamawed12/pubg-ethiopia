@@ -94,11 +94,11 @@ export function Navigation() {
             <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
               {/* Short version on mobile and tablets */}
               <span className="inline xl:hidden text-lg sm:text-xl">
-                {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                {'PMCA '}<span className="text-white/40">{' — '}</span>{' ETHIOPIA'}
               </span>
               {/* Full long version on large screens */}
               <span className="hidden xl:inline text-lg xl:text-xl">
-                {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{' — '}</span>{' ETHIOPIA'}
               </span>
             </span>
 
@@ -140,7 +140,7 @@ export function Navigation() {
               onMouseEnter={() => playSound('hover')}
               aria-label={isMuted ? 'Unmute tactical audio' : 'Mute tactical audio'}
               title={isMuted ? 'Turn Sound ON' : 'Mute Audio'}
-              className="p-2 rounded border border-white/10 hover:border-[#CCFF00]/50 bg-black/40 hover:bg-[#CCFF00]/10 text-[#999999] hover:text-[#CCFF00] transition-all duration-200 cursor-pointer"
+              className="p-2 rounded-xl border border-white/10 hover:border-[#CCFF00]/50 bg-black/40 hover:bg-[#CCFF00]/10 text-[#999999] hover:text-[#CCFF00] transition-all duration-200 cursor-pointer"
             >
               {isMuted ? (
                 /* Muted Speaker Icon */
@@ -185,11 +185,7 @@ export function Navigation() {
               href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="hidden sm:inline-flex items-center justify-center px-4 md:px-5 py-2 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_15px_rgba(204,255,0,0.4)] active:scale-95 cursor-pointer"
-              style={{
-                clipPath:
-                  'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
-              }}
+              className="hidden sm:inline-flex items-center justify-center px-5 py-2.5 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(204,255,0,0.5)] active:scale-95 cursor-pointer rounded-xl"
             >
               REGISTER
             </Link>
@@ -239,7 +235,7 @@ export function Navigation() {
             {/* Top Bar inside Mobile Menu */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <span className="font-heading font-black text-xl tracking-wider text-[#CCFF00] uppercase">
-                {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
               </span>
               <button
                 type="button"
@@ -291,7 +287,7 @@ export function Navigation() {
                   playSound('click');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full py-4 text-center bg-[#CCFF00] text-[#050505] font-heading font-black text-base tracking-widest uppercase hover:bg-[#b8e600] transition-colors"
+                className="w-full py-4 text-center bg-[#CCFF00] text-[#050505] font-heading font-black text-base tracking-widest uppercase hover:bg-[#b8e600] transition-colors rounded-xl shadow-lg shadow-[#CCFF00]/20"
               >
                 REGISTER NOW
               </Link>

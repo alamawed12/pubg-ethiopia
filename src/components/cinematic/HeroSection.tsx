@@ -133,11 +133,11 @@ export function HeroSection() {
           {/* Pre-heading: Mono Terminal Tag */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-1.5 sm:gap-2 mb-4 px-2.5 sm:px-3 py-1 rounded border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm max-w-full"
+            className="flex items-center gap-1.5 sm:gap-2 mb-4 px-3 py-1.5 rounded-full border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm max-w-full"
           >
             <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#CCFF00] animate-pulse shrink-0" />
             <span className="font-mono text-[10px] sm:text-xs md:text-sm text-[#CCFF00] tracking-normal sm:tracking-widest uppercase truncate">
-              {'OFFICIAL PUBG MOBILE TEAM // ADDIS ABABA, ETHIOPIA'}
+              {'OFFICIAL PUBG MOBILE TEAM • ADDIS ABABA, ETHIOPIA'}
             </span>
             <span className="inline-block w-1.5 h-3 bg-[#CCFF00] animate-pulse ml-0.5 shrink-0" />
           </motion.div>
@@ -176,11 +176,7 @@ export function HeroSection() {
               href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="relative group overflow-hidden w-full sm:w-auto px-8 py-4 bg-[#CCFF00] text-[#050505] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:scale-[1.02] active:scale-[0.98] text-center"
-              style={{
-                clipPath:
-                  'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
-              }}
+              className="relative group overflow-hidden w-full sm:w-auto px-8 py-4 bg-[#CCFF00] text-[#050505] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:scale-[1.02] active:scale-[0.98] text-center rounded-xl"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 <span>REGISTER NOW</span>
@@ -192,25 +188,21 @@ export function HeroSection() {
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             </Link>
 
-            {/* Secondary Ghost Button */}
-            <Link
-              href="/register"
+            {/* Secondary Ghost Button -> Scrolls to Assembly Program Section */}
+            <a
+              href="#assembly"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="w-full sm:w-auto px-8 py-4 border border-white/20 hover:border-[#CCFF00] bg-black/40 hover:bg-[#CCFF00]/5 text-white hover:text-[#CCFF00] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 backdrop-blur-sm text-center"
-              style={{
-                clipPath:
-                  'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
-              }}
+              className="w-full sm:w-auto px-8 py-4 border border-white/20 hover:border-[#CCFF00] bg-black/40 hover:bg-[#CCFF00]/5 text-white hover:text-[#CCFF00] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 backdrop-blur-sm text-center rounded-xl"
             >
               EXPLORE THE PROGRAM
-            </Link>
+            </a>
           </motion.div>
 
           {/* Three Key Data Points */}
           <motion.div
             variants={itemVariants}
-            className="mt-12 md:mt-16 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-0 border border-white/10 bg-black/40 backdrop-blur-md p-4 sm:p-6"
+            className="mt-12 md:mt-16 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-0 border border-white/10 bg-black/40 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl shadow-black/50"
           >
             {/* Stat 1 */}
             <div className="flex flex-col items-center justify-center sm:border-r sm:border-white/10 px-4">

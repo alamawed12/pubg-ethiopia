@@ -31,10 +31,10 @@ export function Footer() {
               <span className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 shadow-[0_0_8px_#CCFF00]" />
               <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase">
                 <span className="inline lg:hidden text-xl">
-                  {'PMCA '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                  {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
                 </span>
                 <span className="hidden lg:inline text-xl">
-                  {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'//'}</span>{' ETHIOPIA'}
+                  {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
                 </span>
               </span>
             </div>
@@ -46,7 +46,7 @@ export function Footer() {
 
             <div className="mt-2 font-mono text-xs text-[#999999]/60 flex items-center gap-2">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]/50 animate-pulse" />
-              <span>{'ADDIS ABABA // 9.0249° N, 38.7469° E'}</span>
+              <span>{'ADDIS ABABA • 9.0249° N, 38.7469° E'}</span>
             </div>
           </div>
 
@@ -63,7 +63,7 @@ export function Footer() {
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
-                  {'// HOME'}
+                  {'HOME'}
                 </Link>
               </li>
               <li>
@@ -73,7 +73,7 @@ export function Footer() {
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
-                  {'// REGISTRATION'}
+                  {'REGISTRATION'}
                 </Link>
               </li>
               <li>
@@ -83,7 +83,7 @@ export function Footer() {
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
-                  {'// TOURNAMENT RULES'}
+                  {'TOURNAMENT RULES'}
                 </Link>
               </li>
               <li>
@@ -93,7 +93,7 @@ export function Footer() {
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
                 >
-                  {'// FREQUENTLY ASKED'}
+                  {'FREQUENTLY ASKED'}
                 </Link>
               </li>
               <li>
@@ -103,7 +103,7 @@ export function Footer() {
                   onMouseEnter={() => playSound('hover')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5 text-[#CCFF00]"
                 >
-                  {'// REGISTRATION PORTAL'}
+                  {'REGISTRATION PORTAL'}
                 </Link>
               </li>
             </ul>

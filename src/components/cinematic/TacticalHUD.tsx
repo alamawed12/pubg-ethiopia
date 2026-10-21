@@ -64,7 +64,7 @@ export function TacticalHUD({ className = '' }: TacticalHUDProps) {
           {coords.lat}° N, {coords.lng}° E
         </div>
         <div className="text-[#999999]/30 text-[9px] md:text-[10px]">
-          SEC-09 // ADDIS ABABA
+          SEC-09 • ADDIS ABABA
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export function TacticalHUD({ className = '' }: TacticalHUDProps) {
       <div className="absolute top-5 right-5 md:top-9 md:right-9 text-right flex flex-col gap-0.5 text-[#CCFF00]/25">
         <div>GRID REF: 09-3874</div>
         <div className="text-[9px] md:text-[10px] text-[#999999]/30">
-          CH: 04 // PUBG-M-ET
+          CH: 04 • PUBG-M-ET
         </div>
       </div>
 

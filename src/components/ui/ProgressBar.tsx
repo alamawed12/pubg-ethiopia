@@ -23,7 +23,7 @@ export function ProgressBar({ currentStep, steps, className }: ProgressBarProps)
   return (
     <nav aria-label="Progress" className={clsx('w-full py-2 sm:py-4', className)}>
       {/* Mobile Current Step Headline (Prevents label collisions on phone) */}
-      <div className="sm:hidden flex items-center justify-center gap-2 mb-3 px-3 py-1.5 rounded-lg bg-black/40 border border-white/5">
+      <div className="sm:hidden flex items-center justify-center gap-2 mb-3 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
         <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-lime,#CCFF00)] animate-pulse" />
         <span className="font-mono text-[10px] tracking-wider text-[var(--color-lime,#CCFF00)] font-bold">
           STEP {String(currentStep).padStart(2, '0')} OF {String(steps.length).padStart(2, '0')}

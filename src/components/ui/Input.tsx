@@ -81,7 +81,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : undefined}
             className={clsx(
-              'peer w-full rounded-sm font-body text-sm text-white',
+              'peer w-full rounded-xl font-body text-sm text-white',
               'bg-[var(--color-charcoal,#111111)] px-4 py-3.5 outline-none transition-all duration-200',
               'placeholder:text-[var(--color-silver,#999999)]/40',
               'border',

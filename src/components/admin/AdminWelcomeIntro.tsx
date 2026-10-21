@@ -37,9 +37,9 @@ export function AdminWelcomeIntro() {
   const isScanner = session.user.role === 'scanner' || userEmail.includes('scanner');
   const title = isScanner ? 'Welcome Scanner' : 'Welcome Head Admin';
   const subtitle = isScanner
-    ? 'GATE ADMISSION SCANNER PORTAL ACTIVE // TICKET VALIDATION TERMINAL READY'
-    : 'PMCA ETHIOPIA COMMAND CENTER ACCESS GRANTED // FULL ADMINISTRATIVE PRIVILEGES ACTIVE';
-  const roleCode = isScanner ? 'STAFF // TICKET SCANNER' : 'HQ COMMAND // LEVEL 01 ROOT';
+    ? 'GATE ADMISSION SCANNER PORTAL ACTIVE • TICKET VALIDATION TERMINAL READY'
+    : 'PMCA ETHIOPIA COMMAND CENTER ACCESS GRANTED • FULL ADMINISTRATIVE PRIVILEGES ACTIVE';
+  const roleCode = isScanner ? 'STAFF • TICKET SCANNER' : 'HQ COMMAND • LEVEL 01 ROOT';
   const primaryColor = isScanner ? '#f59e0b' : '#CCFF00';
   const glowShadow = isScanner
     ? '0 0 30px rgba(245, 158, 11, 0.4)'

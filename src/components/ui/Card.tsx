@@ -89,7 +89,7 @@ export function Card({
           transformStyle: 'preserve-3d',
         }}
         className={clsx(
-          'relative w-full rounded-sm transition-[border-color,box-shadow] duration-500 ease-out',
+          'relative w-full rounded-2xl transition-[border-color,box-shadow] duration-500 ease-out',
           'bg-[var(--color-graphite,#1a1a1a)] text-white',
           'border border-white/10 hover:border-[var(--color-lime,#CCFF00)]/30',
           'hover:shadow-[0_10px_30px_rgba(0,0,0,0.6),0_0_20px_rgba(204,255,0,0.08)]',
@@ -103,7 +103,7 @@ export function Card({
         {glowBorder && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 rounded-sm opacity-50 blur-sm bg-gradient-to-r from-[var(--color-lime,#CCFF00)]/30 via-transparent to-[var(--color-lime,#CCFF00)]/30 transition-opacity duration-500 group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 -z-10 rounded-2xl opacity-50 blur-sm bg-gradient-to-r from-[var(--color-lime,#CCFF00)]/30 via-transparent to-[var(--color-lime,#CCFF00)]/30 transition-opacity duration-500 group-hover:opacity-100"
           />
         )}
 

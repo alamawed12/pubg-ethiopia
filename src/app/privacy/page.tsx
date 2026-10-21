@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 shadow-[0_0_8px_#CCFF00]" />
             <span className="font-mono text-xs tracking-widest uppercase text-[#CCFF00]">
-              PUBG MOBILE COMMUNITY ASSEMBLY // ETHIOPIA
+              PUBG MOBILE COMMUNITY ASSEMBLY • ETHIOPIA
             </span>
           </div>
           <h1

@@ -226,7 +226,7 @@ export function AdminShell({ children, adminName, adminEmail, adminRole }: Admin
             />
 
             <span className="font-mono text-xs text-[var(--color-silver,#999999)] uppercase hidden sm:inline">
-              OFFICIAL PUBG MOBILE TEAM // ETHIOPIA COMMAND HEADQUARTERS
+              OFFICIAL PUBG MOBILE TEAM • ETHIOPIA COMMAND HEADQUARTERS
             </span>
           </div>
 

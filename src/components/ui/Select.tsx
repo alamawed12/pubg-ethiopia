@@ -66,7 +66,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${selectId}-error` : undefined}
             className={clsx(
-              'w-full appearance-none rounded-sm font-body text-sm text-white',
+              'w-full appearance-none rounded-xl font-body text-sm text-white',
               'bg-[var(--color-charcoal,#111111)] px-4 py-3.5 pr-10 outline-none transition-all duration-200 cursor-pointer',
               'border',
               error

@@ -132,7 +132,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                   transition={{ duration: 0.3 }}
                   className="font-mono text-[10px] sm:text-xs text-[#CCFF00] tracking-[0.25em] uppercase mb-2"
                 >
-                  {'// ADDIS ABABA GATHERING'}
+                  {'ADDIS ABABA GATHERING'}
                 </motion.div>
 
                 {/* ETHIOPIA Letters (Hardware Accelerated without blur filters) */}
@@ -248,7 +248,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                     COMMUNITY ASSEMBLY
                   </span>
                   <span className="font-mono text-[10px] sm:text-xs tracking-[0.3em] text-[#999999] uppercase">
-                    ADDIS ABABA // ETHIOPIA
+                    ADDIS ABABA • ETHIOPIA
                   </span>
                 </motion.div>
               </motion.div>
@@ -259,7 +259,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           <button
             onClick={handleFinish}
             type="button"
-            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center gap-2 px-3 py-1.5 rounded border border-white/20 bg-black/60 hover:bg-[#CCFF00]/10 hover:border-[#CCFF00]/60 text-[#999999] hover:text-[#CCFF00] font-mono text-xs tracking-widest transition-all duration-300 backdrop-blur-sm cursor-pointer group"
+            className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-black/60 hover:bg-[#CCFF00]/10 hover:border-[#CCFF00]/60 text-[#999999] hover:text-[#CCFF00] font-mono text-xs tracking-widest transition-all duration-300 backdrop-blur-sm cursor-pointer group shadow-lg"
           >
             <span>SKIP</span>
             <span className="transition-transform duration-300 group-hover:translate-x-1">

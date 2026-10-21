@@ -77,7 +77,7 @@ export function Button({
 
   // Base tactical button styles
   const baseStyles = clsx(
-    'group relative inline-flex items-center justify-center font-heading uppercase tracking-wider',
+    'group relative inline-flex items-center justify-center font-heading uppercase tracking-wider rounded-xl',
     'select-none transition-all duration-300 overflow-hidden',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-lime,#CCFF00)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-void,#050505)]',
     disabled || loading ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'
