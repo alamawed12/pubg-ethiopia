@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
+import { AdminWelcomeIntro } from '@/components/admin/AdminWelcomeIntro';
 
 interface NavItem {
   href: string;
@@ -93,6 +94,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#0a0a0a] text-white">
+      <AdminWelcomeIntro />
       {/* ─── Desktop Sidebar ─── */}
       <aside
         className="w-64 flex-shrink-0 border-r hidden md:flex flex-col justify-between"

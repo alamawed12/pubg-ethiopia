@@ -67,3 +67,141 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// BATCH ACCEPT / DECLINE
+export async function PATCH(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (session.user.role === 'scanner') {
+      return NextResponse.json({ error: 'Scanner accounts cannot modify registration status' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { action, ids } = body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: 'No registrations selected' }, { status: 400 });
+    }
+
+    if (action === 'ACCEPT') {
+      // Set to CONFIRMED and approve VIP payments
+      const result = await prisma.registration.updateMany({
+        where: { id: { in: ids } },
+        data: {
+          status: 'CONFIRMED',
+          paymentStatus: 'APPROVED',
+          paymentApprovedAt: new Date(),
+          paymentApprovedBy: session.user.email || 'Head Admin',
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          adminEmail: session.user.email || 'system',
+          action: 'BATCH_REGISTRATIONS_ACCEPTED',
+          details: JSON.stringify({ count: result.count, ids }),
+        },
+      });
+
+      return NextResponse.json({ success: true, count: result.count, action: 'ACCEPT' });
+    }
+
+    if (action === 'DECLINE') {
+      // Set to REJECTED and reject VIP payments
+      const result = await prisma.registration.updateMany({
+        where: { id: { in: ids } },
+        data: {
+          status: 'REJECTED',
+          paymentStatus: 'REJECTED',
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          adminEmail: session.user.email || 'system',
+          action: 'BATCH_REGISTRATIONS_DECLINED',
+          details: JSON.stringify({ count: result.count, ids }),
+        },
+      });
+
+      return NextResponse.json({ success: true, count: result.count, action: 'DECLINE' });
+    }
+
+    return NextResponse.json({ error: 'Invalid action provided' }, { status: 400 });
+  } catch (error) {
+    console.error('[ADMIN_REGISTRATIONS_BATCH_PATCH_ERROR]', error);
+    return NextResponse.json({ error: 'Failed to update registrations' }, { status: 500 });
+  }
+}
+
+// CLEAR ALL REGISTRATIONS OR DELETE SELECTED
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (session.user.role === 'scanner') {
+      return NextResponse.json({ error: 'Scanner accounts cannot delete registrations' }, { status: 403 });
+    }
+
+    const body = await request.json().catch(() => ({}));
+    const { all, ids } = body;
+
+    if (all === true) {
+      // Purge all registrations and reset verified payments
+      const [deletedRegs, deletedPayments] = await Promise.all([
+        prisma.registration.deleteMany({}),
+        prisma.verifiedPayment.deleteMany({}),
+      ]);
+
+      await prisma.auditLog.create({
+        data: {
+          adminEmail: session.user.email || 'system',
+          action: 'PURGE_ALL_REGISTRATIONS',
+          details: JSON.stringify({
+            deletedRegistrations: deletedRegs.count,
+            deletedPayments: deletedPayments.count,
+            performedBy: session.user.email,
+          }),
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'All registrations and payment records successfully cleared.',
+        count: deletedRegs.count,
+      });
+    }
+
+    if (Array.isArray(ids) && ids.length > 0) {
+      const result = await prisma.registration.deleteMany({
+        where: { id: { in: ids } },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          adminEmail: session.user.email || 'system',
+          action: 'DELETE_SELECTED_REGISTRATIONS',
+          details: JSON.stringify({ count: result.count, ids }),
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `Deleted ${result.count} registration(s).`,
+        count: result.count,
+      });
+    }
+
+    return NextResponse.json({ error: 'Specify either all: true or an array of ids' }, { status: 400 });
+  } catch (error) {
+    console.error('[ADMIN_REGISTRATIONS_DELETE_ERROR]', error);
+    return NextResponse.json({ error: 'Failed to delete registrations' }, { status: 500 });
+  }
+}

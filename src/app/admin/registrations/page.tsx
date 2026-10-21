@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import { RegistrationsTableClient } from '@/components/admin/RegistrationsTableClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -167,158 +168,26 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
         </button>
       </form>
 
-      {/* Table */}
-      <div
-        className="rounded-xl border overflow-hidden"
-        style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                {['Ref', 'Player', 'IGN & UID', 'Tier', 'VIP Payment / Txn', 'Category', 'Status', 'Date', 'Action'].map((h) => (
-                  <th
-                    key={h}
-                    className="text-left px-4 py-3 text-xs uppercase tracking-wider"
-                    style={{ color: '#999999' }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {registrations.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center" style={{ color: '#666666' }}>
-                    No registrations found matching the specified filters.
-                  </td>
-                </tr>
-              ) : (
-                registrations.map((r) => {
-                  const sc = statusColors[r.status] || statusColors.PENDING;
-                  const isVip = r.ticketTier === 'VIP';
-                  const isPendingApproval = isVip && (r.paymentStatus === 'PENDING_APPROVAL' || r.status === 'PENDING');
-
-                  return (
-                    <tr
-                      key={r.id}
-                      className={`border-b transition-colors ${
-                        isPendingApproval ? 'bg-amber-500/[0.04] hover:bg-amber-500/[0.08]' : 'hover:bg-white/[0.02]'
-                      }`}
-                      style={{ borderColor: 'rgba(255,255,255,0.03)' }}
-                    >
-                      {/* Reference */}
-                      <td className="px-4 py-3" style={{ fontFamily: 'var(--font-mono)', color: '#CCFF00' }}>
-                        <Link href={`/admin/registrations/${r.id}`} className="hover:underline font-bold">
-                          {r.referenceId}
-                        </Link>
-                      </td>
-
-                      {/* Full Name */}
-                      <td className="px-4 py-3 font-semibold text-white">
-                        {r.fullName}
-                      </td>
-
-                      {/* IGN & UID */}
-                      <td className="px-4 py-3">
-                        <div className="font-mono text-white text-xs">{r.inGameName}</div>
-                        <div className="font-mono text-[11px] text-[#888888]">UID: {r.pubgUid}</div>
-                      </td>
-
-                      {/* Tier */}
-                      <td className="px-4 py-3">
-                        {isVip ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                            ★ VIP
-                          </span>
-                        ) : (
-                          <span className="text-xs font-mono text-[#666666]">
-                            STD
-                          </span>
-                        )}
-                      </td>
-
-                      {/* VIP Payment Details Column */}
-                      <td className="px-4 py-3">
-                        {isVip ? (
-                          <div className="space-y-1">
-                            {r.paymentStatus === 'APPROVED' ? (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                                ✓ PAID & APPROVED
-                              </span>
-                            ) : r.paymentStatus === 'REJECTED' ? (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40">
-                                ✗ PAYMENT REJECTED
-                              </span>
-                            ) : (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/50">
-                                ⏳ APPROVAL REQUIRED
-                              </span>
-                            )}
-
-                            {/* Txn Code and Method */}
-                            <div className="font-mono text-[11px] text-white">
-                              {r.paymentTxnCode ? (
-                                <span className="text-amber-300 font-bold">TXN: {r.paymentTxnCode}</span>
-                              ) : (
-                                <span className="text-[#888888]">No Txn code</span>
-                              )}
-                            </div>
-
-                            {/* Telegram Contact */}
-                            {r.telegramUsername && (
-                              <div className="font-mono text-[10px] text-sky-400">
-                                TG: {r.telegramUsername}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="font-mono text-xs text-[#666666]">Free Registration</span>
-                        )}
-                      </td>
-
-                      {/* Category */}
-                      <td className="px-4 py-3 capitalize text-xs" style={{ color: '#999999' }}>
-                        {r.category.replace('_', ' ')}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3">
-                        <span
-                          className="inline-block px-2 py-0.5 rounded-full text-xs uppercase tracking-wider font-bold"
-                          style={{ backgroundColor: sc.bg, color: sc.text, fontFamily: 'var(--font-mono)' }}
-                        >
-                          {r.status}
-                        </span>
-                      </td>
-
-                      {/* Date */}
-                      <td className="px-4 py-3 text-xs font-mono" style={{ color: '#666666' }}>
-                        {new Date(r.createdAt).toLocaleDateString()}
-                      </td>
-
-                      {/* Action */}
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/registrations/${r.id}`}
-                          className={`inline-block px-3 py-1.5 rounded text-xs font-heading font-black uppercase tracking-wider transition-all ${
-                            isPendingApproval
-                              ? 'bg-amber-400 hover:bg-amber-300 text-black shadow-[0_0_10px_rgba(245,158,11,0.4)]'
-                              : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
-                          }`}
-                        >
-                          {isPendingApproval ? 'APPROVE VIP →' : 'DETAILS →'}
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Interactive Table with Select All, Batch Actions & Clear All */}
+      <RegistrationsTableClient
+        registrations={registrations.map((r) => ({
+          id: r.id,
+          referenceId: r.referenceId,
+          fullName: r.fullName,
+          inGameName: r.inGameName,
+          pubgUid: r.pubgUid,
+          ticketTier: r.ticketTier,
+          paymentMethod: r.paymentMethod,
+          paymentTxnCode: r.paymentTxnCode,
+          telegramUsername: r.telegramUsername,
+          paymentStatus: r.paymentStatus,
+          category: r.category,
+          status: r.status,
+          createdAt: r.createdAt.toISOString(),
+        }))}
+        statusColors={statusColors}
+        totalCount={total}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
