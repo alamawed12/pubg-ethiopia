@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -91,8 +94,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch authoritative live counts
+    const getLiveCounts = async () => {
+      const [total, vip, standard] = await Promise.all([
+        prisma.registration.count({ where: { status: 'CHECKED_IN' } }),
+        prisma.registration.count({ where: { status: 'CHECKED_IN', ticketTier: 'VIP' } }),
+        prisma.registration.count({ where: { status: 'CHECKED_IN', ticketTier: 'STANDARD' } }),
+      ]);
+      return { total, vip, standard };
+    };
+
     // Check for duplicate check-in
     if (registration.status === 'CHECKED_IN' || registration.checkedInAt) {
+      const counts = await getLiveCounts();
       return NextResponse.json(
         {
           success: false,
@@ -102,8 +116,14 @@ export async function POST(request: NextRequest) {
           checkedInAt: registration.checkedInAt,
           checkedInBy: registration.checkedInBy,
           registration,
+          counts,
         },
-        { status: 409 }
+        {
+          status: 409,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+          },
+        }
       );
     }
 
@@ -137,12 +157,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      status: 'SUCCESS',
-      message: 'GENUINE TICKET VERIFIED — ADMISSION GRANTED',
-      registration: updated,
-    });
+    const counts = await getLiveCounts();
+
+    return NextResponse.json(
+      {
+        success: true,
+        status: 'SUCCESS',
+        message: 'GENUINE TICKET VERIFIED — ADMISSION GRANTED',
+        registration: updated,
+        counts,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (error) {
     console.error('[SCANNER_CHECK_IN_API_ERROR]', error);
     return NextResponse.json(

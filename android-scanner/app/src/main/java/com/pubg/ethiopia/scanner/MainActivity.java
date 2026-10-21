@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Test server connection on startup
+        // Test server connection and sync live counters on startup
         checkServerStatus();
     }
 
@@ -125,6 +125,23 @@ public class MainActivity extends AppCompatActivity {
             if (connectionIndicator != null) {
                 connectionIndicator.setBackgroundResource(success ? R.drawable.circle_green : R.drawable.circle_red);
             }
+            if (success) {
+                syncLiveGateMetrics();
+            }
+        });
+    }
+
+    private void syncLiveGateMetrics() {
+        ApiClient.getInstance().fetchLiveGateCounts(serverUrl, secretKey, (total, vip, standard) -> {
+            countTotal = total;
+            countVip = vip;
+            countStandard = standard;
+            prefs.edit()
+                    .putInt(SettingsActivity.KEY_TOTAL_COUNT, countTotal)
+                    .putInt(SettingsActivity.KEY_VIP_COUNT, countVip)
+                    .putInt(SettingsActivity.KEY_STANDARD_COUNT, countStandard)
+                    .apply();
+            updateCountersUI();
         });
     }
 
@@ -155,7 +172,17 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getInstance().checkInTicket(serverUrl, rawTicketData, staffName, secretKey, new ApiClient.ApiCallback() {
             @Override
             public void onSuccess(ScanResult result) {
-                if (result.isSuccess()) {
+                if (result.serverTotalCount >= 0) {
+                    countTotal = result.serverTotalCount;
+                    countVip = result.serverVipCount;
+                    countStandard = result.serverStandardCount;
+                    prefs.edit()
+                            .putInt(SettingsActivity.KEY_TOTAL_COUNT, countTotal)
+                            .putInt(SettingsActivity.KEY_VIP_COUNT, countVip)
+                            .putInt(SettingsActivity.KEY_STANDARD_COUNT, countStandard)
+                            .apply();
+                    updateCountersUI();
+                } else if (result.isSuccess()) {
                     countTotal++;
                     if (result.isVip()) {
                         countVip++;
@@ -222,8 +249,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         EditText etTicketInput = dialogView.findViewById(R.id.etTicketInput);
-        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
-        Button btnSubmit = dialogView.findViewById(R.id.btnSubmit);
+        Button btnSubmit = dialogView.findViewById(R.id.btnSubmitManual);
+        Button btnCancel = dialogView.findViewById(R.id.btnCancelManual);
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 

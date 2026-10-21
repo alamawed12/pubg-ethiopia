@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
@@ -94,11 +97,18 @@ export async function POST(request: NextRequest, context: RouteContext) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Attendee checked in successfully',
-      registration: updated,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Attendee checked in successfully',
+        registration: updated,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
   } catch (error) {
     console.error('[ADMIN_CHECK_IN_ERROR]', error);
     return NextResponse.json(

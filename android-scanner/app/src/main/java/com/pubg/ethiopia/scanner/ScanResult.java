@@ -12,6 +12,11 @@ public class ScanResult {
     public String checkedInAt = "";
     public String checkedInBy = "";
 
+    // Live venue counters returned from server database
+    public int serverTotalCount = -1;
+    public int serverVipCount = -1;
+    public int serverStandardCount = -1;
+
     public boolean isSuccess() {
         return "SUCCESS".equalsIgnoreCase(status);
     }

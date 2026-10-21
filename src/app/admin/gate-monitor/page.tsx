@@ -43,8 +43,15 @@ export default function AdminGateMonitorPage() {
     try {
       const params = new URLSearchParams();
       if (search.trim()) params.append('search', search.trim());
+      params.append('_t', Date.now().toString());
 
-      const res = await fetch(`/api/admin/gate-monitor?${params.toString()}`);
+      const res = await fetch(`/api/admin/gate-monitor?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
       const data = await res.json();
       if (data.success) {
         setMetrics(data.metrics);

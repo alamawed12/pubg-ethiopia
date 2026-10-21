@@ -45,6 +45,10 @@ public class ApiClient {
         void onResult(boolean success, String message);
     }
 
+    public interface LiveCountsCallback {
+        void onCounts(int total, int vip, int standard);
+    }
+
     private ApiClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -163,6 +167,14 @@ public class ApiClient {
                                     result.checkedInBy = regObj.optString("checkedInBy", staffName);
                                 }
 
+                                // Parse real-time server counters
+                                JSONObject countsObj = resJson.optJSONObject("counts");
+                                if (countsObj != null) {
+                                    result.serverTotalCount = countsObj.optInt("total", -1);
+                                    result.serverVipCount = countsObj.optInt("vip", -1);
+                                    result.serverStandardCount = countsObj.optInt("standard", -1);
+                                }
+
                                 if (statusCode == 200) {
                                     callback.onSuccess(result);
                                 } else if (statusCode == 409) { // Already checked in
@@ -186,6 +198,48 @@ public class ApiClient {
 
             } catch (Exception ex) {
                 mainHandler.post(() -> callback.onError("Request creation error: " + ex.getMessage(), 0));
+            }
+        });
+    }
+
+    public void fetchLiveGateCounts(String serverUrl, String secretKey, LiveCountsCallback callback) {
+        executor.execute(() -> {
+            try {
+                String cleanBaseUrl = normalizeUrl(serverUrl);
+                String endpoint = cleanBaseUrl + "/api/admin/gate-monitor?key=" + secretKey;
+
+                Request request = new Request.Builder()
+                        .url(endpoint)
+                        .addHeader("x-scanner-key", secretKey)
+                        .addHeader("Cache-Control", "no-cache")
+                        .get()
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        // Keep local cache if offline
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            String body = response.body() != null ? response.body().string() : "";
+                            try {
+                                JSONObject json = new JSONObject(body);
+                                JSONObject metrics = json.optJSONObject("metrics");
+                                if (metrics != null) {
+                                    int total = metrics.optInt("totalCheckedIn", 0);
+                                    int vip = metrics.optInt("vipCheckedIn", 0);
+                                    int standard = metrics.optInt("standardCheckedIn", 0);
+                                    mainHandler.post(() -> callback.onCounts(total, vip, standard));
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
+                });
+            } catch (Exception ignored) {
             }
         });
     }
