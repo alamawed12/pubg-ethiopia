@@ -45,17 +45,17 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
-      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
-      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
-      { url: '/images/pubg-helmet-logo.png', type: 'image/png' },
+      { url: '/images/pubg-helmet-logo.png?v=2', type: 'image/png' },
+      { url: '/favicon.ico?v=2', sizes: 'any' },
+      { url: '/favicon-32x32.png?v=2', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon-16x16.png?v=2', type: 'image/png', sizes: '16x16' },
+      { url: '/icon.png?v=2', type: 'image/png', sizes: '512x512' },
     ],
     apple: [
-      { url: '/apple-icon.png', type: 'image/png', sizes: '180x180' },
-      { url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' },
+      { url: '/images/pubg-helmet-logo.png?v=2', type: 'image/png', sizes: '180x180' },
+      { url: '/apple-icon.png?v=2', type: 'image/png', sizes: '180x180' },
     ],
-    shortcut: '/favicon.ico',
+    shortcut: '/favicon.ico?v=2',
   },
   openGraph: {
     title: "PUBG MOBILE Community Assembly — Ethiopia",
@@ -75,6 +75,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable} ${montserrat.variable}`}
     >
+      <head>
+        <link rel="icon" href="/images/pubg-helmet-logo.png?v=2" type="image/png" sizes="any" />
+        <link rel="apple-touch-icon" href="/images/pubg-helmet-logo.png?v=2" />
+      </head>
       <body className="film-grain">{children}</body>
     </html>
   );
