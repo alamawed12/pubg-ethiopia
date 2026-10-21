@@ -25,7 +25,7 @@ export default function RegisterPage() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-px bg-gradient-to-r from-transparent via-[var(--color-lime,#CCFF00)] to-transparent opacity-60 shadow-[0_0_15px_rgba(204,255,0,0.8)]" />
 
       {/* Main Registration Container */}
-      <main className="relative z-10 mx-auto max-w-2xl px-4 sm:px-6 pt-12 pb-24 md:pt-20 md:pb-32">
+      <main className="relative z-10 mx-auto max-w-2xl px-3 sm:px-6 pt-10 pb-24 md:pt-20 md:pb-32 w-full overflow-x-hidden">
         {/* Navigation Return Link */}
         <div className="mb-8">
           <Link
@@ -56,12 +56,12 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-lime,#CCFF00)]/30 bg-[var(--color-lime,#CCFF00)]/10 px-3 py-1 font-mono text-xs uppercase tracking-widest text-[var(--color-lime,#CCFF00)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-lime,#CCFF00)] animate-pulse" />
-            OFFICIAL PUBG MOBILE TEAM REGISTRATION • LIMITED CAPACITY
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--color-lime,#CCFF00)]/30 bg-[var(--color-lime,#CCFF00)]/10 px-2.5 sm:px-3 py-1 font-mono text-[10px] sm:text-xs uppercase tracking-normal sm:tracking-widest text-[var(--color-lime,#CCFF00)] max-w-full">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-lime,#CCFF00)] animate-pulse shrink-0" />
+            <span className="truncate">OFFICIAL PUBG MOBILE TEAM REGISTRATION • LIMITED CAPACITY</span>
           </div>
 
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-wider text-white">
+          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight sm:tracking-wider text-white break-words">
             SECURE YOUR <span className="text-[var(--color-lime,#CCFF00)]">REGISTRATION</span>
           </h1>
 

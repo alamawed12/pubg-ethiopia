@@ -75,7 +75,7 @@ export function AdminWelcomeIntro() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 max-w-lg w-full mx-4 p-8 rounded-2xl border text-center flex flex-col items-center shadow-2xl"
+            className="relative z-10 max-w-lg w-full mx-4 p-5 sm:p-8 rounded-2xl border text-center flex flex-col items-center shadow-2xl"
             style={{
               backgroundColor: '#0d0d0d',
               borderColor: `${primaryColor}40`,
@@ -90,7 +90,7 @@ export function AdminWelcomeIntro() {
               transition={{ delay: 0.1, duration: 0.4 }}
               src="/images/pubg-mobile-logo.png"
               alt="PUBG Mobile"
-              className="h-14 w-auto object-contain mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+              className="h-12 sm:h-14 w-auto object-contain mb-3 sm:mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
             />
 
             {/* Role Badge */}
@@ -98,7 +98,7 @@ export function AdminWelcomeIntro() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.3 }}
-              className="px-3 py-1 rounded-full font-mono text-[10px] uppercase font-bold tracking-widest mb-3 border"
+              className="px-2.5 sm:px-3 py-1 rounded-full font-mono text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sm:tracking-widest mb-3 border max-w-full truncate"
               style={{
                 backgroundColor: `${primaryColor}15`,
                 borderColor: `${primaryColor}60`,
@@ -113,7 +113,7 @@ export function AdminWelcomeIntro() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.25, duration: 0.4 }}
-              className="text-3xl sm:text-4xl font-black uppercase tracking-wider mb-2 font-heading"
+              className="text-2xl sm:text-4xl font-black uppercase tracking-wider mb-2 font-heading"
               style={{
                 color: primaryColor,
                 textShadow: glowShadow,

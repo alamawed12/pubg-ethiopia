@@ -133,23 +133,23 @@ export function HeroSection() {
           {/* Pre-heading: Mono Terminal Tag */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-2 mb-4 px-3 py-1 rounded border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm"
+            className="flex items-center gap-1.5 sm:gap-2 mb-4 px-2.5 sm:px-3 py-1 rounded border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm max-w-full"
           >
-            <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
-            <span className="font-mono text-xs md:text-sm text-[#CCFF00] tracking-widest uppercase">
+            <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#CCFF00] animate-pulse shrink-0" />
+            <span className="font-mono text-[10px] sm:text-xs md:text-sm text-[#CCFF00] tracking-normal sm:tracking-widest uppercase truncate">
               {'OFFICIAL PUBG MOBILE TEAM // ADDIS ABABA, ETHIOPIA'}
             </span>
-            <span className="inline-block w-1.5 h-3.5 bg-[#CCFF00] animate-pulse ml-0.5" />
+            <span className="inline-block w-1.5 h-3 bg-[#CCFF00] animate-pulse ml-0.5 shrink-0" />
           </motion.div>
 
           {/* Main Headline: Exact 3 Lines */}
-          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-center">
+          <div className="flex flex-col items-center justify-center font-heading font-black tracking-tight uppercase leading-[0.95] text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-center max-w-full">
             <motion.h1 variants={itemVariants} className="text-white drop-shadow-sm">
               PUBG MOBILE
             </motion.h1>
             <motion.div
               variants={itemVariants}
-              className="text-[#CCFF00] drop-shadow-[0_0_35px_rgba(204,255,0,0.35)] py-1 md:py-2"
+              className="text-[#CCFF00] drop-shadow-[0_0_35px_rgba(204,255,0,0.35)] py-1 md:py-2 break-words"
             >
               COMMUNITY ASSEMBLY
             </motion.div>

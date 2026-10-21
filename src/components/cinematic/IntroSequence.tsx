@@ -116,10 +116,10 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 key="title-group"
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.4 } }}
-                className="relative z-10 flex flex-col items-center justify-center text-center px-4"
+                className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl mx-auto"
               >
                 {/* ETHIOPIA letters */}
-                <h1 className="font-heading text-6xl md:text-8xl lg:text-9xl text-[#cccccc] tracking-[0.3em] uppercase flex flex-wrap justify-center overflow-hidden font-bold">
+                <h1 className="font-heading text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-[#cccccc] tracking-[0.15em] sm:tracking-[0.25em] md:tracking-[0.3em] uppercase flex flex-wrap justify-center font-bold max-w-full">
                   {ethLetters.map((char, index) => (
                     <motion.span
                       key={`eth-${index}`}
@@ -139,7 +139,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
                 {/* COMMUNITY ASSEMBLY letters */}
                 {phase >= 2.5 && (
-                  <h2 className="mt-4 font-heading text-2xl md:text-4xl lg:text-5xl text-[#999999] tracking-[0.25em] uppercase flex flex-wrap justify-center font-medium">
+                  <h2 className="mt-3 sm:mt-4 font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl text-[#999999] tracking-[0.12em] sm:tracking-[0.2em] md:tracking-[0.25em] uppercase flex flex-wrap justify-center font-medium max-w-full">
                     {assemblyLetters.map((char, index) => (
                       <motion.span
                         key={`ca-${index}`}
@@ -173,12 +173,12 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                   transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
                 }}
                 exit={{ opacity: 0, transition: { duration: 0.4 } }}
-                className="relative z-10 flex flex-col items-center justify-center text-center px-4 leading-none"
+                className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl mx-auto leading-tight"
               >
-                <div className="font-heading text-5xl md:text-7xl lg:text-8xl font-black text-[#CCFF00] tracking-wider uppercase drop-shadow-[0_0_35px_rgba(204,255,0,0.4)]">
+                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#CCFF00] tracking-normal sm:tracking-wider uppercase drop-shadow-[0_0_35px_rgba(204,255,0,0.4)]">
                   ONE COMMUNITY.
                 </div>
-                <div className="font-heading text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-wider uppercase mt-2 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <div className="font-heading text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-normal sm:tracking-wider uppercase mt-1 sm:mt-2 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                   ONE BATTLEGROUND.
                 </div>
               </motion.div>

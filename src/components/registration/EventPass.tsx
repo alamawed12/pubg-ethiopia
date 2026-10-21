@@ -505,7 +505,7 @@ export function EventPass({
           <div className="pointer-events-none absolute bottom-3.5 right-3.5 h-3.5 w-3.5 border-b-2 border-r-2 border-amber-400/70" />
 
           {/* VIP Pass Header (Top Logo & Title) */}
-          <div className="pt-5 px-6 pb-4 border-b border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-4 sm:pt-5 px-4 sm:px-6 pb-3 sm:pb-4 border-b border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -531,7 +531,7 @@ export function EventPass({
           </div>
 
           {/* Horizontal Split Body (Left Info, Right QR Code) */}
-          <div className="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
             {/* Left Column: Attendee Data */}
             <div className="md:col-span-7 space-y-4 text-left">
               {/* Pass Ref */}
@@ -673,7 +673,7 @@ export function EventPass({
         <div className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 border-b-2 border-r-2 border-[var(--color-lime,#CCFF00)]/60" />
 
         {/* Card Body */}
-        <div className="p-6 text-center">
+        <div className="p-4 sm:p-6 text-center">
           {/* Official Team Verified Pill */}
           <div className="mb-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[10px] tracking-widest uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
