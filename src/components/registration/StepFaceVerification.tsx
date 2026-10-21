@@ -63,6 +63,7 @@ export function StepFaceVerification({
   });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const processCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -89,44 +90,72 @@ export function StepFaceVerification({
     }
   }, []);
 
-  // Start Camera Stream
-  const startCamera = useCallback(async (mode: 'user' | 'environment') => {
-    setCameraError(null);
-    try {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: mode,
-          width: { ideal: 720 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
-
-      setStream(newStream);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
-      }
-    } catch (err) {
-      console.warn('Camera access denied or unavailable', err);
-      setCameraError('Camera access unavailable. You can upload a live selfie photo below.');
-    }
-  }, [stream]);
-
-  // Stop camera on unmount or when captured
+  // Stop camera
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
+    setStream(null);
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
     }
-  }, [stream]);
+  }, []);
+
+  // Start Camera Stream with iOS WebKit & Mobile compatibility
+  const startCamera = useCallback(async (mode: 'user' | 'environment') => {
+    setCameraError(null);
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+
+      // 1. Mobile & iOS Safari friendly video constraints
+      // (avoid 1:1 aspect ratio constraint which hangs on iOS camera hardware)
+      let newStream: MediaStream;
+      try {
+        newStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: mode,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch {
+        // Fallback with minimal constraints for older iPhone / Android devices
+        newStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: mode },
+          audio: false,
+        });
+      }
+
+      streamRef.current = newStream;
+      setStream(newStream);
+
+      if (videoRef.current) {
+        const video = videoRef.current;
+        video.srcObject = newStream;
+        video.muted = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+
+        // Explicitly trigger play for iOS WebKit
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            video.onloadedmetadata = () => {
+              video.play().catch(() => {});
+            };
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Camera access denied or unavailable', err);
+      setCameraError('Camera access unavailable. Please check permissions or upload a selfie below.');
+    }
+  }, []);
 
   // Flip camera between front and rear
   const toggleCameraFacing = () => {
@@ -504,7 +533,7 @@ export function StepFaceVerification({
     return () => {
       stopCamera();
     };
-  }, [capturedSelfie, facingMode, startCamera, stopCamera]);
+  }, [facingMode]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -632,14 +661,29 @@ export function StepFaceVerification({
             </div>
 
             {/* Circular Viewfinder */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-[#CCFF00] shadow-[0_0_30px_rgba(204,255,0,0.35)] flex items-center justify-center bg-black">
+            <div
+              onClick={() => {
+                if (videoRef.current && videoRef.current.paused) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full overflow-hidden border-4 border-[#CCFF00] shadow-[0_0_30px_rgba(204,255,0,0.35)] flex items-center justify-center bg-black cursor-pointer"
+              style={{
+                WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+                transform: 'translateZ(0)',
+              }}
+            >
               {/* Video Element */}
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className="w-full h-full object-cover transform scale-x-[-1]"
+                className="w-full h-full object-cover"
+                style={{
+                  transform: facingMode === 'user' ? 'scaleX(-1)' : 'none',
+                  WebkitTransform: facingMode === 'user' ? 'scaleX(-1)' : 'none',
+                }}
               />
 
               {/* Pulsing Target Reticle */}
