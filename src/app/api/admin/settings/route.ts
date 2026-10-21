@@ -86,26 +86,91 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        const testRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keyToTest}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: 'Respond with OK if connected.' }] }],
-            }),
+        // Step 1: Query the models endpoint with the key to find active supported models
+        let discoveredModels: string[] = [];
+        try {
+          const listRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${keyToTest}`
+          );
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const rawModels: Array<{ name: string; supportedGenerationMethods?: string[] }> = listData.models || [];
+            discoveredModels = rawModels
+              .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
+              .map((m) => m.name.replace(/^models\//, ''));
           }
-        );
+        } catch (listErr) {
+          console.warn('[GEMINI_LIST_MODELS_WARN]', listErr);
+        }
 
-        if (testRes.ok) {
+        // Prioritize models: flash models first, then any discovered model, then standard fallback list
+        const candidates = [
+          ...discoveredModels.filter((m) => m.includes('flash')),
+          ...discoveredModels,
+          'gemini-2.0-flash',
+          'gemini-2.5-flash',
+          'gemini-1.5-flash-latest',
+          'gemini-1.5-flash',
+          'gemini-pro',
+          'gemini-1.5-pro',
+        ];
+
+        // Deduplicate
+        const uniqueCandidates = Array.from(new Set(candidates));
+
+        let success = false;
+        let workingModel = '';
+        let lastError = '';
+
+        for (const model of uniqueCandidates) {
+          try {
+            const testRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyToTest}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: 'Respond with OK.' }] }],
+                }),
+              }
+            );
+
+            if (testRes.ok) {
+              success = true;
+              workingModel = model;
+              break;
+            } else {
+              lastError = await testRes.text();
+            }
+          } catch (modelErr) {
+            lastError = modelErr instanceof Error ? modelErr.message : String(modelErr);
+          }
+        }
+
+        if (success) {
+          // Persist verified working model
+          await prisma.systemSetting.upsert({
+            where: { key: 'gemini_model_name' },
+            update: { value: workingModel },
+            create: { key: 'gemini_model_name', value: workingModel },
+          });
+
+          // Also save the key if it was passed cleanly
+          if (geminiApiKey && !geminiApiKey.includes('••••')) {
+            await prisma.systemSetting.upsert({
+              where: { key: 'gemini_api_key' },
+              update: { value: geminiApiKey.trim() },
+              create: { key: 'gemini_api_key', value: geminiApiKey.trim() },
+            });
+          }
+
           return NextResponse.json({
             success: true,
-            message: '✓ Google Gemini 1.5 Flash Vision AI connected and operational! Anti-fraud brother biometric checks active.',
+            message: `✓ Connected successfully to Google Gemini (${workingModel})! Anti-fraud brother biometric checks active.`,
           });
         } else {
-          const errText = await testRes.text();
           return NextResponse.json(
-            { success: false, error: `Google API rejected the key (HTTP ${testRes.status}): ${errText.slice(0, 160)}` },
+            { success: false, error: `Google API rejected the key: ${lastError.slice(0, 180)}` },
             { status: 400 }
           );
         }

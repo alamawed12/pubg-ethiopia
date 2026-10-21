@@ -120,8 +120,39 @@ Return ONLY valid JSON matching this exact schema:
   "details": "concise explanation"
 }`;
 
-      // Support gemini-1.5-flash and gemini-2.0-flash models with fallback
-      const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+      // Resolve known working model from database or discovery
+      let storedModel = '';
+      try {
+        const modelSetting = await prisma.systemSetting.findUnique({ where: { key: 'gemini_model_name' } });
+        if (modelSetting?.value) storedModel = modelSetting.value.trim();
+      } catch {}
+
+      // Discover available models from the project
+      let discoveredModels: string[] = [];
+      try {
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${geminiApiKey}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const rawModels: Array<{ name: string; supportedGenerationMethods?: string[] }> = listData.models || [];
+          discoveredModels = rawModels
+            .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
+            .map((m) => m.name.replace(/^models\//, ''));
+        }
+      } catch {}
+
+      const modelsToTry = Array.from(
+        new Set([
+          storedModel,
+          ...discoveredModels.filter((m) => m.includes('flash')),
+          ...discoveredModels,
+          'gemini-2.0-flash',
+          'gemini-2.5-flash',
+          'gemini-1.5-flash-latest',
+          'gemini-1.5-flash',
+          'gemini-1.5-pro',
+          'gemini-pro',
+        ])
+      ).filter(Boolean);
 
       for (const model of modelsToTry) {
         try {
