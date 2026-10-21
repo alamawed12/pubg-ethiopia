@@ -127,14 +127,14 @@ export function Footer() {
             <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
               <li>
                 <a
-                  href="https://t.me"
+                  href="https://t.me/pubgmethsupport"
                   target="_blank"
                   rel="noopener noreferrer"
                   onMouseEnter={() => playSound('hover')}
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>TELEGRAM COMMUNITY</span>
+                  <span>TELEGRAM SUPPORT</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>
@@ -142,14 +142,29 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://discord.com"
+                  href="https://discord.gg/73xvuBch"
                   target="_blank"
                   rel="noopener noreferrer"
                   onMouseEnter={() => playSound('hover')}
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>DISCORD DISPATCH</span>
+                  <span>DISCORD SERVER</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://t.me/pubgm_eth"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>TELEGRAM CHANNEL</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>
