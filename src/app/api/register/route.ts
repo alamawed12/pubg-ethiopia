@@ -5,14 +5,12 @@ import { rateLimit } from '@/lib/rate-limit';
 import { generateReferenceId, generateQRToken } from '@/lib/reference';
 import { generateQRDataURL } from '@/lib/qr';
 
-// Allow larger body for base64 ID image uploads
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 export const maxDuration = 30;
 
 const DEFAULT_CAPACITY = 300;
 
-/**
- * Extracts client IP from incoming request headers.
- */
 function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) {
@@ -27,7 +25,7 @@ function getClientIp(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Rate Limiting Check (10 requests per 15 minutes per IP)
+    // 1. Rate Limiting Check
     const clientIp = getClientIp(req);
     const rateLimitResult = rateLimit(`reg_${clientIp}`, 10, 15 * 60 * 1000);
 
@@ -49,7 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Parse & Validate Payload with Zod
+    // 2. Parse & Validate Payload
     let rawBody;
     try {
       rawBody = await req.json();
@@ -83,17 +81,9 @@ export async function POST(req: NextRequest) {
 
     const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : DEFAULT_CAPACITY;
     const capacityLimit = isNaN(maxCapacity) || maxCapacity < 1 ? DEFAULT_CAPACITY : maxCapacity;
-    const capacityWarningThreshold = Math.max(1, Math.floor(capacityLimit * 0.9));
-
-    if (existingCount >= capacityWarningThreshold && existingCount < capacityLimit) {
-      console.warn(
-        `[CAPACITY_ALERT] Registration count (${existingCount}/${capacityLimit}) is approaching maximum venue threshold.`
-      );
-    }
-
     const registrationStatus = existingCount >= capacityLimit ? 'WAITLISTED' : 'PENDING';
 
-    // 4. Check for Existing Duplicate Registrations
+    // 4. Duplicate Check
     const duplicate = await prisma.registration.findFirst({
       where: {
         OR: [{ pubgUid: data.pubgUid }, { phoneNumber: data.phoneNumber }],
@@ -105,8 +95,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error:
-              'A player with this PUBG MOBILE UID is already registered for the assembly.',
+            error: 'A player with this PUBG MOBILE UID is already registered for the assembly.',
           },
           { status: 400 }
         );
@@ -115,8 +104,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error:
-              'A registration with this phone number already exists in our system.',
+            error: 'A registration with this phone number already exists in our system.',
           },
           { status: 400 }
         );
@@ -142,7 +130,7 @@ export async function POST(req: NextRequest) {
 
     const qrToken = generateQRToken();
 
-    // 6. Generate QR Code Data URL with security payload
+    // 6. Generate QR Code Data URL
     const qrPayload = JSON.stringify({
       ref: referenceId,
       token: qrToken,
@@ -157,14 +145,28 @@ export async function POST(req: NextRequest) {
       lightColor: '#FFFFFF',
     });
 
-    // 7. Check for Instant Automated Match in VerifiedPayment (SMS Bot)
+    // 7. Process Biometric AI Face Match & VIP Approvals
     const rawTier = (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD';
     const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
+
+    const rawSelfieImage = ((rawBody as Record<string, unknown>).selfieImage as string) || null;
+    const rawFaceScore = Number((rawBody as Record<string, unknown>).faceMatchScore) || 0;
+    const rawFaceStatus = ((rawBody as Record<string, unknown>).faceMatchStatus as string) || 'NOT_VERIFIED';
 
     let initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
     let initialRegistrationStatus = registrationStatus;
     let autoApproved = false;
 
+    // RULE 1: For STANDARD ticket tier:
+    // If AI Biometric Face Match succeeded (score >= 70 or status === 'PASSED')
+    // AND capacity is available: INSTANT AUTOMATED APPROVAL!
+    if (rawTier === 'STANDARD' && (rawFaceStatus === 'PASSED' || rawFaceScore >= 70) && registrationStatus !== 'WAITLISTED') {
+      initialRegistrationStatus = 'CONFIRMED';
+      autoApproved = true;
+    }
+
+    // RULE 2: For VIP ticket tier:
+    // Check SMS Bot instant transaction match
     if (rawTier === 'VIP' && submittedTxnCode) {
       const matchedPayment = await prisma.verifiedPayment.findFirst({
         where: {
@@ -178,7 +180,6 @@ export async function POST(req: NextRequest) {
         initialRegistrationStatus = 'CONFIRMED';
         autoApproved = true;
 
-        // Mark SMS payment as claimed
         await prisma.verifiedPayment.update({
           where: { id: matchedPayment.id },
           data: {
@@ -189,7 +190,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 8. Persist to SQLite Database via Prisma
+    // 8. Persist to Database via Prisma
     const newRegistration = await prisma.registration.create({
       data: {
         referenceId,
@@ -204,8 +205,14 @@ export async function POST(req: NextRequest) {
         teamName: data.teamName || null,
         tournamentInterest: data.tournamentInterest,
         squadDetails: data.squadDetails || null,
-        idFrontImage: (rawBody as Record<string, unknown>).idFrontImage as string || null,
-        idBackImage: (rawBody as Record<string, unknown>).idBackImage as string || null,
+        idFrontImage: ((rawBody as Record<string, unknown>).idFrontImage as string) || null,
+        idBackImage: ((rawBody as Record<string, unknown>).idBackImage as string) || null,
+        selfieImage: rawSelfieImage,
+        faceMatchScore: rawFaceScore,
+        faceMatchStatus: rawFaceStatus,
+        faceMatchDetails: rawTier === 'STANDARD' && autoApproved
+          ? `Instant Approval: AI Biometric Face Match Verified (${rawFaceScore}%).`
+          : `AI Face Match: ${rawFaceScore}% (${rawFaceStatus}).`,
         ticketTier: rawTier,
         vipPrice: rawTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
         paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
@@ -215,7 +222,7 @@ export async function POST(req: NextRequest) {
         paymentStatus: initialPaymentStatus,
         status: initialRegistrationStatus,
         paymentApprovedAt: autoApproved ? new Date() : null,
-        paymentApprovedBy: autoApproved ? 'AUTOMATED_SMS_BOT' : null,
+        paymentApprovedBy: autoApproved ? (rawTier === 'STANDARD' ? 'AI_BIOMETRIC_KYC_ENGINE' : 'AUTOMATED_SMS_BOT') : null,
       },
     });
 
@@ -237,10 +244,17 @@ export async function POST(req: NextRequest) {
           paymentTxnCode: newRegistration.paymentTxnCode,
           telegramUsername: newRegistration.telegramUsername,
           paymentStatus: newRegistration.paymentStatus,
+          faceMatchScore: newRegistration.faceMatchScore,
+          faceMatchStatus: newRegistration.faceMatchStatus,
           autoApproved,
         },
       },
-      { status: 201 }
+      {
+        status: 201,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
     );
   } catch (error: unknown) {
     console.error('[API_REGISTER_ERROR]', error);

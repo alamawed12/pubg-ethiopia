@@ -19,6 +19,8 @@ export interface RegistrationRow {
   category: string;
   status: string;
   createdAt: string | Date;
+  faceMatchScore?: number | null;
+  faceMatchStatus?: string | null;
 }
 
 interface RegistrationsTableClientProps {
@@ -346,7 +348,14 @@ export function RegistrationsTableClient({
                       </td>
 
                       {/* Full Name */}
-                      <td className="px-4 py-3 font-semibold text-white">{r.fullName}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-semibold text-white">{r.fullName}</div>
+                        {r.faceMatchScore && r.faceMatchScore >= 70 ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 mt-0.5">
+                            ✓ KYC Match {r.faceMatchScore}%
+                          </span>
+                        ) : null}
+                      </td>
 
                       {/* IGN & UID */}
                       <td className="px-4 py-3">

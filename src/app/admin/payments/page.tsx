@@ -22,6 +22,9 @@ interface VipPaymentRecord {
   paymentApprovedBy: string | null;
   status: string;
   createdAt: string;
+  faceMatchScore?: number | null;
+  faceMatchStatus?: string | null;
+  selfieImage?: string | null;
 }
 
 interface PaymentStats {
@@ -374,6 +377,11 @@ export default function AdminPaymentsPage() {
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30">
                         VIP PASS
                       </span>
+                      {p.faceMatchScore && p.faceMatchScore >= 70 ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-green-500/20 text-green-300 border border-green-500/40">
+                          ✓ AI KYC {p.faceMatchScore}%
+                        </span>
+                      ) : null}
 
                       {/* Payment Status Pill */}
                       {isPending && (

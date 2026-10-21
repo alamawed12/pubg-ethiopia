@@ -30,6 +30,12 @@ model Registration {
   idFrontImage  String?
   idBackImage   String?
 
+  // AI Biometric Face Match (Bybit-style KYC)
+  selfieImage       String?   // base64 data URL of live captured face selfie
+  faceMatchScore    Int?      // 0 to 100 percentage
+  faceMatchStatus   String?   @default("NOT_VERIFIED") // PASSED, FAILED, NOT_VERIFIED, MANUAL_REVIEW
+  faceMatchDetails  String?   // AI breakdown details
+
   // Ticket Tier
   ticketTier    String   @default("STANDARD") // STANDARD, VIP
   vipPrice      Int?
