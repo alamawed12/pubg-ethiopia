@@ -36,6 +36,18 @@ export const metadata: Metadata = {
     "Addis Ababa",
     "gaming",
   ],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/images/community-assembly-logo.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', type: 'image/png' },
+      { url: '/images/community-assembly-logo.png', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     title: "PUBG MOBILE Community Assembly — Ethiopia",
     description:
