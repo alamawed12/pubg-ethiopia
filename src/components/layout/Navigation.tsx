@@ -77,33 +77,32 @@ export function Navigation() {
             : 'bg-transparent border-b border-transparent py-5 md:py-6'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* ─── Left: Logo & Wordmark ─── */}
           <Link
             href="/"
             onClick={() => playSound('click')}
             onMouseEnter={() => playSound('hover')}
-            className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
+            className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none shrink-0"
             aria-label="PUBG Mobile Community Assembly Ethiopia"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/pubg-mobile-logo.png"
               alt="PUBG Mobile"
-              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105 shrink-0"
             />
-            <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)]">
-              {/* Short version on mobile and tablets */}
-              <span className="inline xl:hidden text-lg sm:text-xl">
-                {'PMCA '}<span className="text-white/40">{' — '}</span>{' ETHIOPIA'}
+            <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)] whitespace-nowrap">
+              {/* Responsive compact brand name to prevent nav crowding */}
+              <span className="inline 2xl:hidden text-base sm:text-lg">
+                {'PUBG·M '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
               </span>
-              {/* Full long version on large screens */}
-              <span className="hidden xl:inline text-lg xl:text-xl">
-                {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{' — '}</span>{' ETHIOPIA'}
+              <span className="hidden 2xl:inline text-lg">
+                {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
               </span>
             </span>
 
-            <span className="hidden sm:inline-flex items-center gap-1 ml-1.5 px-2 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[9px] tracking-wider uppercase">
+            <span className="hidden xl:inline-flex items-center gap-1 ml-1 px-2 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[9px] tracking-wider uppercase whitespace-nowrap shrink-0">
               <span className="w-1 h-1 rounded-full bg-[#CCFF00] animate-pulse" />
               OFFICIAL TEAM
             </span>
@@ -112,7 +111,7 @@ export function Navigation() {
           {/* ─── Center: Desktop Navigation Links ─── */}
           <nav
             aria-label="Main Navigation"
-            className="hidden md:flex items-center gap-8 lg:gap-10"
+            className="hidden lg:flex items-center gap-5 xl:gap-7 shrink-0"
           >
             {NAV_ITEMS.map((item) => (
               <a
@@ -120,7 +119,7 @@ export function Navigation() {
                 href={item.href}
                 onClick={(e) => handleLinkClick(e, item.href)}
                 onMouseEnter={() => playSound('hover')}
-                className="relative py-1 font-mono text-xs lg:text-sm tracking-widest text-[#cccccc] hover:text-white transition-colors duration-200 group uppercase"
+                className="relative py-1 font-mono text-xs xl:text-sm tracking-wider text-[#cccccc] hover:text-white transition-colors duration-200 group uppercase whitespace-nowrap"
               >
                 <span>{item.label}</span>
                 {/* Underline growing from center */}
@@ -130,7 +129,7 @@ export function Navigation() {
           </nav>
 
           {/* ─── Right: Audio Toggle + Register Button + Mobile Menu Button ─── */}
-          <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0">
             {/* Sound Toggle Button */}
             <button
               type="button"
@@ -186,12 +185,12 @@ export function Navigation() {
               href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="hidden sm:inline-flex items-center justify-center px-5 py-2.5 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(204,255,0,0.5)] active:scale-95 cursor-pointer rounded-xl"
+              className="hidden lg:inline-flex items-center justify-center px-5 py-2.5 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(204,255,0,0.5)] active:scale-95 cursor-pointer rounded-xl whitespace-nowrap"
             >
               REGISTER
             </Link>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile / Tablet Hamburger Button */}
             <button
               type="button"
               onClick={() => {
@@ -199,7 +198,7 @@ export function Navigation() {
                 setIsMobileMenuOpen((prev) => !prev);
               }}
               aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
-              className="md:hidden p-2 text-[#cccccc] hover:text-[#CCFF00] transition-colors cursor-pointer"
+              className="lg:hidden p-2 text-[#cccccc] hover:text-[#CCFF00] transition-colors cursor-pointer"
             >
               <svg
                 className="w-6 h-6"
@@ -231,7 +230,7 @@ export function Navigation() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-6 md:hidden select-none"
+            className="fixed inset-0 z-50 bg-[#0a0a0a]/98 backdrop-blur-2xl flex flex-col justify-between p-6 lg:hidden select-none"
           >
             {/* Top Bar inside Mobile Menu */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
