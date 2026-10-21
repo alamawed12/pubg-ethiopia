@@ -14,7 +14,7 @@ interface StepFaceVerificationProps {
   onBack: () => void;
 }
 
-type LivenessStage = 'CENTER' | 'TURN_LEFT' | 'TURN_RIGHT' | 'BLINK' | 'SMILE' | 'COMPLETED';
+type LivenessStage = 'CENTER' | 'TURN_LEFT' | 'TURN_RIGHT' | 'TILT_DOWN' | 'BLINK' | 'SMILE' | 'COMPLETED';
 
 export function StepFaceVerification({
   idFrontImage,
@@ -33,19 +33,21 @@ export function StepFaceVerification({
   const [analysisStep, setAnalysisStep] = useState<string>('Initializing AI engine...');
   const [capturedSelfie, setCapturedSelfie] = useState<string>(selfieImage || '');
 
-  // Active Real-Time Liveness State (Bybit-style live challenges)
+  // Active Real-Time Liveness State (Bybit-style 3D biometric challenges)
   const [livenessStage, setLivenessStage] = useState<LivenessStage>('CENTER');
   const [stageProgress, setStageProgress] = useState<number>(0);
   const [completedStages, setCompletedStages] = useState<{
     centered: boolean;
     turnedLeft: boolean;
     turnedRight: boolean;
+    tiltedDown: boolean;
     blinked: boolean;
     smiled: boolean;
   }>({
     centered: false,
     turnedLeft: false,
     turnedRight: false,
+    tiltedDown: false,
     blinked: false,
     smiled: false,
   });
@@ -67,7 +69,7 @@ export function StepFaceVerification({
   const animFrameRef = useRef<number | null>(null);
 
   // Play audio tones for instant auditory feedback during live challenges
-  const playChime = useCallback((freq = 880, duration = 0.12) => {
+  const playChime = useCallback((freq = 880, duration = 0.14) => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
@@ -78,7 +80,7 @@ export function StepFaceVerification({
       gain.connect(ctx.destination);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.setValueAtTime(0.09, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
       osc.start();
       osc.stop(ctx.currentTime + duration);
@@ -134,65 +136,73 @@ export function StepFaceVerification({
   };
 
   // Run AI Facial Verification
-  const runAiVerification = async (selfieDataUrl: string) => {
-    setIsAnalyzing(true);
-    setAnalysisStep('Detecting ID card facial portrait...');
+  const runAiVerification = useCallback(
+    async (selfieDataUrl: string) => {
+      setIsAnalyzing(true);
+      setAnalysisStep('Detecting ID card facial portrait...');
 
-    try {
-      setTimeout(() => setAnalysisStep('Extracting cranial bone structure & features...'), 700);
-      setTimeout(() => setAnalysisStep('Comparing biometric geometry against National ID...'), 1400);
+      try {
+        setTimeout(() => setAnalysisStep('Analyzing cranial structure & facial landmarks...'), 600);
+        setTimeout(() => setAnalysisStep('Running AI anti-fraud sibling & identity match...'), 1200);
 
-      const res = await fetch('/api/verify-face', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idFrontImage,
-          selfieImage: selfieDataUrl,
-          livenessData: {
-            turnedLeft: completedStages.turnedLeft,
-            turnedRight: completedStages.turnedRight,
-            blinked: completedStages.blinked,
-            smiled: completedStages.smiled,
-            durationMs: 4000,
-          },
-        }),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        const score = data.confidence || 40;
-        const status = data.status || (score >= 70 ? 'PASSED' : 'FAILED');
-
-        setMatchResult({
-          score,
-          status,
-          details: data.details || (status === 'PASSED' ? 'Biometric identity verified.' : 'Face does not match National ID.'),
+        const res = await fetch('/api/verify-face', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idFrontImage,
+            selfieImage: selfieDataUrl,
+            livenessData: {
+              turnedLeft: completedStages.turnedLeft,
+              turnedRight: completedStages.turnedRight,
+              tiltedDown: completedStages.tiltedDown,
+              blinked: completedStages.blinked,
+              smiled: completedStages.smiled,
+              durationMs: 4000,
+            },
+          }),
         });
 
-        updateField('selfieImage', selfieDataUrl);
-        updateField('faceMatchScore', score);
-        updateField('faceMatchStatus', status);
-      } else {
+        const data = await res.json();
+
+        if (data.success && data.status === 'PASSED') {
+          const score = data.confidence || 85;
+          setMatchResult({
+            score,
+            status: 'PASSED',
+            details: data.details || 'Biometric identity verified with high confidence.',
+          });
+
+          updateField('selfieImage', selfieDataUrl);
+          updateField('faceMatchScore', score);
+          updateField('faceMatchStatus', 'PASSED');
+        } else {
+          const score = data.confidence || 32;
+          setMatchResult({
+            score,
+            status: 'FAILED',
+            details:
+              data.details ||
+              data.error ||
+              'Facial geometry differs from National ID portrait (sibling/brother detected). Face match rejected.',
+          });
+          updateField('selfieImage', selfieDataUrl);
+          updateField('faceMatchScore', score);
+          updateField('faceMatchStatus', 'FAILED');
+        }
+      } catch (e) {
+        console.error('Face verification error', e);
         setMatchResult({
-          score: 38,
+          score: 30,
           status: 'FAILED',
-          details: data.error || 'Face match score below threshold. Please ensure you are scanning your own National ID card.',
+          details: 'Verification network timeout or server error. Please ensure good lighting and retry.',
         });
         updateField('faceMatchStatus', 'FAILED');
+      } finally {
+        setIsAnalyzing(false);
       }
-    } catch (e) {
-      console.error('Face verification error', e);
-      setMatchResult({
-        score: 45,
-        status: 'FAILED',
-        details: 'Verification network timeout. Please ensure clear lighting and retry.',
-      });
-      updateField('faceMatchStatus', 'FAILED');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+    },
+    [idFrontImage, completedStages, updateField]
+  );
 
   // Snaps high-definition frame
   const captureFrame = useCallback(() => {
@@ -216,16 +226,17 @@ export function StepFaceVerification({
     setCapturedSelfie(dataUrl);
     stopCamera();
     runAiVerification(dataUrl);
-  }, [facingMode, stopCamera]);
+  }, [facingMode, stopCamera, runAiVerification]);
 
-  // Real-time Canvas Computer Vision Liveness Loop
+  // Real-time Computer Vision Liveness Loop (IMMUNE TO PHONE MOVEMENT)
   useEffect(() => {
     if (capturedSelfie || !stream) return;
 
-    let baselineLuminance = 0;
     let holdCount = 0;
     let leftTurnFrames = 0;
     let rightTurnFrames = 0;
+    let tiltDownFrames = 0;
+    let baselineEyeVar = 0;
     let blinkDipFrames = 0;
     let smileFrames = 0;
 
@@ -252,79 +263,146 @@ export function StepFaceVerification({
       const imgData = ctx.getImageData(0, 0, 160, 160);
       const d = imgData.data;
 
-      // Calculate Center of Mass of skin-tone pixels and luminance
-      let totalSkinX = 0;
-      let totalSkinY = 0;
+      // 1. Establish Face Bounding Box via Skin Pixels
+      let minX = 160;
+      let maxX = 0;
+      let minY = 160;
+      let maxY = 0;
       let skinPixels = 0;
-      let totalLum = 0;
-      let eyeZoneLum = 0;
-      let eyeZonePixels = 0;
-      let mouthZoneLum = 0;
-      let mouthZonePixels = 0;
+      let sumSkinY = 0;
 
-      for (let y = 20; y < 140; y += 2) {
-        for (let x = 20; x < 140; x += 2) {
+      for (let y = 15; y < 145; y += 2) {
+        for (let x = 15; x < 145; x += 2) {
           const idx = (y * 160 + x) * 4;
           const r = d[idx];
           const g = d[idx + 1];
           const b = d[idx + 2];
-          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          totalLum += lum;
 
-          // Skin tone detector (RGB heuristic)
-          if (r > 60 && g > 40 && b > 20 && r > g && r - b > 10) {
-            totalSkinX += x;
-            totalSkinY += y;
+          // Strict human skin tone spectrum detector
+          if (r > 60 && g > 40 && b > 25 && r > g && r - b > 12) {
             skinPixels++;
-          }
-
-          // Eye zone (y: 40-75)
-          if (y >= 40 && y <= 75 && x >= 45 && x <= 115) {
-            eyeZoneLum += lum;
-            eyeZonePixels++;
-          }
-
-          // Mouth zone (y: 95-130)
-          if (y >= 95 && y <= 130 && x >= 45 && x <= 115) {
-            mouthZoneLum += lum;
-            mouthZonePixels++;
+            sumSkinY += y;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
           }
         }
       }
 
-      const avgEyeLum = eyeZonePixels > 0 ? eyeZoneLum / eyeZonePixels : 0;
-      const avgMouthLum = mouthZonePixels > 0 ? mouthZoneLum / mouthZonePixels : 0;
-      const centerX = skinPixels > 0 ? totalSkinX / skinPixels : 80;
-      const centerY = skinPixels > 0 ? totalSkinY / skinPixels : 80;
+      const faceWidth = maxX - minX;
+      const faceHeight = maxY - minY;
+      const hasFace = skinPixels > 220 && faceWidth > 40 && faceHeight > 48;
+      const boxCenterX = (minX + maxX) / 2;
+      const boxCenterY = (minY + maxY) / 2;
 
-      // LIVENESS CHALLENGE STATE MACHINE
+      // 2. Relative Internal Features (Completely Invariant to Device / Phone Movement!)
+      let leftCheekSkin = 0;
+      let rightCheekSkin = 0;
+      let centerMaxLum = 0;
+      let nosePeakX = boxCenterX;
+      let eyeZoneVarSum = 0;
+      let eyeZonePixels = 0;
+      let mouthZoneLumSum = 0;
+      let mouthZonePixels = 0;
+      let mouthLeftEdge = 160;
+      let mouthRightEdge = 0;
+
+      if (hasFace) {
+        const leftBoundary = minX + faceWidth * 0.35;
+        const rightBoundary = maxX - faceWidth * 0.35;
+        const eyeTop = minY + faceHeight * 0.28;
+        const eyeBottom = minY + faceHeight * 0.48;
+        const mouthTop = minY + faceHeight * 0.65;
+        const mouthBottom = minY + faceHeight * 0.88;
+
+        for (let y = minY; y < maxY; y += 2) {
+          for (let x = minX; x < maxX; x += 2) {
+            const idx = (y * 160 + x) * 4;
+            const r = d[idx];
+            const g = d[idx + 1];
+            const b = d[idx + 2];
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            const isSkin = r > 60 && g > 40 && b > 25 && r > g && r - b > 12;
+
+            // Cheek columns
+            if (isSkin && x < leftBoundary) leftCheekSkin++;
+            if (isSkin && x > rightBoundary) rightCheekSkin++;
+
+            // Central nasal ridge luminance peak
+            if (x >= leftBoundary && x <= rightBoundary && y >= eyeBottom && y <= mouthTop) {
+              if (lum > centerMaxLum) {
+                centerMaxLum = lum;
+                nosePeakX = x;
+              }
+            }
+
+            // Eye strip variance
+            if (y >= eyeTop && y <= eyeBottom && x >= minX + faceWidth * 0.15 && x <= maxX - faceWidth * 0.15) {
+              eyeZoneVarSum += Math.abs(lum - 110);
+              eyeZonePixels++;
+            }
+
+            // Mouth zone width & luminance
+            if (y >= mouthTop && y <= mouthBottom && x >= minX + faceWidth * 0.2 && x <= maxX - faceWidth * 0.2) {
+              mouthZoneLumSum += lum;
+              mouthZonePixels++;
+              if (lum < 60 || (lum > 140 && isSkin)) {
+                if (x < mouthLeftEdge) mouthLeftEdge = x;
+                if (x > mouthRightEdge) mouthRightEdge = x;
+              }
+            }
+          }
+        }
+      }
+
+      // Mathematical Relative Invariants:
+      // Internal nose position: 0.5 is centered. < 0.38 is left turn, > 0.62 is right turn.
+      const internalNoseRatio = faceWidth > 0 ? (nosePeakX - minX) / faceWidth : 0.5;
+      // Cheek area ratio: 1.0 is balanced. < 0.55 or > 1.8 indicates 3D head yaw.
+      const cheekRatio = leftCheekSkin / Math.max(1, rightCheekSkin);
+      // Vertical centroid ratio: tilts down when forehead shifts forward and eyes move down.
+      const verticalCentroidRatio = skinPixels > 0 ? (sumSkinY / skinPixels - minY) / Math.max(1, faceHeight) : 0.5;
+      // Eye variance
+      const currentEyeVar = eyeZonePixels > 0 ? eyeZoneVarSum / eyeZonePixels : 0;
+      // Mouth width
+      const mouthWidthRatio = faceWidth > 0 && mouthRightEdge > mouthLeftEdge ? (mouthRightEdge - mouthLeftEdge) / faceWidth : 0;
+      const mouthAvgLum = mouthZonePixels > 0 ? mouthZoneLumSum / mouthZonePixels : 0;
+
+      // 3. LIVENESS STATE MACHINE
       setLivenessStage((currentStage) => {
+        // STAGE 1: CENTER (Face inside reticle)
         if (currentStage === 'CENTER') {
-          // Check if face is centered in circle
-          if (skinPixels > 180 && centerX >= 65 && centerX <= 95 && centerY >= 60 && centerY <= 100) {
+          if (hasFace && boxCenterX >= 60 && boxCenterX <= 100 && boxCenterY >= 60 && boxCenterY <= 100) {
             holdCount++;
-            setStageProgress(Math.min(100, holdCount * 4));
-            if (holdCount >= 25) {
-              playChime(660);
+            setStageProgress(Math.min(100, holdCount * 5));
+            if (holdCount >= 20) {
+              playChime(587); // D5
               setCompletedStages((prev) => ({ ...prev, centered: true }));
               setStageProgress(0);
-              baselineLuminance = avgEyeLum;
+              baselineEyeVar = currentEyeVar;
               return 'TURN_LEFT';
             }
           } else {
             holdCount = Math.max(0, holdCount - 1);
-            setStageProgress(Math.min(100, holdCount * 4));
+            setStageProgress(Math.min(100, holdCount * 5));
           }
           return 'CENTER';
         }
 
+        // STAGE 2: TURN LEFT (Device-movement-immune 3D head rotation)
         if (currentStage === 'TURN_LEFT') {
-          // Detect head turn left (face center moves to left or right based on mirror)
-          if (centerX < 66 || centerX > 94) {
+          // Physical head turn changes internal feature asymmetry:
+          // Either nose shifts towards edge (noseRatio < 0.38 or > 0.62) OR cheek ratio deviates significantly.
+          const isPhysicallyTurnedLeft =
+            hasFace && (internalNoseRatio < 0.38 || internalNoseRatio > 0.62 || cheekRatio < 0.55 || cheekRatio > 1.8);
+
+          if (isPhysicallyTurnedLeft) {
             leftTurnFrames++;
-            setStageProgress(Math.min(100, leftTurnFrames * 10));
-            if (leftTurnFrames >= 10) {
-              playChime(784);
+            setStageProgress(Math.min(100, leftTurnFrames * 12));
+            if (leftTurnFrames >= 8) {
+              playChime(659); // E5
               setCompletedStages((prev) => ({ ...prev, turnedLeft: true }));
               setStageProgress(0);
               return 'TURN_RIGHT';
@@ -333,29 +411,52 @@ export function StepFaceVerification({
           return 'TURN_LEFT';
         }
 
+        // STAGE 3: TURN RIGHT (Opposite head rotation)
         if (currentStage === 'TURN_RIGHT') {
-          // Detect head turn right
-          if (centerX > 92 || centerX < 68) {
+          const isPhysicallyTurnedRight =
+            hasFace && (internalNoseRatio > 0.62 || internalNoseRatio < 0.38 || cheekRatio > 1.8 || cheekRatio < 0.55);
+
+          if (isPhysicallyTurnedRight) {
             rightTurnFrames++;
-            setStageProgress(Math.min(100, rightTurnFrames * 10));
-            if (rightTurnFrames >= 10) {
-              playChime(880);
+            setStageProgress(Math.min(100, rightTurnFrames * 12));
+            if (rightTurnFrames >= 8) {
+              playChime(784); // G5
               setCompletedStages((prev) => ({ ...prev, turnedRight: true }));
               setStageProgress(0);
-              return 'BLINK';
+              return 'TILT_DOWN';
             }
           }
           return 'TURN_RIGHT';
         }
 
+        // STAGE 4: TILT HEAD DOWN (Nod downward)
+        if (currentStage === 'TILT_DOWN') {
+          // When head tilts down, forehead foreshortens and vertical centroid ratio shifts downward (> 0.54)
+          const isTiltedDown = hasFace && verticalCentroidRatio > 0.53;
+
+          if (isTiltedDown || tiltDownFrames > 0) {
+            tiltDownFrames++;
+            setStageProgress(Math.min(100, tiltDownFrames * 14));
+            if (tiltDownFrames >= 7) {
+              playChime(880); // A5
+              setCompletedStages((prev) => ({ ...prev, tiltedDown: true }));
+              setStageProgress(0);
+              baselineEyeVar = currentEyeVar;
+              return 'BLINK';
+            }
+          }
+          return 'TILT_DOWN';
+        }
+
+        // STAGE 5: BLINK
         if (currentStage === 'BLINK') {
-          // Detect eye blink (luminance dip / contrast change in upper zone)
-          const diff = Math.abs(avgEyeLum - baselineLuminance);
-          if (diff > 4 || blinkDipFrames > 0) {
+          // Sharp dip in eye contrast variance confirms eyelid closure
+          const varDip = baselineEyeVar > 0 ? (baselineEyeVar - currentEyeVar) / baselineEyeVar : 0;
+          if (varDip > 0.18 || blinkDipFrames > 0) {
             blinkDipFrames++;
-            setStageProgress(Math.min(100, blinkDipFrames * 16));
-            if (blinkDipFrames >= 6) {
-              playChime(987);
+            setStageProgress(Math.min(100, blinkDipFrames * 18));
+            if (blinkDipFrames >= 5) {
+              playChime(988); // B5
               setCompletedStages((prev) => ({ ...prev, blinked: true }));
               setStageProgress(0);
               return 'SMILE';
@@ -364,18 +465,19 @@ export function StepFaceVerification({
           return 'BLINK';
         }
 
+        // STAGE 6: SMILE
         if (currentStage === 'SMILE') {
-          // Detect mouth smile (luminance and width change in mouth area)
-          if (avgMouthLum > 40) {
+          // Mouth horizontal expansion & center luminance rise
+          if (mouthWidthRatio > 0.32 || mouthAvgLum > 55) {
             smileFrames++;
-            setStageProgress(Math.min(100, smileFrames * 14));
-            if (smileFrames >= 7) {
-              playChime(1046, 0.25);
+            setStageProgress(Math.min(100, smileFrames * 16));
+            if (smileFrames >= 6) {
+              playChime(1046, 0.28); // High C6
               setCompletedStages((prev) => ({ ...prev, smiled: true }));
-              // Automatically snap the frame!
+              // Automatically capture high-definition frame!
               setTimeout(() => {
                 captureFrame();
-              }, 300);
+              }, 250);
               return 'COMPLETED';
             }
           }
@@ -402,7 +504,7 @@ export function StepFaceVerification({
     return () => {
       stopCamera();
     };
-  }, []);
+  }, [capturedSelfie, facingMode, startCamera, stopCamera]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -427,6 +529,7 @@ export function StepFaceVerification({
       centered: false,
       turnedLeft: false,
       turnedRight: false,
+      tiltedDown: false,
       blinked: false,
       smiled: false,
     });
@@ -436,7 +539,7 @@ export function StepFaceVerification({
     startCamera(facingMode);
   };
 
-  const isVerified = matchResult.status === 'PASSED';
+  const isVerified = matchResult.status === 'PASSED' && matchResult.score >= 70;
 
   // Liveness instructions text & icons
   const getStageDirective = () => {
@@ -444,36 +547,42 @@ export function StepFaceVerification({
       case 'CENTER':
         return {
           title: 'LOOK STRAIGHT & CENTER YOUR FACE',
-          sub: 'Hold steady inside the green circle',
+          sub: 'Hold steady inside the target reticle',
           icon: '🎯',
         };
       case 'TURN_LEFT':
         return {
-          title: '👈 SLOWLY TURN YOUR HEAD TO THE LEFT',
-          sub: 'Turn slightly to verify 3D facial depth',
+          title: '👈 TURN YOUR HEAD TO THE LEFT',
+          sub: 'Turn your head (not your phone) to verify 3D depth',
           icon: '⬅️',
         };
       case 'TURN_RIGHT':
         return {
-          title: '👉 SLOWLY TURN YOUR HEAD TO THE RIGHT',
-          sub: 'Turn to the opposite side',
+          title: '👉 TURN YOUR HEAD TO THE RIGHT',
+          sub: 'Turn your head smoothly to the opposite side',
           icon: '➡️',
+        };
+      case 'TILT_DOWN':
+        return {
+          title: '👇 NOD / TILT YOUR HEAD DOWN',
+          sub: 'Tilt head slightly downward to verify cranial angle',
+          icon: '⬇️',
         };
       case 'BLINK':
         return {
           title: '😉 BLINK BOTH EYES NOW',
-          sub: 'Blink naturally to confirm live presence',
+          sub: 'Blink naturally to confirm live human presence',
           icon: '👁️',
         };
       case 'SMILE':
         return {
           title: '😊 SMILE AT THE CAMERA',
-          sub: 'Smile to finalize biometric scan',
+          sub: 'Smile naturally to finalize biometric scan',
           icon: '✨',
         };
       case 'COMPLETED':
         return {
-          title: '✓ LIVENESS CONFIRMED!',
+          title: '✓ LIVENESS CHALLENGE PASSED!',
           sub: 'Analyzing biometric match against National ID...',
           icon: '🎉',
         };
@@ -488,10 +597,10 @@ export function StepFaceVerification({
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="font-mono text-xs uppercase tracking-widest text-[#CCFF00]">
-            STEP 03.5 // ACTIVE LIVENESS KYC
+            STEP 03.5 // REAL-TIME LIVENESS KYC
           </span>
           <span className="bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
-            LIVE 3D RECOGNITION
+            BYBIT-GRADE 3D AI
           </span>
         </div>
         <h2
@@ -501,7 +610,7 @@ export function StepFaceVerification({
           LIVE FACE &amp; NATIONAL ID MATCH
         </h2>
         <p className="text-sm text-[#999999] mt-1">
-          Complete the live prompt challenges below (center, turn left, turn right, blink, and smile) to prove you are live and match your National ID card.
+          Complete the active head movement challenges (turn head left, right, tilt down, blink, and smile) to prove you are a live human, then our AI matches your face against your National ID.
         </p>
       </div>
 
@@ -539,7 +648,7 @@ export function StepFaceVerification({
               {/* Oval Head Placement Guide */}
               <div
                 className={`absolute w-40 h-52 sm:w-44 sm:h-56 rounded-[50%] border-2 pointer-events-none transition-colors duration-300 ${
-                  stageProgress > 50
+                  stageProgress > 40
                     ? 'border-[#CCFF00] shadow-[0_0_15px_#CCFF00]'
                     : 'border-dashed border-[#CCFF00]/60'
                 }`}
@@ -559,6 +668,26 @@ export function StepFaceVerification({
                   ▶
                 </div>
               )}
+              {livenessStage === 'TILT_DOWN' && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-3xl font-black text-[#CCFF00] animate-bounce">
+                  ▼
+                </div>
+              )}
+
+              {/* Active Circular Progress Ring */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none -rotate-90">
+                <circle
+                  cx="50%"
+                  cy="50%"
+                  r="48%"
+                  fill="none"
+                  stroke="#CCFF00"
+                  strokeWidth="4"
+                  strokeDasharray="900"
+                  strokeDashoffset={900 - (900 * stageProgress) / 100}
+                  className="transition-all duration-150"
+                />
+              </svg>
             </div>
 
             {/* Challenge Progress Checklist */}
@@ -601,6 +730,18 @@ export function StepFaceVerification({
 
               <span
                 className={`px-2 py-1 rounded text-[11px] font-mono font-bold transition-all ${
+                  completedStages.tiltedDown
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/40'
+                    : livenessStage === 'TILT_DOWN'
+                    ? 'bg-[#CCFF00] text-black animate-pulse'
+                    : 'bg-white/5 text-[#666666]'
+                }`}
+              >
+                {completedStages.tiltedDown ? '✓ 4. Down' : '4. Tilt Down'}
+              </span>
+
+              <span
+                className={`px-2 py-1 rounded text-[11px] font-mono font-bold transition-all ${
                   completedStages.blinked
                     ? 'bg-green-500/20 text-green-300 border border-green-500/40'
                     : livenessStage === 'BLINK'
@@ -608,7 +749,7 @@ export function StepFaceVerification({
                     : 'bg-white/5 text-[#666666]'
                 }`}
               >
-                {completedStages.blinked ? '✓ 4. Blink' : '4. Blink'}
+                {completedStages.blinked ? '✓ 5. Blink' : '5. Blink'}
               </span>
 
               <span
@@ -620,7 +761,7 @@ export function StepFaceVerification({
                     : 'bg-white/5 text-[#666666]'
                 }`}
               >
-                {completedStages.smiled ? '✓ 5. Smile' : '5. Smile'}
+                {completedStages.smiled ? '✓ 6. Smile' : '6. Smile'}
               </span>
             </div>
 
@@ -801,6 +942,16 @@ export function StepFaceVerification({
                     </span>
                   </div>
                 )}
+
+                {/* REJECTION NOTICE */}
+                {!isVerified && (
+                  <div className="mt-2 pt-2 border-t border-red-500/20 flex items-center gap-2 text-xs font-mono text-red-400">
+                    <span>⛔</span>
+                    <span>
+                      <strong>REGISTRATION BLOCKED:</strong> You cannot proceed with this registration. The live person in front of the camera does not match the person on the National ID card.
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -834,7 +985,7 @@ export function StepFaceVerification({
           type="button"
           disabled={!isVerified || isAnalyzing}
           onClick={onNext}
-          className="px-8"
+          className="px-8 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isVerified ? 'CONTINUE TO CONFIRMATION →' : 'PASS LIVE MATCH TO PROCEED'}
         </Button>

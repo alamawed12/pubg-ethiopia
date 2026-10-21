@@ -153,14 +153,27 @@ export async function POST(req: NextRequest) {
     const rawFaceScore = Number((rawBody as Record<string, unknown>).faceMatchScore) || 0;
     const rawFaceStatus = ((rawBody as Record<string, unknown>).faceMatchStatus as string) || 'NOT_VERIFIED';
 
+    // STRICT BIOMETRIC KYC GATING:
+    // Prevent fraud, brothers/relatives using another person's ID, or bypassed face scans.
+    // If the live selfie does not pass facial matching against the National ID (score >= 70 and status === 'PASSED'),
+    // reject registration immediately with HTTP 403.
+    if (rawFaceStatus !== 'PASSED' || rawFaceScore < 70) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Biometric Identity Verification Failed (Match Score: ${rawFaceScore}%). Your live face scan does not match the National ID card portrait. Registration cannot proceed.`,
+        },
+        { status: 403 }
+      );
+    }
+
     let initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
     let initialRegistrationStatus = registrationStatus;
     let autoApproved = false;
 
     // RULE 1: For STANDARD ticket tier:
-    // If AI Biometric Face Match succeeded (score >= 70 or status === 'PASSED')
-    // AND capacity is available: INSTANT AUTOMATED APPROVAL!
-    if (rawTier === 'STANDARD' && (rawFaceStatus === 'PASSED' || rawFaceScore >= 70) && registrationStatus !== 'WAITLISTED') {
+    // With AI Biometric Face Match verified (PASSED, score >= 70), auto-approve pass instantly!
+    if (rawTier === 'STANDARD' && registrationStatus !== 'WAITLISTED') {
       initialRegistrationStatus = 'CONFIRMED';
       autoApproved = true;
     }

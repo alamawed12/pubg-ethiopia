@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -9,6 +10,7 @@ interface VerifyFaceRequest {
   livenessData?: {
     turnedLeft: boolean;
     turnedRight: boolean;
+    tiltedDown?: boolean;
     blinked: boolean;
     smiled: boolean;
     durationMs: number;
@@ -33,56 +35,6 @@ function extractBase64Data(dataUrl: string): { mimeType: string; base64: string 
     return { mimeType: match[1], base64: match[2] };
   }
   return { mimeType: 'image/jpeg', base64: dataUrl };
-}
-
-/**
- * Computes statistical feature vectors and perceptual distance from image base64 strings.
- * Analyzes luminance distribution, color tone channels, and high-frequency edge entropy.
- */
-function compareImageFeatures(idBase64: string, selfieBase64: string): {
-  similarityScore: number;
-  isProbableSamePerson: boolean;
-  divergence: number;
-} {
-  const sampleCount = 600;
-  const idLen = idBase64.length;
-  const selfieLen = selfieBase64.length;
-
-  if (idLen < 1000 || selfieLen < 1000) {
-    return { similarityScore: 35, isProbableSamePerson: false, divergence: 0.65 };
-  }
-
-  // Sample luminance and high-frequency byte patterns
-  let totalDelta = 0;
-  let idEntropy = 0;
-  let selfieEntropy = 0;
-
-  for (let i = 0; i < sampleCount; i++) {
-    const idIdx = Math.floor((i * 997) % idLen);
-    const selfieIdx = Math.floor((i * 1009) % selfieLen);
-
-    const bId = idBase64.charCodeAt(idIdx);
-    const bSelfie = selfieBase64.charCodeAt(selfieIdx);
-
-    totalDelta += Math.abs(bId - bSelfie);
-    idEntropy += (bId ^ (i & 0xff));
-    selfieEntropy += (bSelfie ^ (i & 0xff));
-  }
-
-  const avgDelta = totalDelta / sampleCount; // 0 to 255
-  const normalizedDelta = Math.min(1, avgDelta / 128); // 0 (identical) to 1 (very different)
-
-  // Ratio of structural entropy
-  const entropyRatio = Math.min(idEntropy, selfieEntropy) / Math.max(idEntropy, selfieEntropy);
-
-  // Divergence score between the two images (0 = identical, 1 = completely distinct)
-  const divergence = 0.5 * normalizedDelta + 0.5 * (1 - entropyRatio);
-
-  // Calculate similarity: only high structural and byte correlation yields > 70%
-  const similarityScore = Math.round(Math.max(20, Math.min(95, (1 - divergence) * 100)));
-  const isProbableSamePerson = similarityScore >= 72;
-
-  return { similarityScore, isProbableSamePerson, divergence };
 }
 
 export async function POST(request: NextRequest) {
@@ -113,31 +65,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
+    // 1. Resolve Google Gemini Vision API Key from Environment or Database SystemSetting
+    let geminiApiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_AI_API_KEY ||
+      process.env.GEMINI_KEY ||
+      '';
 
-    // If Google Gemini Vision API Key is provided, use Google Multimodal Vision (High Security KYC)
-    if (geminiApiKey) {
+    if (!geminiApiKey) {
       try {
-        const prompt = `You are a strict, production-grade KYC Biometric Facial Verification AI engine (comparable to Bybit, Binance, and SumSub).
-Compare Image 1 (National ID Document photo) and Image 2 (Live captured user selfie).
+        const dbSetting = await prisma.systemSetting.findUnique({
+          where: { key: 'gemini_api_key' },
+        });
+        if (dbSetting?.value && dbSetting.value.trim().length > 10) {
+          geminiApiKey = dbSetting.value.trim();
+        }
+      } catch (dbErr) {
+        console.warn('[VERIFY_FACE] Could not query systemSetting for gemini_api_key:', dbErr);
+      }
+    }
 
-CRITICAL SECURITY DIRECTIVE:
-You must determine if these two images depict the EXACT SAME INDIVIDUAL or DIFFERENT PEOPLE.
-Do NOT be deceived by family resemblance, siblings, or brothers.
-Carefully examine:
-1. Cranial structure and forehead curvature.
-2. Interpupillary distance relative to face width.
-3. Nasal bridge height, nostril width, and nose tip slope.
-4. Lip contours, philtrum depth, and mouth curvature.
-5. Jawline angle, chin shape, and facial proportions.
+    // 2. High-Precision Gemini Multimodal Facial Recognition & Anti-Fraud Engine
+    if (geminiApiKey) {
+      const prompt = `You are an ultra-strict, production-grade KYC Biometric Facial Verification and Anti-Fraud AI engine (comparable to Bybit, Binance, and SumSub).
+You are comparing two images:
+- Image 1: Ethiopian National ID Document card portrait photo.
+- Image 2: Live captured biometric selfie of the applicant registering for the event.
 
-RULES:
-- If the two photos belong to different people (e.g. brothers, relatives, or different individuals):
-  Output "isMatch": false, "confidence": (integer between 15 and 48), "status": "FAILED", "details": "Cranial geometry and facial features indicate different individuals (possible family resemblance/brother, not the same person)."
-- Only if the biometric facial geometry definitively confirms the same person:
-  Output "isMatch": true, "confidence": (integer between 75 and 98), "status": "PASSED", "details": "Biometric match confirmed across cranial structure and facial landmarks."
+CRITICAL SECURITY & SIBLING/BROTHER FRAUD DIRECTIVE:
+You must determine with mathematical certainty if Image 1 and Image 2 depict the EXACT SAME INDIVIDUAL or DIFFERENT PEOPLE.
+BE ON EXTREME ALERT FOR SIBLINGS, BROTHERS, COUSINS, OR FAMILY RESEMBLANCE.
+An applicant may be attempting to register using their brother's ID card.
+Even if they have similar eyes, skin complexion, or hair texture, you MUST rigorously scrutinize:
+1. Cranial bone architecture & forehead width-to-height ratio.
+2. Interpupillary distance (distance between eye pupils) relative to ear-to-ear face width.
+3. Nasal bridge height, nostril wing curvature, and septum angle.
+4. Lip contours, philtrum groove depth, and oral commissure width.
+5. Mandibular jawline angle, chin cleft/prominence, and tragus-to-mouth proportions.
 
-Return ONLY valid JSON matching this schema:
+STRICT VERIFICATION RULES:
+- If the two photos depict DIFFERENT INDIVIDUALS (including brothers, siblings, relatives, or lookalikes):
+  You MUST set "isMatch": false, "confidence": (an integer between 18 and 46), "status": "FAILED".
+  In "details", state clearly that cranial geometry and facial features indicate different individuals (e.g. "Facial bone structure and nasal-mandibular dimensions indicate different people (sibling/brother detected). Face does not match the National ID portrait.").
+- Only if the biometric facial geometry definitively confirms the EXACT SAME PERSON:
+  Set "isMatch": true, "confidence": (an integer between 78 and 98), "status": "PASSED", "details": "Biometric match confirmed across cranial structure and facial landmarks."
+
+Return ONLY valid JSON matching this exact schema:
 {
   "isMatch": boolean,
   "confidence": number,
@@ -147,83 +120,91 @@ Return ONLY valid JSON matching this schema:
   "details": "concise explanation"
 }`;
 
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+      // Support gemini-1.5-flash and gemini-2.0-flash models with fallback
+      const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
 
-        const geminiRes = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  { text: prompt },
-                  {
-                    inline_data: {
-                      mime_type: idData.mimeType,
-                      data: idData.base64,
+      for (const model of modelsToTry) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+
+          const geminiRes = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    {
+                      inline_data: {
+                        mime_type: idData.mimeType,
+                        data: idData.base64,
+                      },
                     },
-                  },
-                  {
-                    inline_data: {
-                      mime_type: selfieData.mimeType,
-                      data: selfieData.base64,
+                    {
+                      inline_data: {
+                        mime_type: selfieData.mimeType,
+                        data: selfieData.base64,
+                      },
                     },
-                  },
-                ],
+                  ],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.05,
+                responseMimeType: 'application/json',
               },
-            ],
-            generationConfig: {
-              temperature: 0.05,
-              responseMimeType: 'application/json',
-            },
-          }),
-        });
+            }),
+          });
 
-        if (geminiRes.ok) {
-          const geminiData = await geminiRes.json();
-          const textResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (textResponse) {
-            const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-            const parsed = JSON.parse(cleanJson);
-            const conf = Math.round(Number(parsed.confidence) || 40);
-            const isMatch = Boolean(parsed.isMatch) && conf >= 70;
+          if (geminiRes.ok) {
+            const geminiData = await geminiRes.json();
+            const textResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (textResponse) {
+              const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+              const parsed = JSON.parse(cleanJson);
+              const conf = Math.round(Number(parsed.confidence) || 35);
+              const isMatch = Boolean(parsed.isMatch) && conf >= 70;
 
-            const result: BiometricResult = {
-              success: true,
-              isMatch,
-              confidence: conf,
-              status: isMatch ? 'PASSED' : 'FAILED',
-              idFaceDetected: Boolean(parsed.idFaceDetected ?? true),
-              selfieFaceDetected: Boolean(parsed.selfieFaceDetected ?? true),
-              livenessVerified: Boolean(livenessData?.blinked && livenessData?.smiled),
-              details: parsed.details || (isMatch ? 'Biometric verification passed.' : 'Face does not match ID document.'),
-              source: 'GEMINI_AI_VISION',
-            };
-            return NextResponse.json(result);
+              const result: BiometricResult = {
+                success: true,
+                isMatch,
+                confidence: conf,
+                status: isMatch ? 'PASSED' : 'FAILED',
+                idFaceDetected: Boolean(parsed.idFaceDetected ?? true),
+                selfieFaceDetected: Boolean(parsed.selfieFaceDetected ?? true),
+                livenessVerified: Boolean(livenessData?.blinked && livenessData?.smiled),
+                details:
+                  parsed.details ||
+                  (isMatch
+                    ? 'Biometric identity verified with high confidence.'
+                    : 'Cranial structure and facial geometry do not match the National ID card (brother/sibling detected).'),
+                source: 'GEMINI_AI_VISION',
+              };
+              return NextResponse.json(result);
+            }
+          } else {
+            console.warn(`[GEMINI_KYC_WARN] Model ${model} returned HTTP ${geminiRes.status}:`, await geminiRes.text());
           }
+        } catch (callErr) {
+          console.warn(`[GEMINI_KYC_CALL_ERR] Failed model ${model}:`, callErr);
         }
-      } catch (geminiError) {
-        console.warn('[GEMINI_KYC_ERROR] Gemini Vision failed, using biometric comparison engine:', geminiError);
       }
     }
 
-    // High-Precision Structural Biometric Comparison
-    const comparison = compareImageFeatures(idData.base64, selfieData.base64);
-
-    const isMatch = comparison.isProbableSamePerson;
-    const confidence = comparison.similarityScore;
-
+    // 3. Fallback when Google Gemini API Key is not configured
+    // SECURITY PRINCIPLE: If no neural AI engine is configured, DO NOT falsely pass the user!
+    // Return a strict rejection informing the admin and user that the Gemini key is needed.
     const result: BiometricResult = {
       success: true,
-      isMatch,
-      confidence,
-      status: isMatch ? 'PASSED' : 'FAILED',
+      isMatch: false,
+      confidence: 32,
+      status: 'FAILED',
       idFaceDetected: true,
       selfieFaceDetected: true,
       livenessVerified: Boolean(livenessData?.blinked && livenessData?.smiled),
-      details: isMatch
-        ? `Biometric facial geometry verified with ${confidence}% confidence across facial feature coordinates.`
-        : `Face does not match National ID portrait (${confidence}% match confidence). Facial geometry differs from ID card holder.`,
+      details:
+        'Google Gemini Vision AI key is not yet configured. Please configure your free Google Gemini API Key in Admin Settings -> Event & VIP Pass Settings to enable live brother/sibling facial matching.',
       source: 'BIOMETRIC_FEATURE_ENGINE',
     };
 

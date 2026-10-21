@@ -52,9 +52,14 @@ export function StepVerification({
   const [consentError, setConsentError] = useState<string | null>(null);
 
   const isVip = formData.ticketTier === 'VIP';
+  const isFaceVerified = formData.faceMatchStatus === 'PASSED' && (formData.faceMatchScore || 0) >= 70;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFaceVerified) {
+      setConsentError('Biometric verification failed. Your live selfie does not match the National ID card portrait.');
+      return;
+    }
     if (!agreedToPrivacy) {
       setConsentError('Please agree to the Registration and Privacy Policy to proceed.');
       return;
@@ -508,10 +513,14 @@ export function StepVerification({
           variant="primary"
           size="lg"
           loading={isSubmitting}
-          disabled={isSubmitting}
-          className="w-full sm:w-auto min-w-[220px]"
+          disabled={isSubmitting || !isFaceVerified}
+          className="w-full sm:w-auto min-w-[220px] disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {isVip ? 'SUBMIT FOR VIP APPROVAL →' : 'CONFIRM & GET TICKET NOW →'}
+          {isFaceVerified
+            ? isVip
+              ? 'SUBMIT FOR VIP APPROVAL →'
+              : 'CONFIRM & GET TICKET NOW →'
+            : 'FACE MATCH REQUIRED'}
         </Button>
       </div>
     </motion.form>

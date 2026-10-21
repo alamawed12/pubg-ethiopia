@@ -135,6 +135,13 @@ export function RegistrationForm() {
 
   // Form submission handler
   const handleSubmit = async () => {
+    if (formData.faceMatchStatus !== 'PASSED' || (formData.faceMatchScore || 0) < 70) {
+      setApiError(
+        'Identity Mismatch: Your live face does not match the National ID card portrait. You cannot complete registration without passing biometric facial matching.'
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setApiError(null);
 

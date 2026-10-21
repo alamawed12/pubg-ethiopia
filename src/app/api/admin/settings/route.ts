@@ -13,11 +13,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [priceSetting, enabledSetting, capacitySetting, heroDisplaySetting, vipCount, standardCount, totalRegistrations] = await Promise.all([
+    const [
+      priceSetting,
+      enabledSetting,
+      capacitySetting,
+      heroDisplaySetting,
+      geminiKeySetting,
+      vipCount,
+      standardCount,
+      totalRegistrations,
+    ] = await Promise.all([
       prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_price' } }),
       prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_enabled' } }),
       prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
       prisma.systemSetting.findUnique({ where: { key: 'hero_attendees_display' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'gemini_api_key' } }),
       prisma.registration.count({ where: { ticketTier: 'VIP' } }),
       prisma.registration.count({ where: { ticketTier: 'STANDARD' } }),
       prisma.registration.count(),
@@ -28,12 +38,18 @@ export async function GET() {
     const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : 300;
     const heroAttendeesDisplay = heroDisplaySetting?.value || (capacitySetting ? `${capacitySetting.value}+` : '300+');
 
+    const rawKey = geminiKeySetting?.value || process.env.GEMINI_API_KEY || '';
+    const hasGeminiKey = Boolean(rawKey && rawKey.trim().length > 10);
+    const maskedGeminiKey = hasGeminiKey ? `${rawKey.slice(0, 4)}••••••••${rawKey.slice(-4)}` : '';
+
     return NextResponse.json({
       success: true,
       vipPrice: isNaN(vipPrice) ? 500 : vipPrice,
       vipEnabled,
       maxCapacity: isNaN(maxCapacity) ? 300 : maxCapacity,
       heroAttendeesDisplay,
+      hasGeminiKey,
+      geminiApiKey: maskedGeminiKey,
       stats: {
         vipCount,
         standardCount,
@@ -55,7 +71,62 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { vipPrice, vipEnabled, maxCapacity, heroAttendeesDisplay } = body;
+    const { action, vipPrice, vipEnabled, maxCapacity, heroAttendeesDisplay, geminiApiKey } = body;
+
+    // Handle instant Gemini API Key test connection
+    if (action === 'TEST_GEMINI') {
+      let keyToTest = geminiApiKey ? String(geminiApiKey).trim() : '';
+      if (!keyToTest || keyToTest.includes('••••')) {
+        const storedKey = await prisma.systemSetting.findUnique({ where: { key: 'gemini_api_key' } });
+        keyToTest = storedKey?.value || process.env.GEMINI_API_KEY || '';
+      }
+
+      if (!keyToTest) {
+        return NextResponse.json({ success: false, error: 'No Gemini API key provided to test.' }, { status: 400 });
+      }
+
+      try {
+        const testRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keyToTest}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: 'Respond with OK if connected.' }] }],
+            }),
+          }
+        );
+
+        if (testRes.ok) {
+          return NextResponse.json({
+            success: true,
+            message: '✓ Google Gemini 1.5 Flash Vision AI connected and operational! Anti-fraud brother biometric checks active.',
+          });
+        } else {
+          const errText = await testRes.text();
+          return NextResponse.json(
+            { success: false, error: `Google API rejected the key (HTTP ${testRes.status}): ${errText.slice(0, 160)}` },
+            { status: 400 }
+          );
+        }
+      } catch (testErr) {
+        return NextResponse.json(
+          { success: false, error: `Connection failed: ${testErr instanceof Error ? testErr.message : String(testErr)}` },
+          { status: 500 }
+        );
+      }
+    }
+
+    if (geminiApiKey !== undefined) {
+      const cleanKey = String(geminiApiKey).trim();
+      if (cleanKey && !cleanKey.includes('••••')) {
+        await prisma.systemSetting.upsert({
+          where: { key: 'gemini_api_key' },
+          update: { value: cleanKey },
+          create: { key: 'gemini_api_key', value: cleanKey },
+        });
+      }
+    }
 
     if (heroAttendeesDisplay !== undefined) {
       const displayVal = String(heroAttendeesDisplay).trim();
@@ -105,7 +176,7 @@ export async function POST(req: NextRequest) {
       data: {
         adminEmail: session.user.email || session.user.name || 'admin',
         action: 'UPDATE_SYSTEM_SETTINGS',
-        details: JSON.stringify({ vipPrice, vipEnabled, maxCapacity }),
+        details: JSON.stringify({ vipPrice, vipEnabled, maxCapacity, updatedGeminiKey: Boolean(geminiApiKey) }),
       },
     });
 
