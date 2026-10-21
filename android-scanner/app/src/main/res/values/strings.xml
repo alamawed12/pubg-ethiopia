@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">PMCA Gate Scanner</string>
+    <string name="title_activity_settings">Scanner Settings</string>
+    <string name="status_ready">ALIGN QR TICKET INSIDE VIEWFINDER</string>
+    <string name="status_scanning">VERIFYING WITH COMMAND CENTER...</string>
+    <string name="btn_manual_entry">MANUAL ENTRY</string>
+    <string name="btn_settings">SETTINGS</string>
+    <string name="btn_flash">TORCH</string>
+    <string name="default_server_url">https://pubg-ethiopia.vercel.app</string>
+    <string name="default_secret_key">pubget1213</string>
+    <string name="default_staff_name">Gate Staff 1</string>
+</resources>

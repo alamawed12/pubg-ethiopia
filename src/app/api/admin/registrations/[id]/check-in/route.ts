@@ -10,8 +10,23 @@ interface RouteContext {
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authHeader = request.headers.get('authorization');
+    const scannerKey = request.headers.get('x-scanner-key');
+    const staffNameHeader = request.headers.get('x-staff-name') || 'Gate Staff';
+
+    const validScannerSecret = process.env.SCANNER_API_KEY || 'pubget_gate_2026_scanner';
+    const validAdminPass = process.env.ADMIN_PASSWORD || 'pubget1213';
+
+    const isApiKeyValid =
+      scannerKey === validScannerSecret ||
+      scannerKey === validAdminPass ||
+      (authHeader && authHeader.startsWith('Bearer ') && (
+        authHeader.slice(7) === validScannerSecret ||
+        authHeader.slice(7) === validAdminPass
+      ));
+
+    if (!session?.user && !isApiKeyValid) {
+      return NextResponse.json({ error: 'Unauthorized - Scanner authentication required' }, { status: 401 });
     }
 
     const { id } = await context.params;
@@ -45,7 +60,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const checkInTime = new Date();
-    const adminEmail = session.user.email || session.user.name || 'admin';
+    const adminEmail = session?.user?.email || session?.user?.name || staffNameHeader;
 
     // Mark as checked in
     const updated = await prisma.registration.update({

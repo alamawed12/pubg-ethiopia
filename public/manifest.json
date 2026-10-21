@@ -1,0 +1,28 @@
+{
+  "name": "PMCA Gate Scanner — PUBG Mobile Ethiopia",
+  "short_name": "Gate Scanner",
+  "description": "Live ticket scanning and gate admission control for PUBG Mobile Community Assembly Ethiopia",
+  "start_url": "/admin/check-in",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#CCFF00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

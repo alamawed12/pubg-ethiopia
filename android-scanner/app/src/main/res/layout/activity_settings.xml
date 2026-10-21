@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pubg_void"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="COMMAND SERVER CONFIG"
+            android:textColor="@color/pubg_lime"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="monospace"
+            android:text="Configure endpoint URL, gate officer identifier, and security clearing key."
+            android:textColor="@color/silver"
+            android:textSize="12sp" />
+
+        <!-- Server URL -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="monospace"
+            android:text="BACKEND SERVER BASE URL"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etServerUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/edit_text_bg"
+            android:fontFamily="monospace"
+            android:hint="https://pubg-ethiopia.vercel.app"
+            android:inputType="textUri"
+            android:padding="12dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/silver_dark"
+            android:textSize="13sp" />
+
+        <!-- Secret Key -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="monospace"
+            android:text="SCANNER CLEARING KEY / ADMIN PIN"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etSecretKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/edit_text_bg"
+            android:fontFamily="monospace"
+            android:hint="pubget1213"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/silver_dark"
+            android:textSize="13sp" />
+
+        <!-- Staff Identifier -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="monospace"
+            android:text="GATE OFFICER IDENTIFIER"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etStaffName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/edit_text_bg"
+            android:fontFamily="monospace"
+            android:hint="e.g. Gate 1 Officer"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/silver_dark"
+            android:textSize="13sp" />
+
+        <!-- Test Connection Button -->
+        <Button
+            android:id="@+id/btnTestConnection"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="monospace"
+            android:text="TEST SERVER CONNECTION"
+            android:textColor="@color/white"
+            app:strokeColor="@color/pubg_border" />
+
+        <TextView
+            android:id="@+id/tvTestResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:background="@color/pubg_border" />
+
+        <!-- Save and Back Buttons -->
+        <Button
+            android:id="@+id/btnSaveSettings"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/pubg_lime"
+            android:fontFamily="monospace"
+            android:padding="14dp"
+            android:text="SAVE SETTINGS"
+            android:textColor="@color/pubg_void"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnResetCounter"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:text="RESET LOCAL SCAN COUNTER"
+            android:textColor="@color/pubg_red"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -57,6 +57,7 @@ export const metadata: Metadata = {
     ],
     shortcut: '/favicon.ico?v=2',
   },
+  manifest: '/manifest.json',
   openGraph: {
     title: "PUBG MOBILE Community Assembly — Ethiopia",
     description:
@@ -78,6 +79,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/pubg-helmet-logo.png?v=2" type="image/png" sizes="any" />
         <link rel="apple-touch-icon" href="/images/pubg-helmet-logo.png?v=2" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="film-grain">{children}</body>
     </html>

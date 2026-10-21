@@ -1,0 +1,19 @@
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.PUBGScanner" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/pubg_lime</item>
+        <item name="colorPrimaryVariant">@color/pubg_lime_dark</item>
+        <item name="colorOnPrimary">@color/pubg_void</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/pubg_lime</item>
+        <item name="colorSecondaryVariant">@color/pubg_lime_dark</item>
+        <item name="colorOnSecondary">@color/pubg_void</item>
+
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/pubg_void</item>
+        <item name="android:windowBackground">@color/pubg_void</item>
+        <item name="android:navigationBarColor">@color/pubg_void</item>
+    </style>
+</resources>

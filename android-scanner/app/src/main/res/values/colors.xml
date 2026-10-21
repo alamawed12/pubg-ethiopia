@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pubg_lime">#CCFF00</color>
+    <color name="pubg_lime_dark">#99CC00</color>
+    <color name="pubg_void">#050505</color>
+    <color name="pubg_abyss">#0A0A0A</color>
+    <color name="pubg_charcoal">#111111</color>
+    <color name="pubg_graphite">#1A1A1A</color>
+    <color name="pubg_border">#33FFFFFF</color>
+    <color name="pubg_gold">#FBBF24</color>
+    <color name="pubg_gold_bg">#29220A</color>
+    <color name="pubg_green">#22C55E</color>
+    <color name="pubg_green_bg">#0A200F</color>
+    <color name="pubg_red">#EF4444</color>
+    <color name="pubg_red_bg">#240A0A</color>
+    <color name="pubg_amber">#F59E0B</color>
+    <color name="white">#FFFFFF</color>
+    <color name="silver">#999999</color>
+    <color name="silver_dark">#666666</color>
+    <color name="translucent_black">#CC000000</color>
+</resources>

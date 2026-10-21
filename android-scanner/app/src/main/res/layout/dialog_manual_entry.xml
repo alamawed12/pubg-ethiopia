@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="MANUAL ADMISSION LOOKUP"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="monospace"
+        android:text="Enter attendee Reference ID (PUBG-ET-XXXX) or numeric PUBG UID:"
+        android:textColor="@color/silver"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etTicketInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/edit_text_bg"
+        android:fontFamily="monospace"
+        android:hint="e.g. PUBG-ET-ABC123 or 512345678"
+        android:inputType="textCapCharacters"
+        android:padding="12dp"
+        android:textColor="@color/pubg_lime"
+        android:textColorHint="@color/silver_dark"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="CANCEL"
+            android:textColor="@color/silver" />
+
+        <Button
+            android:id="@+id/btnSubmit"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/pubg_lime"
+            android:fontFamily="monospace"
+            android:text="VERIFY &amp; CHECK IN"
+            android:textColor="@color/pubg_void"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>
