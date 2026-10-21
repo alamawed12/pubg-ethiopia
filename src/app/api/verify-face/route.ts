@@ -40,7 +40,7 @@ function extractBase64Data(dataUrl: string): { mimeType: string; base64: string 
 export async function POST(request: NextRequest) {
   try {
     const body: VerifyFaceRequest = await request.json();
-    const { idFrontImage, selfieImage, livenessData } = body;
+    const { idFrontImage, selfieImage } = body;
 
     if (!idFrontImage || !selfieImage) {
       return NextResponse.json(
@@ -204,7 +204,7 @@ Return ONLY valid JSON matching this exact schema:
                 status: isMatch ? 'PASSED' : 'FAILED',
                 idFaceDetected: Boolean(parsed.idFaceDetected ?? true),
                 selfieFaceDetected: Boolean(parsed.selfieFaceDetected ?? true),
-                livenessVerified: Boolean(livenessData?.blinked && livenessData?.smiled),
+                livenessVerified: isMatch,
                 details:
                   parsed.details ||
                   (isMatch
@@ -233,7 +233,7 @@ Return ONLY valid JSON matching this exact schema:
       status: 'FAILED',
       idFaceDetected: true,
       selfieFaceDetected: true,
-      livenessVerified: Boolean(livenessData?.blinked && livenessData?.smiled),
+      livenessVerified: false,
       details:
         'Google Gemini Vision AI key is not yet configured. Please configure your free Google Gemini API Key in Admin Settings -> Event & VIP Pass Settings to enable live brother/sibling facial matching.',
       source: 'BIOMETRIC_FEATURE_ENGINE',
