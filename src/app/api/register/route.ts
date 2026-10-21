@@ -161,19 +161,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: `Biometric Identity Verification Failed (Match Score: ${rawFaceScore}%). Your live face scan does not match the National ID card portrait. Registration cannot proceed.`,
+          error: `Biometric Identity Verification Failed (Match Score: ${rawFaceScore}%). Your face does not match the National ID card portrait. Registration cannot proceed.`,
         },
         { status: 403 }
       );
     }
 
-    // INSTANT TICKET ISSUANCE FOR BOTH STANDARD AND VIP:
-    // Once AI Biometric KYC confirms the face matches the ID, both Standard and VIP passes
-    // are automatically CONFIRMED and issued immediately!
+    // BOTH STANDARD AND VIP:
+    // Both tiers enter the Admin Review Queue with verified biometric credentials.
+    // VIP requires admin verification of payment; Standard requires slot confirmation.
+    // Once approved by admin, tickets unlock in their Attendee Portal (/portal).
     const isWaitlisted = registrationStatus === 'WAITLISTED';
-    const initialRegistrationStatus = isWaitlisted ? 'WAITLISTED' : 'CONFIRMED';
-    const initialPaymentStatus = rawTier === 'VIP' ? 'APPROVED' : 'UNPAID';
-    const autoApproved = !isWaitlisted;
+    const initialRegistrationStatus = isWaitlisted ? 'WAITLISTED' : 'PENDING';
+    const initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
 
     // Check SMS Bot transaction match if txn code provided
     if (rawTier === 'VIP' && submittedTxnCode) {
@@ -219,9 +219,7 @@ export async function POST(req: NextRequest) {
         selfieImage: rawSelfieImage,
         faceMatchScore: rawFaceScore,
         faceMatchStatus: rawFaceStatus,
-        faceMatchDetails: autoApproved
-          ? `Instant Approval: AI Biometric Face Match Verified (${rawFaceScore}%).`
-          : `AI Face Match: ${rawFaceScore}% (${rawFaceStatus}).`,
+        faceMatchDetails: `AI Biometric Face Match: ${rawFaceScore}% (${rawFaceStatus}). Awaiting Admin Portal Approval.`,
         ticketTier: rawTier,
         vipPrice: rawTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
         paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
@@ -230,8 +228,8 @@ export async function POST(req: NextRequest) {
         paymentReceiptImage: ((rawBody as Record<string, unknown>).paymentReceiptImage as string) || null,
         paymentStatus: initialPaymentStatus,
         status: initialRegistrationStatus,
-        paymentApprovedAt: autoApproved ? new Date() : null,
-        paymentApprovedBy: autoApproved ? 'AI_BIOMETRIC_KYC_ENGINE' : null,
+        paymentApprovedAt: null,
+        paymentApprovedBy: null,
       },
     });
 
@@ -255,7 +253,7 @@ export async function POST(req: NextRequest) {
           paymentStatus: newRegistration.paymentStatus,
           faceMatchScore: newRegistration.faceMatchScore,
           faceMatchStatus: newRegistration.faceMatchStatus,
-          autoApproved,
+          autoApproved: false,
         },
       },
       {

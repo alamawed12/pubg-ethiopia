@@ -322,10 +322,10 @@ export function StepVerification({
 
             <div className="rounded-lg border border-white/10 bg-black/40 p-3 flex flex-col justify-center text-xs font-mono">
               <span className="text-white font-bold block mb-1">
-                ⚡ INSTANT {isVip ? 'VIP' : 'STANDARD'} PASS APPROVAL
+                ⏳ {isVip ? 'VIP ADMIN APPROVAL QUEUE' : 'ADMIN REVIEW QUEUE'}
               </span>
               <span className="text-[#888888] text-[11px] leading-relaxed">
-                Face and ID match verified. Your official {isVip ? 'VIP All-Access Pass' : 'admission pass'} will be issued immediately upon completing registration!
+                Biometric face match verified. Once you submit, your application will be audited by the admin team, and your official QR ticket will unlock in your Attendee Portal upon approval!
               </span>
             </div>
           </div>
@@ -399,10 +399,12 @@ export function StepVerification({
         </svg>
         <div className="text-xs font-mono space-y-1">
           <p className="font-semibold text-sky-300 uppercase tracking-wide">
-            {isVip ? 'INSTANT VIP PASS ISSUANCE' : 'PASS ISSUANCE'}
+            {isVip ? 'VIP APPROVAL TIMELINE' : 'APPLICATION REVIEW TIMELINE'}
           </p>
           <p className="text-sky-200/80 leading-relaxed">
-            Your identity and National ID have been matched by AI. Once you click complete, your official {isVip ? 'VIP All-Access Pass' : 'admission pass'} will be instantly generated!
+            {isVip
+              ? 'VIP tickets are issued once your payment receipt is verified by Head Admin. Your QR pass will unlock automatically in your Attendee Portal.'
+              : 'Your identity and National ID have been matched by AI. Once the admin team approves your slot, your digital pass will unlock in your Attendee Portal.'}
           </p>
         </div>
       </div>
@@ -512,7 +514,7 @@ export function StepVerification({
           {isFaceVerified
             ? isVip
               ? 'SUBMIT FOR VIP APPROVAL →'
-              : 'CONFIRM & GET TICKET NOW →'
+              : 'SUBMIT FOR ADMIN APPROVAL →'
             : 'FACE MATCH REQUIRED'}
         </Button>
       </div>

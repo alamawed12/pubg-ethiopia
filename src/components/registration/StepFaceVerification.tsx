@@ -486,12 +486,12 @@ export function StepFaceVerification({
                   {matchResult.details}
                 </p>
 
-                {/* Instant issuance notice */}
+                {/* Biometric verification notice */}
                 {isVerified && (
                   <div className="mt-2 pt-2 border-t border-green-500/20 flex items-center gap-2 text-xs font-mono text-[#CCFF00]">
-                    <span>⚡</span>
+                    <span>✓</span>
                     <span>
-                      <strong>Instant Pass Approved:</strong> Because your face matches your National ID, your {ticketTier === 'VIP' ? 'VIP All-Access Pass' : 'Standard Admission Ticket'} will be generated and issued immediately upon submission!
+                      <strong>Biometric Verification Passed:</strong> Your live face matches your National ID ({matchResult.score}%). After submitting, your application will be reviewed by the admin team, and your official {ticketTier === 'VIP' ? 'VIP' : 'Standard'} QR ticket will unlock in your Attendee Portal upon approval!
                     </span>
                   </div>
                 )}
@@ -540,7 +540,7 @@ export function StepFaceVerification({
           onClick={onNext}
           className="px-8 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {isVerified ? 'CONTINUE TO CONFIRMATION →' : 'PASS FACE MATCH TO PROCEED'}
+          {isVerified ? 'CONTINUE TO REVIEW →' : 'PASS FACE MATCH TO PROCEED'}
         </Button>
       </div>
 
