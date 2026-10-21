@@ -237,8 +237,88 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // ─── STANDARD / CONFIRMED PASS SUCCESS SCREEN ─────────────────────────────
+  // ─── STANDARD (FREE) PASS: PENDING ADMIN APPROVAL (NO QR UNTIL ACCEPTED) ───
   // ════════════════════════════════════════════════════════════════════════════
+  if (!isConfirmed) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full text-center py-6 px-4 max-w-xl mx-auto"
+      >
+        {/* Hourglass/Pending Icon */}
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+          <svg className="w-10 h-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 font-mono text-xs uppercase tracking-widest mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          REGISTRATION RECEIVED • PENDING REVIEW
+        </div>
+
+        <h2 className="font-heading text-3xl sm:text-4xl font-black uppercase tracking-wider text-white">
+          APPLICATION SUBMITTED
+        </h2>
+
+        <p className="mt-3 text-sm text-[#cccccc] leading-relaxed">
+          Thank you, <strong className="text-white">{data.fullName}</strong>. Your free registration application has been queued for committee review. 
+        </p>
+
+        {/* Ref box */}
+        <div className="mt-6 mb-6 p-5 rounded-2xl bg-[#111111] border border-white/10 space-y-2 text-left">
+          <div className="flex items-center justify-between border-b border-white/5 pb-2">
+            <span className="font-mono text-xs text-[#999999] uppercase">Application Reference</span>
+            <span className="font-mono text-sm font-bold text-[#CCFF00]">{data.referenceId}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-white/5 pb-2">
+            <span className="font-mono text-xs text-[#999999] uppercase">Player Name &amp; IGN</span>
+            <span className="font-mono text-xs text-white">{data.fullName} ({data.inGameName})</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-xs text-[#999999] uppercase">Status</span>
+            <span className="font-mono text-xs font-bold text-amber-400">PENDING ADMIN AUDIT</span>
+          </div>
+        </div>
+
+        {/* Informative Explanation of Ticket Unlock */}
+        <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#CCFF00]/20 text-xs text-left text-[#cccccc] space-y-2">
+          <div className="flex items-center gap-2 font-mono text-[#CCFF00] uppercase font-bold">
+            <span>ℹ️</span> HOW TO GET YOUR DIGITAL TICKET
+          </div>
+          <p className="text-[12px] text-[#999999] leading-relaxed">
+            Free tickets do not show an immediate QR code. As soon as the admin reviews and accepts your submission, your QR ticket unlocks in the <strong>Attendee Portal</strong>.
+          </p>
+          <p className="text-[11px] text-[#999999] font-mono">
+            You can log into your portal anytime using your <strong>Full Name</strong> and <strong>Phone Number</strong>.
+          </p>
+        </div>
+
+        {/* Portal Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button
+            variant="primary"
+            size="lg"
+            href="/portal"
+            className="w-full sm:w-auto min-w-[200px]"
+          >
+            GO TO ATTENDEE PORTAL →
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="lg"
+            href="/"
+            className="w-full sm:w-auto min-w-[160px]"
+          >
+            RETURN HOME
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.92 }}

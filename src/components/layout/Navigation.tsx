@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'HOME', href: '/#hero' },
   { label: 'REGISTRATION', href: '/register' },
+  { label: 'MY TICKET', href: '/portal' },
   { label: 'TOURNAMENT', href: '/#tournament' },
   { label: 'FAQ', href: '/#faq' },
 ];

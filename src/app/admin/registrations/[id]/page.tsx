@@ -426,6 +426,7 @@ export default function RegistrationDetailPage() {
               <Field label="In-Game Name" value={reg.inGameName} mono />
               <Field label="PUBG UID" value={reg.pubgUid} mono />
               <Field label="Phone" value={`${reg.countryCode} ${reg.phoneNumber}`} mono />
+              <Field label="Portal Login Info" value={`Name: ${reg.fullName} | Phone: ${reg.phoneNumber}`} color="#CCFF00" mono />
               <Field label="City / Region" value={reg.cityRegion} />
               <Field label="Ticket Tier" value={reg.ticketTier === 'VIP' ? '★ VIP All-Access' : 'Standard'} color={reg.ticketTier === 'VIP' ? '#f59e0b' : '#CCFF00'} />
             </div>

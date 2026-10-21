@@ -78,6 +78,16 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/portal"
+                  onClick={() => playSound('click')}
+                  onMouseEnter={() => playSound('hover')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5"
+                >
+                  {'MY TICKET & PASS'}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/#tournament"
                   onClick={() => handleLinkClick('/#tournament')}
                   onMouseEnter={() => playSound('hover')}
