@@ -8,9 +8,7 @@ import { generateQRDataURL } from '@/lib/qr';
 // Allow larger body for base64 ID image uploads
 export const maxDuration = 30;
 
-
-const MAX_CAPACITY = 300;
-const CAPACITY_WARNING_THRESHOLD = 270;
+const DEFAULT_CAPACITY = 300;
 
 /**
  * Extracts client IP from incoming request headers.
@@ -78,15 +76,22 @@ export async function POST(req: NextRequest) {
     const data = parseResult.data;
 
     // 3. Capacity & Quota Management
-    const existingCount = await prisma.registration.count();
+    const [existingCount, capacitySetting] = await Promise.all([
+      prisma.registration.count(),
+      prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
+    ]);
 
-    if (existingCount >= CAPACITY_WARNING_THRESHOLD && existingCount < MAX_CAPACITY) {
+    const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : DEFAULT_CAPACITY;
+    const capacityLimit = isNaN(maxCapacity) || maxCapacity < 1 ? DEFAULT_CAPACITY : maxCapacity;
+    const capacityWarningThreshold = Math.max(1, Math.floor(capacityLimit * 0.9));
+
+    if (existingCount >= capacityWarningThreshold && existingCount < capacityLimit) {
       console.warn(
-        `[CAPACITY_ALERT] Registration count (${existingCount}/${MAX_CAPACITY}) is approaching maximum venue threshold.`
+        `[CAPACITY_ALERT] Registration count (${existingCount}/${capacityLimit}) is approaching maximum venue threshold.`
       );
     }
 
-    const registrationStatus = existingCount >= MAX_CAPACITY ? 'WAITLISTED' : 'PENDING';
+    const registrationStatus = existingCount >= capacityLimit ? 'WAITLISTED' : 'PENDING';
 
     // 4. Check for Existing Duplicate Registrations
     const duplicate = await prisma.registration.findFirst({

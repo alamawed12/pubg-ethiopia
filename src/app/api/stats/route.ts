@@ -6,15 +6,22 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const totalRegistrations = await prisma.registration.count();
-    const confirmed = await prisma.registration.count({ where: { status: 'CONFIRMED' } });
-    const pending = await prisma.registration.count({ where: { status: 'PENDING' } });
+    const [totalRegistrations, confirmed, pending, capacitySetting] = await Promise.all([
+      prisma.registration.count(),
+      prisma.registration.count({ where: { status: 'CONFIRMED' } }),
+      prisma.registration.count({ where: { status: 'PENDING' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
+    ]);
+
+    const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : 300;
+    const capacity = isNaN(maxCapacity) ? 300 : maxCapacity;
 
     return NextResponse.json({
       totalRegistrations,
       confirmed,
       pending,
-      isOpen: totalRegistrations < 300,
+      capacity,
+      isOpen: totalRegistrations < capacity,
     });
   } catch {
     return NextResponse.json({ totalRegistrations: 0, isOpen: true });

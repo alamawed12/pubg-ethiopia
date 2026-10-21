@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 
 export default function AdminSettingsPage() {
+  const [maxCapacity, setMaxCapacity] = useState(300);
   const [vipPrice, setVipPrice] = useState(500);
   const [vipEnabled, setVipEnabled] = useState(true);
-  const [stats, setStats] = useState({ vipCount: 0, standardCount: 0, estimatedVipRevenue: 0 });
+  const [stats, setStats] = useState({ vipCount: 0, standardCount: 0, totalRegistrations: 0, estimatedVipRevenue: 0 });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -16,6 +17,7 @@ export default function AdminSettingsPage() {
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
+          if (d.maxCapacity !== undefined) setMaxCapacity(d.maxCapacity);
           setVipPrice(d.vipPrice);
           setVipEnabled(d.vipEnabled);
           if (d.stats) setStats(d.stats);
@@ -36,6 +38,7 @@ export default function AdminSettingsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          maxCapacity: Number(maxCapacity),
           vipPrice: Number(vipPrice),
           vipEnabled,
         }),
@@ -78,21 +81,34 @@ export default function AdminSettingsPage() {
         </p>
       </div>
 
-      {/* VIP Overview Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Overview Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div
-          className="p-5 rounded-xl border"
+          className="p-5 rounded-2xl border"
+          style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
+        >
+          <span className="font-mono text-xs uppercase text-[#999999]">MAX CAPACITY QUOTA</span>
+          <div className="text-2xl font-black font-heading text-[#CCFF00] mt-1">
+            {maxCapacity} PLAYERS
+          </div>
+          <span className="text-[11px] text-[#666666] font-mono">
+            {stats.totalRegistrations || 0} registered ({Math.round(((stats.totalRegistrations || 0) / (maxCapacity || 1)) * 100)}%)
+          </span>
+        </div>
+
+        <div
+          className="p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
           <span className="font-mono text-xs uppercase text-[#999999]">CURRENT VIP PRICE</span>
           <div className="text-2xl font-black font-heading text-[#CCFF00] mt-1">
             {vipPrice.toLocaleString()} ETB
           </div>
-          <span className="text-[11px] text-[#666666] font-mono">Per attendee ticket</span>
+          <span className="text-[11px] text-[#666666] font-mono">Per VIP attendee</span>
         </div>
 
         <div
-          className="p-5 rounded-xl border"
+          className="p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
           <span className="font-mono text-xs uppercase text-[#999999]">VIP TICKETS CLAIMED</span>
@@ -105,7 +121,7 @@ export default function AdminSettingsPage() {
         </div>
 
         <div
-          className="p-5 rounded-xl border"
+          className="p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
           <span className="font-mono text-xs uppercase text-[#999999]">ESTIMATED VIP REVENUE</span>
@@ -118,32 +134,32 @@ export default function AdminSettingsPage() {
 
       {/* Settings Form */}
       <div
-        className="p-6 sm:p-8 rounded-xl border"
+        className="p-6 sm:p-8 rounded-2xl border"
         style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <h2
           className="text-xl uppercase tracking-wider mb-6 flex items-center gap-2"
           style={{ fontFamily: 'var(--font-heading)', color: '#CCFF00' }}
         >
-          <span>⭐</span> VIP TICKET CONFIGURATION
+          <span>⚙️</span> ATTENDEE QUOTA &amp; VIP PASS CONFIGURATION
         </h2>
 
         {saveSuccess && (
           <div
-            className="mb-6 p-4 rounded-lg text-sm border flex items-center gap-3"
+            className="mb-6 p-4 rounded-xl text-sm border flex items-center gap-3"
             style={{
               backgroundColor: 'rgba(34,197,94,0.1)',
               borderColor: 'rgba(34,197,94,0.3)',
               color: '#22c55e',
             }}
           >
-            <span>✓</span> VIP Ticket Price and status saved successfully! Updates are live on the registration portal.
+            <span>✓</span> Settings saved successfully! Capacity quota and VIP pricing are updated live on the website.
           </div>
         )}
 
         {error && (
           <div
-            className="mb-6 p-4 rounded-lg text-sm border"
+            className="mb-6 p-4 rounded-xl text-sm border"
             style={{
               backgroundColor: 'rgba(239,68,68,0.1)',
               borderColor: 'rgba(239,68,68,0.3)',
@@ -155,6 +171,32 @@ export default function AdminSettingsPage() {
         )}
 
         <form onSubmit={handleSave} className="space-y-6">
+          {/* Max Capacity Section */}
+          <div className="pb-6 border-b border-white/10">
+            <label className="block text-xs font-mono uppercase tracking-wider mb-2 text-[#cccccc]">
+              MAXIMUM ATTENDEE CAPACITY (NUMBER OF PEOPLE)
+            </label>
+            <div className="flex items-center gap-3 max-w-md">
+              <input
+                type="number"
+                min="10"
+                max="5000"
+                step="10"
+                value={maxCapacity}
+                onChange={(e) => setMaxCapacity(Math.max(1, parseInt(e.target.value) || 0))}
+                className="w-full px-4 py-3 rounded-xl border text-lg font-bold text-white outline-none focus:border-[#CCFF00] font-mono"
+                style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)' }}
+              />
+              <span className="text-sm font-mono font-bold text-[#CCFF00] whitespace-nowrap">
+                PLAYERS
+              </span>
+            </div>
+            <p className="text-xs text-[#999999] mt-2">
+              Sets the attendee limit for the event. Once total registrations reach this number, future registrants are automatically placed on the waitlist.
+            </p>
+          </div>
+
+          {/* VIP Price Section */}
           <div>
             <label className="block text-xs font-mono uppercase tracking-wider mb-2 text-[#cccccc]">
               VIP PASS TICKET PRICE (ETHIOPIAN BIRR - ETB)
@@ -166,7 +208,7 @@ export default function AdminSettingsPage() {
                 step="50"
                 value={vipPrice}
                 onChange={(e) => setVipPrice(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full px-4 py-3 rounded-lg border text-lg font-bold text-white outline-none focus:border-[#CCFF00] font-mono"
+                className="w-full px-4 py-3 rounded-xl border text-lg font-bold text-white outline-none focus:border-[#CCFF00] font-mono"
                 style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)' }}
               />
               <span className="text-sm font-mono font-bold text-[#CCFF00] whitespace-nowrap">
@@ -184,7 +226,7 @@ export default function AdminSettingsPage() {
               id="vipEnabled"
               checked={vipEnabled}
               onChange={(e) => setVipEnabled(e.target.checked)}
-              className="w-4 h-4 accent-[#CCFF00] cursor-pointer"
+              className="w-4 h-4 accent-[#CCFF00] cursor-pointer rounded"
             />
             <label htmlFor="vipEnabled" className="text-sm text-white font-medium cursor-pointer">
               Enable VIP Pass tier on registration form
@@ -195,14 +237,14 @@ export default function AdminSettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-8 py-3 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(204,255,0,0.3)]"
+              className="px-8 py-3.5 rounded-xl text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(204,255,0,0.3)]"
               style={{
                 backgroundColor: '#CCFF00',
                 color: '#050505',
                 fontFamily: 'var(--font-heading)',
               }}
             >
-              {saving ? 'SAVING CHANGES...' : 'SAVE VIP SETTINGS'}
+              {saving ? 'SAVING CHANGES...' : 'SAVE SETTINGS'}
             </button>
           </div>
         </form>

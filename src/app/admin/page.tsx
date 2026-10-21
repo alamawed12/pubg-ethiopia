@@ -4,43 +4,71 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  let total = 0, pending = 0, confirmed = 0, checkedIn = 0, rejected = 0, waitlisted = 0, pendingVip = 0;
+  let total = 0, pending = 0, confirmed = 0, checkedIn = 0, rejected = 0, waitlisted = 0, pendingVip = 0, capacity = 300;
   let recent: { id: string; referenceId: string; fullName: string; inGameName: string; category: string; status: string; createdAt: Date }[] = [];
 
   try {
-    total = await prisma.registration.count();
-    pending = await prisma.registration.count({ where: { status: 'PENDING' } });
-    confirmed = await prisma.registration.count({ where: { status: 'CONFIRMED' } });
-    checkedIn = await prisma.registration.count({ where: { status: 'CHECKED_IN' } });
-    rejected = await prisma.registration.count({ where: { status: 'REJECTED' } });
-    waitlisted = await prisma.registration.count({ where: { status: 'WAITLISTED' } });
-    pendingVip = await prisma.registration.count({
-      where: {
-        ticketTier: 'VIP',
-        OR: [
-          { paymentStatus: 'PENDING_APPROVAL' },
-          { paymentStatus: 'UNPAID', status: 'PENDING' },
-        ],
-      },
-    });
-    recent = await prisma.registration.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: {
-        id: true,
-        referenceId: true,
-        fullName: true,
-        inGameName: true,
-        category: true,
-        status: true,
-        createdAt: true,
-      },
-    });
+    const [
+      totalCount,
+      pendingCount,
+      confirmedCount,
+      checkedInCount,
+      rejectedCount,
+      waitlistedCount,
+      pendingVipCount,
+      recentList,
+      capacitySetting,
+    ] = await Promise.all([
+      prisma.registration.count(),
+      prisma.registration.count({ where: { status: 'PENDING' } }),
+      prisma.registration.count({ where: { status: 'CONFIRMED' } }),
+      prisma.registration.count({ where: { status: 'CHECKED_IN' } }),
+      prisma.registration.count({ where: { status: 'REJECTED' } }),
+      prisma.registration.count({ where: { status: 'WAITLISTED' } }),
+      prisma.registration.count({
+        where: {
+          ticketTier: 'VIP',
+          OR: [
+            { paymentStatus: 'PENDING_APPROVAL' },
+            { paymentStatus: 'UNPAID', status: 'PENDING' },
+          ],
+        },
+      }),
+      prisma.registration.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: {
+          id: true,
+          referenceId: true,
+          fullName: true,
+          inGameName: true,
+          category: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
+      prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
+    ]);
+
+    total = totalCount;
+    pending = pendingCount;
+    confirmed = confirmedCount;
+    checkedIn = checkedInCount;
+    rejected = rejectedCount;
+    waitlisted = waitlistedCount;
+    pendingVip = pendingVipCount;
+    recent = recentList;
+
+    if (capacitySetting && capacitySetting.value) {
+      const parsed = parseInt(capacitySetting.value, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        capacity = parsed;
+      }
+    }
   } catch (err) {
     console.error('[ADMIN_DASHBOARD_DB_ERROR]', err);
   }
 
-  const capacity = 300;
   const capacityPct = Math.round((total / capacity) * 100);
 
   const stats = [
