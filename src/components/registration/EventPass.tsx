@@ -67,10 +67,10 @@ export function EventPass({
         }
       };
 
-      // Load PUBG Logo for embedding
+      // Load PUBG Community Assembly Logo for embedding
       let pubgLogoImg: HTMLImageElement | null = null;
       try {
-        pubgLogoImg = await loadImage('/images/pubg-mobile-logo.png');
+        pubgLogoImg = await loadImage('/images/community-assembly-logo.png');
       } catch {
         // Logo optional fallback
       }
@@ -143,7 +143,7 @@ export function EventPass({
 
         // ─── Top Header Section ───
         if (pubgLogoImg && pubgLogoImg.naturalWidth > 0) {
-          ctx.drawImage(pubgLogoImg, 45, 40, 68, 48);
+          ctx.drawImage(pubgLogoImg, 45, 40, 84, 42);
         }
 
         ctx.textAlign = 'left';
@@ -261,7 +261,7 @@ export function EventPass({
           // Embedded PUBG Mobile Logo in center of QR
           if (pubgLogoImg && pubgLogoImg.naturalWidth > 0) {
             const logoW = 56;
-            const logoH = 42;
+            const logoH = 28;
             const logoX = 780 - logoW / 2;
             const logoY = 260 - logoH / 2;
 
@@ -346,7 +346,7 @@ export function EventPass({
 
         // Top PUBG Mobile Logo
         if (pubgLogoImg && pubgLogoImg.naturalWidth > 0) {
-          ctx.drawImage(pubgLogoImg, 268, 48, 64, 46);
+          ctx.drawImage(pubgLogoImg, 258, 48, 84, 42);
         }
 
         // "PUBG MOBILE"
@@ -399,8 +399,8 @@ export function EventPass({
 
           // Draw centered PUBG Mobile logo in the QR code
           if (pubgLogoImg && pubgLogoImg.naturalWidth > 0) {
-            const logoW = 54;
-            const logoH = 40;
+            const logoW = 56;
+            const logoH = 28;
             const logoX = 300 - logoW / 2;
             const logoY = 405 - logoH / 2;
 
@@ -509,9 +509,9 @@ export function EventPass({
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/pubg-mobile-logo.png"
-                alt="PUBG Mobile"
-                className="h-10 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                src="/images/community-assembly-logo.png"
+                alt="PUBG Mobile Community Assembly Ethiopia"
+                className="h-11 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_14px_rgba(245,158,11,0.5)]"
               />
               <div>
                 <div className="font-mono text-[10px] tracking-[0.25em] text-amber-400 uppercase font-bold flex items-center gap-1.5">
@@ -592,9 +592,9 @@ export function EventPass({
                       <div className="bg-[#050505] px-1.5 py-1 rounded-md border border-amber-400 shadow-[0_2px_8px_rgba(0,0,0,0.9)] flex items-center justify-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src="/images/pubg-mobile-logo.png"
+                          src="/images/community-assembly-logo.png"
                           alt="PUBG Mobile"
-                          className="h-6 w-auto object-contain"
+                          className="h-5 w-auto object-contain"
                         />
                       </div>
                     </div>
@@ -681,12 +681,12 @@ export function EventPass({
           </div>
 
           {/* Top Logo */}
-          <div className="flex justify-center mb-1">
+          <div className="flex justify-center mb-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-8 w-auto object-contain"
+              src="/images/community-assembly-logo.png"
+              alt="PUBG Mobile Community Assembly Ethiopia"
+              className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(204,255,0,0.5)]"
             />
           </div>
 
@@ -733,9 +733,9 @@ export function EventPass({
                   <div className="bg-[#050505] px-1.5 py-1 rounded-md border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/images/pubg-mobile-logo.png"
+                      src="/images/community-assembly-logo.png"
                       alt="PUBG Mobile"
-                      className="h-6 w-auto object-contain"
+                      className="h-5 w-auto object-contain"
                     />
                   </div>
                 </div>

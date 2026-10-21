@@ -133,13 +133,16 @@ export function HeroSection() {
           animate={isInView ? 'visible' : 'hidden'}
           className="flex flex-col items-center w-full"
         >
-          {/* Official PUBG Mobile Hero Logo */}
-          <motion.div variants={itemVariants} className="mb-5 flex justify-center">
+          {/* Official PUBG Mobile Hero Logo with High-Impact Pop Glow */}
+          <motion.div variants={itemVariants} className="mb-6 sm:mb-8 flex justify-center relative group">
+            {/* Ambient neon lime backglow behind logo */}
+            <div className="absolute inset-0 bg-[#CCFF00]/25 blur-3xl rounded-full scale-125 -z-10 animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 bg-[#CCFF00]/15 blur-xl rounded-full scale-110 -z-10 pointer-events-none" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-14 sm:h-20 md:h-24 w-auto object-contain drop-shadow-[0_0_30px_rgba(204,255,0,0.35)]"
+              src="/images/community-assembly-logo.png"
+              alt="PUBG Mobile Community Assembly Ethiopia"
+              className="h-24 sm:h-32 md:h-40 lg:h-44 w-auto object-contain filter drop-shadow-[0_0_35px_rgba(204,255,0,0.6)] transition-transform duration-500 hover:scale-105 select-none"
             />
           </motion.div>
 

@@ -96,13 +96,16 @@ export default function AttendeePortalPage() {
 
       {/* Top Header Bar */}
       <header className="relative z-20 border-b border-white/10 bg-[#050505]/80 backdrop-blur-md px-4 sm:px-8 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/pubg-mobile-logo.png"
-            alt="PUBG Mobile"
-            className="h-8 w-auto object-contain"
-          />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative">
+            <div className="absolute inset-0 bg-[#CCFF00]/25 blur-md rounded-full scale-110 opacity-70 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/community-assembly-logo.png"
+              alt="PUBG Mobile Community Assembly Ethiopia"
+              className="relative h-9 sm:h-11 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(204,255,0,0.5)] transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
           <span className="font-heading font-black text-lg text-[#CCFF00] tracking-wider uppercase hidden sm:inline">
             ATTENDEE PORTAL
           </span>

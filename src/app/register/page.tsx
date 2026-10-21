@@ -47,12 +47,13 @@ export default function RegisterPage() {
 
         {/* Page Header */}
         <header className="mb-10 text-center space-y-3">
-          <div className="flex justify-center mb-3">
+          <div className="flex justify-center mb-4 relative">
+            <div className="absolute inset-0 bg-[#CCFF00]/20 blur-2xl rounded-full scale-110 pointer-events-none" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-12 sm:h-14 w-auto object-contain drop-shadow-[0_0_20px_rgba(204,255,0,0.3)]"
+              src="/images/community-assembly-logo.png"
+              alt="PUBG Mobile Community Assembly Ethiopia"
+              className="relative h-16 sm:h-20 md:h-24 w-auto object-contain filter drop-shadow-[0_0_25px_rgba(204,255,0,0.5)] transition-transform duration-300 hover:scale-105"
             />
           </div>
 

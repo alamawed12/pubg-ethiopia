@@ -83,14 +83,14 @@ export function AdminWelcomeIntro() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* PUBG Mobile Logo */}
+            {/* PUBG Mobile Community Assembly Logo */}
             <motion.img
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-12 sm:h-14 w-auto object-contain mb-3 sm:mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+              src="/images/community-assembly-logo.png"
+              alt="PUBG Mobile Community Assembly Ethiopia"
+              className="h-14 sm:h-16 w-auto object-contain mb-3 sm:mb-4 filter drop-shadow-[0_0_20px_rgba(204,255,0,0.45)]"
             />
 
             {/* Role Badge */}

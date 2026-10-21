@@ -27,14 +27,19 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
           {/* Column 1: Brand & Mission */}
           <div className="flex flex-col gap-4 lg:col-span-1">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-[#CCFF00] rotate-45 shadow-[0_0_8px_#CCFF00]" />
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/community-assembly-logo.png"
+                alt="Community Assembly Ethiopia"
+                className="h-10 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(204,255,0,0.5)]"
+              />
               <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase">
-                <span className="inline lg:hidden text-xl">
+                <span className="inline lg:hidden text-lg">
                   {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
                 </span>
-                <span className="hidden lg:inline text-xl">
-                  {'PUBG MOBILE COMMUNITY ASSEMBLY '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
+                <span className="hidden lg:inline text-lg">
+                  {'COMMUNITY ASSEMBLY '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
                 </span>
               </span>
             </div>

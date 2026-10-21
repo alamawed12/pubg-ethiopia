@@ -232,9 +232,9 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 {/* PUBG MOBILE Official Logo */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/pubg-mobile-logo.png"
-                  alt="PUBG Mobile Official Logo"
-                  className="h-24 sm:h-32 md:h-36 w-auto object-contain drop-shadow-[0_0_35px_rgba(204,255,0,0.55)] select-none"
+                  src="/images/community-assembly-logo.png"
+                  alt="PUBG Mobile Community Assembly Ethiopia"
+                  className="h-28 sm:h-36 md:h-44 w-auto object-contain filter drop-shadow-[0_0_45px_rgba(204,255,0,0.7)] select-none"
                 />
 
                 {/* Tactical Assembly Title below morph */}

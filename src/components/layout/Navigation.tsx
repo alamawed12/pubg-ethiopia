@@ -86,13 +86,17 @@ export function Navigation() {
             className="group flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none shrink-0"
             aria-label="PUBG Mobile Community Assembly Ethiopia"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-7 sm:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105 shrink-0"
-            />
-            <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.3)] whitespace-nowrap">
+            {/* Logo with popping radioactive glow */}
+            <div className="relative flex items-center">
+              <div className="absolute inset-0 bg-[#CCFF00]/30 blur-md rounded-full scale-125 opacity-70 group-hover:opacity-100 group-hover:scale-135 transition-all duration-300 pointer-events-none" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/community-assembly-logo.png"
+                alt="PUBG Mobile Community Assembly Ethiopia"
+                className="relative h-9 sm:h-11 w-auto object-contain transition-all duration-300 group-hover:scale-105 filter drop-shadow-[0_0_14px_rgba(204,255,0,0.6)] shrink-0"
+              />
+            </div>
+            <span className="font-heading font-black tracking-wider text-[#CCFF00] uppercase drop-shadow-[0_0_15px_rgba(204,255,0,0.35)] whitespace-nowrap">
               {/* Responsive compact brand name to prevent nav crowding */}
               <span className="inline 2xl:hidden text-base sm:text-lg">
                 {'PUBG·M '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
@@ -234,9 +238,17 @@ export function Navigation() {
           >
             {/* Top Bar inside Mobile Menu */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <span className="font-heading font-black text-xl tracking-wider text-[#CCFF00] uppercase">
-                {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
-              </span>
+              <div className="flex items-center gap-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/community-assembly-logo.png"
+                  alt="PUBG Mobile Community Assembly Ethiopia"
+                  className="h-8 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(204,255,0,0.5)]"
+                />
+                <span className="font-heading font-black text-xl tracking-wider text-[#CCFF00] uppercase">
+                  {'PMCA '}<span className="text-white/40">{'—'}</span>{' ETHIOPIA'}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => {
