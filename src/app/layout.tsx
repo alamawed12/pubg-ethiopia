@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
+import { Inter, Oswald, JetBrains_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,6 +20,13 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
   display: "swap",
 });
 
@@ -64,7 +71,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable} ${montserrat.variable}`}
     >
       <body className="film-grain">{children}</body>
     </html>
