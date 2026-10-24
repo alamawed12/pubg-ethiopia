@@ -12,6 +12,7 @@ interface NavItem {
   label: string;
   shortLabel: string;
   icon: React.ReactNode;
+  headOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -88,6 +89,17 @@ const navItems: NavItem[] = [
     ),
   },
   {
+    href: '/admin/admins',
+    label: 'Admin Team',
+    shortLabel: 'Staff',
+    headOnly: true,
+    icon: (
+      <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+      </svg>
+    ),
+  },
+  {
     href: '/admin/announcements',
     label: 'Announcements',
     shortLabel: 'News',
@@ -118,9 +130,16 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   const isScannerRole = session?.user?.role === 'scanner';
-  const visibleNavItems = isScannerRole
-    ? navItems.filter((i) => i.href === '/admin/check-in')
-    : navItems;
+  const isHeadAdmin =
+    session?.user?.role === 'super_admin' ||
+    session?.user?.email?.toLowerCase() === 'pmcaheadadmin@pubgmethiopia.et' ||
+    session?.user?.email?.toLowerCase() === 'pubgmethiopia.et';
+
+  const visibleNavItems = navItems.filter((i) => {
+    if (isScannerRole) return i.href === '/admin/check-in';
+    if (i.headOnly && !isHeadAdmin) return false;
+    return true;
+  });
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#0a0a0a] text-white">

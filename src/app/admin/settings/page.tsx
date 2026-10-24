@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { AdminManagementSection } from '@/components/admin/AdminManagementSection';
 import {
   SettingsCogIcon,
   ShieldSecurityIcon,
@@ -950,6 +951,11 @@ export default function AdminSettingsPage() {
           </div>
         </div>
       </form>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 7: ADMIN TEAM & SUB-ADMIN REGISTRATION (HEAD ADMIN ONLY)
+      ═══════════════════════════════════════════════════════════════ */}
+      <AdminManagementSection />
     </div>
   );
 }
