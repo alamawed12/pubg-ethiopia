@@ -160,19 +160,19 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-heading text-base font-black tracking-wider text-white uppercase">
+                <span className="font-sans text-sm font-bold tracking-tight text-white uppercase">
                   {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}
                 </span>
-                <span className={`px-1.5 py-0.5 rounded border font-mono text-[9px] uppercase ${
+                <span className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider ${
                   isScannerRole
-                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
-                    : 'bg-[#CCFF00]/15 border-[#CCFF00]/40 text-[#CCFF00]'
+                    ? 'bg-amber-500/15 border border-amber-500/40 text-amber-400'
+                    : 'bg-[#CCFF00]/15 border border-[#CCFF00]/40 text-[#CCFF00]'
                 }`}>
                   {isScannerRole ? 'STAFF' : 'HEAD ADMIN'}
                 </span>
               </div>
-              <p className="font-mono text-[9px] text-[#999999] uppercase tracking-wider mt-0.5">
-                {isScannerRole ? 'ADMISSION CHECK-IN PORTAL' : 'PMCA ETHIOPIA COMMAND'}
+              <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-wider font-medium mt-0.5">
+                {isScannerRole ? 'ADMISSION CHECK-IN PORTAL' : 'PUBG·M ETHIOPIA COMMAND'}
               </p>
             </div>
           </div>
@@ -185,14 +185,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-sans transition-all duration-200 ${
                     isActive
-                      ? 'bg-[#CCFF00] text-[#050505] font-bold shadow-[0_0_15px_rgba(204,255,0,0.25)]'
-                      : 'text-[#999999] hover:text-white hover:bg-white/5'
+                      ? 'bg-[#CCFF00] text-[#050505] font-bold shadow-[0_0_20px_rgba(204,255,0,0.3)]'
+                      : 'text-neutral-400 hover:text-white hover:bg-white/5 font-medium'
                   }`}
                 >
                   <span className={isActive ? 'text-[#050505]' : 'text-[#CCFF00]'}>{item.icon}</span>
-                  <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  <span className="tracking-tight">
                     {item.label}
                   </span>
                 </Link>
@@ -203,12 +203,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
         {/* Desktop Sidebar Footer */}
         <div className="p-4 border-t border-white/10 bg-black/40">
-          <p className="text-xs truncate font-mono text-[#999999] mb-3">
+          <p className="text-xs truncate font-sans text-neutral-400 font-medium mb-3">
             {session?.user?.email || 'pubgmethiopia.et'}
           </p>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-400 font-heading text-xs uppercase tracking-wider transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-400 font-sans text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -230,14 +230,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             alt="PUBG Mobile"
             className="h-7 w-auto object-contain"
           />
-          <span className="font-heading font-black text-sm tracking-wider text-white uppercase">
+          <span className="font-sans font-bold text-sm tracking-tight text-white uppercase">
             {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}
           </span>
         </div>
 
         <button
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          className="px-2.5 py-1 rounded bg-red-950/50 border border-red-500/30 text-red-400 font-mono text-[10px] uppercase tracking-wider flex items-center gap-1"
+          className="px-3 py-1 rounded-full bg-red-950/50 border border-red-500/30 text-red-400 font-sans text-[11px] font-bold uppercase tracking-wider flex items-center gap-1"
         >
           <span>LOGOUT</span>
         </button>
@@ -254,16 +254,16 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-1.5 rounded-lg transition-all min-w-[52px] ${
+              className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition-all min-w-[54px] ${
                 isActive
                   ? 'text-[#CCFF00] font-bold bg-[#CCFF00]/10'
-                  : 'text-[#888888] hover:text-[#cccccc]'
+                  : 'text-neutral-400 hover:text-white'
               }`}
             >
-              <span className={`transition-transform ${isActive ? 'scale-110 text-[#CCFF00]' : 'text-[#888888]'}`}>
+              <span className={`transition-transform ${isActive ? 'scale-110 text-[#CCFF00]' : 'text-neutral-400'}`}>
                 {item.icon}
               </span>
-              <span className="text-[10px] font-heading uppercase tracking-tight mt-0.5 whitespace-nowrap">
+              <span className="text-[10px] font-sans font-semibold uppercase tracking-tight mt-0.5 whitespace-nowrap">
                 {item.shortLabel}
               </span>
             </Link>

@@ -301,8 +301,7 @@ export function RegistrationsTableClient({
                   (h) => (
                     <th
                       key={h}
-                      className="text-left px-4 py-3 text-xs uppercase tracking-wider"
-                      style={{ color: '#999999' }}
+                      className="text-left px-4 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400"
                     >
                       {h}
                     </th>

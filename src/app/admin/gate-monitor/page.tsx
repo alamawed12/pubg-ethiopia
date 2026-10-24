@@ -97,17 +97,16 @@ export default function AdminGateMonitorPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${autoRefresh ? 'bg-[#CCFF00] animate-ping' : 'bg-white/40'}`} />
-            <span className="font-mono text-xs uppercase tracking-widest text-[#CCFF00]">
+            <span className="font-sans text-xs font-bold uppercase tracking-widest text-[#CCFF00]">
               LIVE VENUE TELEMETRY
             </span>
           </div>
           <h1
-            className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white mt-1"
-            style={{ fontFamily: 'var(--font-heading)' }}
+            className="text-2xl sm:text-3xl font-sans font-bold uppercase tracking-tight text-white mt-1"
           >
             GATE COMMAND &amp; CAPACITY MONITOR
           </h1>
-          <p className="text-sm text-[#999999] mt-0.5">
+          <p className="text-sm font-sans text-neutral-400 mt-0.5">
             Real-time gate check-in throughput, venue occupancy quota, and live admission log stream.
           </p>
         </div>

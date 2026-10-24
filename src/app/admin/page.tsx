@@ -99,21 +99,18 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-6xl">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#CCFF00' }} />
-          <span className="text-[11px] uppercase tracking-widest" style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}>
-            SYSTEM ACTIVE
+      <div className="mb-8">
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <div className="w-2 h-2 rounded-full animate-pulse bg-[#CCFF00] shadow-[0_0_8px_rgba(204,255,0,0.8)]" />
+          <span className="font-sans text-xs font-bold uppercase tracking-widest text-[#CCFF00]">
+            COMMAND SYSTEM ACTIVE
           </span>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl tracking-wider uppercase"
-          style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
-        >
+        <h1 className="text-2xl sm:text-4xl font-sans font-bold tracking-tight text-white uppercase">
           COMMAND CENTER
         </h1>
-        <p className="text-sm mt-1" style={{ color: '#666666' }}>
-          PUBG Mobile Community Assembly Ethiopia — Registration & VIP Payment Overview
+        <p className="text-sm font-sans text-neutral-400 font-medium mt-1">
+          PUBG Mobile Community Assembly Ethiopia — Live Operations &amp; Verification Overview
         </p>
       </div>
 
@@ -168,13 +165,13 @@ export default async function AdminDashboardPage() {
                 <s.Icon className="w-4 h-4" />
               </div>
               <span
-                className="text-3xl sm:text-4xl font-black"
-                style={{ fontFamily: 'var(--font-heading)', color: s.color }}
+                className="text-3xl sm:text-4xl font-black font-heading"
+                style={{ color: s.color }}
               >
                 {s.value}
               </span>
             </div>
-            <p className="text-[10px] uppercase tracking-wider leading-tight" style={{ color: '#999999', fontFamily: 'var(--font-mono)' }}>
+            <p className="text-[11px] font-sans font-semibold uppercase tracking-wider text-neutral-400">
               {s.label}
             </p>
           </div>
@@ -192,8 +189,8 @@ export default async function AdminDashboardPage() {
             <CreditCardIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase text-amber-300" style={{ fontFamily: 'var(--font-heading)' }}>VIP Payments</p>
-            <p className="text-[9px] text-[#888888]">Receipt clearing</p>
+            <p className="text-xs font-sans font-bold uppercase text-amber-300">VIP Payments</p>
+            <p className="text-[11px] font-sans text-neutral-400">Receipt clearing</p>
           </div>
         </Link>
         <Link
@@ -205,8 +202,8 @@ export default async function AdminDashboardPage() {
             <ClipboardListIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Registrations</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Players &amp; passes</p>
+            <p className="text-xs font-sans font-bold uppercase text-white">Registrations</p>
+            <p className="text-[11px] font-sans text-neutral-400">Players &amp; passes</p>
           </div>
         </Link>
         <Link
@@ -218,8 +215,8 @@ export default async function AdminDashboardPage() {
             <TrophyIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Squads &amp; Teams</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Esports rosters</p>
+            <p className="text-xs font-sans font-bold uppercase text-white">Squads &amp; Teams</p>
+            <p className="text-[11px] font-sans text-neutral-400">Esports rosters</p>
           </div>
         </Link>
         <Link
@@ -231,8 +228,8 @@ export default async function AdminDashboardPage() {
             <ShieldSecurityIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Gate Monitor</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Live check-ins</p>
+            <p className="text-xs font-sans font-bold uppercase text-white">Gate Monitor</p>
+            <p className="text-[11px] font-sans text-neutral-400">Live check-ins</p>
           </div>
         </Link>
         <Link
@@ -244,8 +241,8 @@ export default async function AdminDashboardPage() {
             <QrScannerIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Scanner</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Scan QR tickets</p>
+            <p className="text-xs font-sans font-bold uppercase text-white">Scanner</p>
+            <p className="text-[11px] font-sans text-neutral-400">Scan QR tickets</p>
           </div>
         </Link>
         <Link
@@ -257,8 +254,8 @@ export default async function AdminDashboardPage() {
             <SettingsCogIcon className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Settings</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Capacity &amp; VIP</p>
+            <p className="text-xs font-sans font-bold uppercase text-white">Settings</p>
+            <p className="text-[11px] font-sans text-neutral-400">Quotas &amp; VIP</p>
           </div>
         </Link>
       </div>
@@ -270,21 +267,21 @@ export default async function AdminDashboardPage() {
       >
         <div className="flex justify-between items-center mb-3">
           <div>
-            <h3 className="text-sm uppercase tracking-wider" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>
+            <h3 className="text-sm font-sans font-bold uppercase tracking-wider text-white">
               VENUE CAPACITY
             </h3>
-            <p className="text-xs mt-0.5" style={{ color: '#666666' }}>
+            <p className="text-xs font-sans text-neutral-400 mt-0.5">
               Maximum capacity quota: {capacity} attendees
             </p>
           </div>
           <div className="text-right">
             <span
-              className="text-2xl font-black"
-              style={{ fontFamily: 'var(--font-heading)', color: capacityPct > 90 ? '#ef4444' : '#CCFF00' }}
+              className="text-2xl font-black font-heading"
+              style={{ color: capacityPct > 90 ? '#ef4444' : '#CCFF00' }}
             >
               {capacityPct}%
             </span>
-            <p className="text-xs" style={{ color: '#999999', fontFamily: 'var(--font-mono)' }}>
+            <p className="text-xs font-sans text-neutral-400 font-semibold">
               {total} / {capacity}
             </p>
           </div>
@@ -300,7 +297,7 @@ export default async function AdminDashboardPage() {
           />
         </div>
         {capacityPct > 90 && (
-          <p className="mt-2 text-xs flex items-center gap-1.5" style={{ color: '#ef4444', fontFamily: 'var(--font-mono)' }}>
+          <p className="mt-2 text-xs flex items-center gap-1.5 font-sans font-bold text-red-400">
             <AlertTriangleIcon className="w-3.5 h-3.5 text-red-500 shrink-0" />
             <span>APPROACHING MAXIMUM CAPACITY</span>
           </p>
@@ -313,17 +310,13 @@ export default async function AdminDashboardPage() {
         style={{ backgroundColor: '#0a0a0a', borderColor: 'rgba(255,255,255,0.06)' }}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <h2
-            className="text-base tracking-wider uppercase flex items-center gap-2"
-            style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#CCFF00' }} />
+          <h2 className="text-sm font-sans font-bold tracking-wider uppercase text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#CCFF00]" />
             RECENT REGISTRATIONS
           </h2>
           <Link
             href="/admin/registrations"
-            className="text-xs uppercase tracking-wider hover:opacity-80 transition-opacity"
-            style={{ color: '#CCFF00', fontFamily: 'var(--font-mono)' }}
+            className="text-xs font-sans font-bold uppercase tracking-wider text-[#CCFF00] hover:underline"
           >
             VIEW ALL →
           </Link>
@@ -332,22 +325,22 @@ export default async function AdminDashboardPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: '#111111' }}>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                   Reference
                 </th>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                   Player
                 </th>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider hidden md:table-cell" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400 hidden md:table-cell">
                   IGN
                 </th>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider hidden lg:table-cell" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400 hidden lg:table-cell">
                   Category
                 </th>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400">
                   Status
                 </th>
-                <th className="text-left px-6 py-3 text-[10px] uppercase tracking-wider hidden sm:table-cell" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+                <th className="text-left px-6 py-3 text-xs font-sans font-bold uppercase tracking-wider text-neutral-400 hidden sm:table-cell">
                   Date
                 </th>
               </tr>

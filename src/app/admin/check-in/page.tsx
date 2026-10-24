@@ -275,17 +275,16 @@ export default function CheckInPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="px-2.5 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[10px] tracking-widest uppercase">
-            OFFICIAL PUBG MOBILE TEAM ADMISSION SYSTEM
+          <span className="px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-sans text-xs font-semibold tracking-wider uppercase">
+            OFFICIAL PUBG MOBILE HQ ADMISSION SYSTEM
           </span>
         </div>
         <h1
-          className="text-3xl tracking-wider uppercase mb-2"
-          style={{ fontFamily: 'var(--font-heading)', color: '#ffffff' }}
+          className="text-2xl sm:text-3xl font-sans font-bold tracking-tight uppercase mb-2 text-white"
         >
           AUTHENTIC TICKET SCANNER &amp; CHECK-IN
         </h1>
-        <p className="text-sm" style={{ color: '#999999' }}>
+        <p className="text-sm font-sans text-neutral-400">
           Point your phone or laptop camera at the attendee&apos;s QR code to verify ticket authenticity and confirm admission.
         </p>
       </div>
@@ -298,14 +297,14 @@ export default function CheckInPage() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-heading font-bold text-sm text-white uppercase tracking-wider">
+              <span className="font-sans font-bold text-sm text-white uppercase tracking-wider">
                 PMCA ANDROID SCANNER APP (ANDROID 5.0+)
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40">
                 OFFLINE &amp; ONLINE
               </span>
             </div>
-            <p className="text-xs text-[#888888] font-mono mt-0.5">
+            <p className="text-xs text-neutral-400 font-sans mt-0.5">
               Native APK for Android phones (Lollipop 5.0 to Android 15). High-speed camera autofocus, torch &amp; haptic feedback.
             </p>
           </div>

@@ -127,14 +127,14 @@ export default function AdminAnnouncementsPage() {
       <div className="border-b border-white/10 pb-6">
         <div className="flex items-center gap-2 mb-1">
           <span className="h-2 w-2 rounded-full bg-[var(--color-lime,#CCFF00)] shadow-[0_0_8px_rgba(204,255,0,0.8)]" />
-          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-lime,#CCFF00)]">
+          <span className="font-sans text-xs font-bold uppercase tracking-widest text-[var(--color-lime,#CCFF00)]">
             BROADCAST TRANSMISSION DESK
           </span>
         </div>
         <h1 className="font-heading text-3xl font-extrabold uppercase tracking-wider text-white">
           COMMUNITY ANNOUNCEMENTS
         </h1>
-        <p className="font-mono text-xs text-[var(--color-silver,#999999)] mt-0.5">
+        <p className="font-sans text-xs text-neutral-400 font-medium mt-0.5">
           Publish public news, tournament bulletins, and live logistical updates to the homepage dashboard.
         </p>
       </div>

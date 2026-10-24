@@ -136,7 +136,7 @@ export default function AdminPaymentsPage() {
         <button
           onClick={fetchPayments}
           disabled={loading}
-          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono uppercase tracking-wider bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all cursor-pointer"
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-sans font-bold uppercase tracking-wider bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all cursor-pointer"
         >
           <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -147,20 +147,20 @@ export default function AdminPaymentsPage() {
 
       {/* Notifications */}
       {actionSuccess && (
-        <div className="p-4 rounded-xl bg-green-950/40 border border-green-500/40 text-green-300 text-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-green-950/40 border border-green-500/40 text-green-300 text-sm flex items-center gap-3 font-sans">
           <svg className="w-5 h-5 shrink-0 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
-          <span className="font-mono">{actionSuccess}</span>
+          <span className="font-semibold">{actionSuccess}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-sm flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-sm flex items-center gap-3 font-sans">
           <svg className="w-5 h-5 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          <span className="font-mono">{errorMsg}</span>
+          <span className="font-semibold">{errorMsg}</span>
         </div>
       )}
 
@@ -170,16 +170,16 @@ export default function AdminPaymentsPage() {
           className="p-4 sm:p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
         >
-          <span className="text-[10px] sm:text-xs font-mono uppercase text-[#999999] tracking-wider block">
+          <span className="text-[11px] font-sans font-semibold uppercase text-neutral-400 tracking-wider block">
             PENDING AUDIT
           </span>
           <div className="text-2xl sm:text-3xl font-black font-heading text-amber-400 mt-1 flex items-baseline gap-2">
             <span>{stats.pendingApprovalCount}</span>
-            <span className="text-xs font-mono text-amber-400/70 font-normal">
+            <span className="text-xs font-sans text-amber-400/80 font-semibold">
               ({stats.pendingRevenue.toLocaleString()} ETB)
             </span>
           </div>
-          <span className="text-[11px] text-[#777777] font-mono mt-0.5 block">
+          <span className="text-[11px] text-neutral-400 font-sans mt-0.5 block">
             Awaiting manual receipt review
           </span>
         </div>
@@ -188,13 +188,13 @@ export default function AdminPaymentsPage() {
           className="p-4 sm:p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(204,255,0,0.15)' }}
         >
-          <span className="text-[10px] sm:text-xs font-mono uppercase text-[#CCFF00] tracking-wider block">
+          <span className="text-[11px] font-sans font-bold uppercase text-[#CCFF00] tracking-wider block">
             TOTAL VIP REVENUE
           </span>
           <div className="text-2xl sm:text-3xl font-black font-heading text-[#CCFF00] mt-1">
             {stats.totalRevenueCollected.toLocaleString()} ETB
           </div>
-          <span className="text-[11px] text-[#777777] font-mono mt-0.5 block">
+          <span className="text-[11px] text-neutral-400 font-sans mt-0.5 block">
             From {stats.approvedCount} approved passes
           </span>
         </div>
@@ -203,13 +203,13 @@ export default function AdminPaymentsPage() {
           className="p-4 sm:p-5 rounded-2xl border"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
         >
-          <span className="text-[10px] sm:text-xs font-mono uppercase text-[#999999] tracking-wider block">
+          <span className="text-[11px] font-sans font-semibold uppercase text-neutral-400 tracking-wider block">
             APPROVED PASSES
           </span>
           <div className="text-2xl sm:text-3xl font-black font-heading text-white mt-1">
             {stats.approvedCount}
           </div>
-          <span className="text-[11px] text-green-400 font-mono mt-0.5 block">
+          <span className="text-[11px] text-emerald-400 font-sans font-medium mt-0.5 block">
             Active &amp; verified VIP tickets
           </span>
         </div>

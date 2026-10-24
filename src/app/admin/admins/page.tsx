@@ -9,17 +9,16 @@ export default function AdminTeamPage() {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="inline-block w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
-          <span className="text-xs font-mono tracking-widest text-[#CCFF00] uppercase font-bold">
+          <span className="text-xs font-sans tracking-widest text-[#CCFF00] uppercase font-bold">
             HQ SECURITY &amp; ACCESS CONTROL
           </span>
         </div>
         <h1
-          className="text-3xl sm:text-4xl tracking-wider uppercase mb-2 font-bold text-white"
-          style={{ fontFamily: 'var(--font-heading)' }}
+          className="text-2xl sm:text-3xl font-sans font-bold tracking-tight uppercase mb-2 text-white"
         >
           ADMIN TEAM &amp; STAFF CREDENTIALS
         </h1>
-        <p className="text-sm text-[#999999] leading-relaxed">
+        <p className="text-sm font-sans text-neutral-400 font-medium leading-relaxed">
           Head Administrator control panel to register and manage staff accounts. Registered admins can log in at <strong className="text-white">/admin/login</strong> with their assigned email and password. Sub-admins are strictly prohibited from creating accounts.
         </p>
       </div>
