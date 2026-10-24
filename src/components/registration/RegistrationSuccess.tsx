@@ -29,28 +29,17 @@ export interface RegistrationSuccessProps {
 export function RegistrationSuccess({ registrationData }: RegistrationSuccessProps) {
   const [data, setData] = useState<RegistrationSuccessData>(registrationData);
   const [isCheckingSms, setIsCheckingSms] = useState(true);
-  const [countdown, setCountdown] = useState(4);
+  const [copiedRef, setCopiedRef] = useState(false);
 
   const isVip = data.ticketTier?.toUpperCase() === 'VIP';
   const isConfirmed = data.status?.toUpperCase() === 'CONFIRMED';
   const isVipPending = isVip && !isConfirmed;
 
-  // Auto-redirect to attendee portal for pending tickets
-  useEffect(() => {
-    if (!isConfirmed) {
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            window.location.href = '/portal';
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [isConfirmed]);
+  const handleCopyRef = () => {
+    navigator.clipboard.writeText(data.referenceId);
+    setCopiedRef(true);
+    setTimeout(() => setCopiedRef(false), 2500);
+  };
 
   // Real-time polling to check if Android SMS bot automatically confirmed the transaction
   useEffect(() => {
@@ -162,13 +151,22 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
         </p>
 
         {/* Official Reference Number Box */}
-        <div className="mt-6 mb-8 inline-block rounded-lg bg-black/60 px-6 py-3.5 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
-          <span className="block font-mono text-[11px] uppercase tracking-widest text-amber-300/80 mb-1">
-            OFFICIAL VIP REGISTRATION REFERENCE
-          </span>
-          <span className="font-mono text-2xl sm:text-3xl font-bold tracking-widest text-amber-400">
-            REF: {data.referenceId}
-          </span>
+        <div className="mt-6 mb-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="rounded-xl bg-black/60 px-6 py-3.5 border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.15)] text-left">
+            <span className="block font-mono text-[11px] uppercase tracking-widest text-amber-300/80 mb-0.5">
+              OFFICIAL VIP REGISTRATION REFERENCE
+            </span>
+            <span className="font-mono text-2xl sm:text-3xl font-bold tracking-widest text-amber-400">
+              {data.referenceId}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyRef}
+            className="px-4 py-3 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-mono text-xs font-bold uppercase transition-all cursor-pointer whitespace-nowrap"
+          >
+            {copiedRef ? 'COPIED TO CLIPBOARD!' : 'COPY REF CODE'}
+          </button>
         </div>
 
         {/* ─── VIP Transaction Log Card ─── */}
@@ -223,10 +221,10 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
           </div>
         </div>
 
-        {/* Redirect Notice Banner */}
+        {/* Holding Status Notice */}
         <div className="mt-6 p-4 rounded-xl bg-black/60 border border-amber-500/40 text-xs font-mono text-amber-300 flex items-center justify-center gap-2">
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-          <span>Redirecting to your Ticket Portal in <strong>{countdown}s</strong>...</span>
+          <span>YOUR PASS IS ON HOLD • PENDING HEAD ADMIN PAYMENT APPROVAL</span>
         </div>
 
         {/* Action Buttons */}
@@ -291,38 +289,47 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
         </p>
 
         {/* Ref box */}
-        <div className="mt-6 mb-6 p-5 rounded-2xl bg-[#111111] border border-white/10 space-y-2 text-left">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <span className="font-mono text-xs text-[#999999] uppercase">Application Reference</span>
-            <span className="font-mono text-sm font-bold text-[#CCFF00]">{data.referenceId}</span>
+        <div className="mt-6 mb-6 p-5 rounded-2xl bg-[#111111] border border-white/10 space-y-3 text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+            <div>
+              <span className="font-mono text-xs text-[#999999] uppercase block mb-0.5">Application Reference</span>
+              <span className="font-mono text-xl sm:text-2xl font-bold text-[#CCFF00] tracking-wider">{data.referenceId}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyRef}
+              className="px-4 py-2 rounded-xl border border-[#CCFF00]/40 bg-[#CCFF00]/10 hover:bg-[#CCFF00]/20 text-[#CCFF00] font-mono text-xs font-bold uppercase transition-all cursor-pointer self-start sm:self-auto"
+            >
+              {copiedRef ? 'COPIED!' : 'COPY REFERENCE'}
+            </button>
           </div>
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
             <span className="font-mono text-xs text-[#999999] uppercase">Player Name &amp; IGN</span>
             <span className="font-mono text-xs text-white">{data.fullName} ({data.inGameName})</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-[#999999] uppercase">Status</span>
-            <span className="font-mono text-xs font-bold text-amber-400">PENDING ADMIN AUDIT</span>
+            <span className="font-mono text-xs text-[#999999] uppercase">Application State</span>
+            <span className="font-mono text-xs font-bold text-amber-400">ON HOLD • PENDING ADMIN AUDIT</span>
           </div>
         </div>
 
         {/* Informative Explanation of Ticket Unlock */}
         <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#CCFF00]/20 text-xs text-left text-[#cccccc] space-y-2">
           <div className="flex items-center gap-2 font-mono text-[#CCFF00] uppercase font-bold">
-            <span>ℹ️</span> HOW TO GET YOUR DIGITAL TICKET
+            <span>ℹ️</span> TICKET ON HOLD • AWAITING ADMIN REVIEW
           </div>
-          <p className="text-[12px] text-[#999999] leading-relaxed">
-            Free tickets do not show an immediate QR code. As soon as the admin reviews and accepts your submission, your QR ticket unlocks in the <strong>Attendee Portal</strong>.
+          <p className="text-[12px] text-[#999999] leading-relaxed font-sans">
+            Your application is securely queued on hold. Our Head Admin will audit your slot, verify your ID images, and activate your QR entry pass.
           </p>
           <p className="text-[11px] text-[#999999] font-mono">
-            You can log into your portal anytime using your <strong>Full Name</strong> and <strong>Phone Number</strong>.
+            Check your live approval status anytime in the <strong>Attendee Portal</strong> using your Full Name and Phone Number.
           </p>
         </div>
 
-        {/* Redirect Notice Banner */}
-        <div className="mt-6 p-4 rounded-xl bg-black/60 border border-[#CCFF00]/30 text-xs font-mono text-[#CCFF00] flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-ping" />
-          <span>Redirecting to your Ticket Portal in <strong>{countdown}s</strong>...</span>
+        {/* Holding Status Notice */}
+        <div className="mt-6 p-4 rounded-xl bg-black/60 border border-amber-500/40 text-xs font-mono text-amber-300 flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <span>APPLICATION PLACED ON HOLD FOR COMMITTEE VERIFICATION</span>
         </div>
 
         {/* Portal Action Buttons */}

@@ -14,6 +14,7 @@ export function HeroSection() {
   const [heroDisplay, setHeroDisplay] = useState<string>('100-1000');
   const [eventDate, setEventDate] = useState<string>('COMING SOON');
   const [eventVenue, setEventVenue] = useState<string>('ADDIS ABABA, ETHIOPIA');
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean>(true);
 
   // Fetch dynamic capacity setting configured by admin
   useEffect(() => {
@@ -27,6 +28,9 @@ export function HeroSection() {
         }
         if (data?.eventDate) setEventDate(data.eventDate);
         if (data?.eventVenue) setEventVenue(data.eventVenue);
+        if (data?.registrationOpen !== undefined) {
+          setIsRegistrationOpen(Boolean(data.registrationOpen));
+        }
       })
       .catch(() => {});
   }, []);
@@ -198,10 +202,14 @@ export function HeroSection() {
               href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="relative group overflow-hidden w-full sm:w-auto px-8 py-4 bg-[#CCFF00] text-[#050505] font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:scale-[1.02] active:scale-[0.98] text-center rounded-xl"
+              className={`relative group overflow-hidden w-full sm:w-auto px-8 py-4 font-heading font-bold text-base md:text-lg tracking-wider uppercase transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] text-center rounded-xl ${
+                !isRegistrationOpen
+                  ? 'bg-amber-400 text-black hover:bg-amber-300 shadow-[0_0_25px_rgba(251,191,36,0.35)]'
+                  : 'bg-[#CCFF00] text-[#050505] hover:shadow-[0_0_30px_rgba(204,255,0,0.5)]'
+              }`}
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                <span>REGISTER NOW</span>
+                <span>{isRegistrationOpen ? 'REGISTER NOW' : 'REGISTRATION ON HOLD'}</span>
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>

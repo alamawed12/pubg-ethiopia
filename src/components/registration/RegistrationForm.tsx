@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressBar, StepItem } from '@/components/ui/ProgressBar';
+import { Button } from '@/components/ui/Button';
+import { ClockPendingIcon } from '@/components/ui/TacticalIcons';
 import { StepPlayerIdentity } from './StepPlayerIdentity';
 import { StepParticipation } from './StepParticipation';
 import { StepIdUpload } from './StepIdUpload';
@@ -94,6 +96,29 @@ export function RegistrationForm() {
   const [registrationResult, setRegistrationResult] = useState<RegistrationSuccessData | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  // Dynamic Registration Gate status (controlled by Head Admin in /admin/settings)
+  const [isGateLoaded, setIsGateLoaded] = useState<boolean>(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean>(true);
+  const [telegramLink, setTelegramLink] = useState<string>('https://t.me/pubgmethiopia');
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.registrationOpen !== undefined) {
+          setIsRegistrationOpen(Boolean(data.registrationOpen));
+        }
+        if (data.telegramLink) setTelegramLink(data.telegramLink);
+        if (data.vipPrice) {
+          setFormData((prev) => ({ ...prev, vipPrice: data.vipPrice }));
+        }
+        setIsGateLoaded(true);
+      })
+      .catch(() => {
+        setIsGateLoaded(true);
+      });
+  }, []);
+
   // VIP Payment is only required for standard attendees/players upgrading to VIP.
   // Content Creators get Complimentary VIP (Free).
   // Volunteers get Free Crew Pass.
@@ -177,6 +202,9 @@ export function RegistrationForm() {
       const result = await response.json();
 
       if (!response.ok || !result.success) {
+        if (result.isHeld) {
+          setIsRegistrationOpen(false);
+        }
         throw new Error(
           result.error ||
             'Registration could not be completed. Please check your input and try again.'
@@ -207,6 +235,65 @@ export function RegistrationForm() {
       setIsSubmitting(false);
     }
   };
+
+  // If registrations are on hold by Head Admin, render holding screen
+  if (isGateLoaded && !isRegistrationOpen) {
+    return (
+      <div className="relative overflow-visible rounded-2xl bg-gradient-to-b from-[#14120c] to-[#0c0a06] p-6 sm:p-10 border-2 border-amber-500/40 text-center shadow-2xl space-y-6">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
+          <ClockPendingIcon className="w-10 h-10 animate-pulse" />
+        </div>
+
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono text-xs uppercase tracking-widest">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <span>REGISTRATION GATE CLOSED • ON HOLD</span>
+        </div>
+
+        <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider text-white">
+          REGISTRATIONS TEMPORARILY ON HOLD
+        </h2>
+
+        <p className="text-sm sm:text-base text-neutral-300 max-w-lg mx-auto leading-relaxed font-sans">
+          The Head Administration has temporarily placed attendee registration on hold while auditing player capacity and reviewing submitted applications.
+        </p>
+
+        <div className="p-5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-neutral-300 max-w-md mx-auto text-left space-y-2.5">
+          <div>
+            <span className="text-amber-400 font-bold block uppercase mb-0.5">• ALREADY REGISTERED?</span>
+            <span className="text-neutral-400">
+              You do not need to register again. You can access your attendee dashboard below to check your ticket status.
+            </span>
+          </div>
+          <div className="border-t border-white/5 pt-2">
+            <span className="text-amber-400 font-bold block uppercase mb-0.5">• REOPENING BULLETINS:</span>
+            <span className="text-neutral-400">
+              Announcements regarding registration re-opening will be broadcast live via our official Telegram community.
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto pt-2">
+          <Button
+            variant="primary"
+            size="lg"
+            href="/portal"
+            className="w-full sm:flex-1"
+          >
+            GO TO ATTENDEE PORTAL →
+          </Button>
+
+          <a
+            href={telegramLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto px-6 py-4 rounded-xl border border-white/20 bg-neutral-900 hover:bg-neutral-800 text-white font-heading font-black text-xs sm:text-sm tracking-wider uppercase transition-colors flex items-center justify-center gap-2"
+          >
+            <span>JOIN TELEGRAM</span>
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   // If registration is complete, render success state
   if (isComplete && registrationResult) {

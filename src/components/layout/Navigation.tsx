@@ -21,6 +21,19 @@ const NAV_ITEMS: NavItem[] = [
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
+
+  // Fetch live registration open / on hold status
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.registrationOpen !== undefined) {
+          setIsRegistrationOpen(Boolean(data.registrationOpen));
+        }
+      })
+      .catch(() => {});
+  }, []);
   const { isMuted, toggleMute, playSound } = useSoundContext();
 
   // Scroll detection
@@ -171,9 +184,13 @@ export function Navigation() {
               href="/register"
               onClick={() => playSound('click')}
               onMouseEnter={() => playSound('hover')}
-              className="hidden lg:inline-flex items-center justify-center px-5 py-2.5 bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(204,255,0,0.5)] active:scale-95 cursor-pointer rounded-xl whitespace-nowrap"
+              className={`hidden lg:inline-flex items-center justify-center px-5 py-2.5 font-heading font-black text-xs md:text-sm tracking-wider uppercase transition-all duration-200 active:scale-95 cursor-pointer rounded-xl whitespace-nowrap ${
+                !isRegistrationOpen
+                  ? 'bg-amber-400 text-black hover:bg-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)]'
+                  : 'bg-[#CCFF00] hover:bg-[#b8e600] text-[#050505] hover:shadow-[0_0_20px_rgba(204,255,0,0.5)]'
+              }`}
             >
-              REGISTER
+              {isRegistrationOpen ? 'REGISTER' : 'ON HOLD'}
             </Link>
 
             {/* Mobile / Tablet Hamburger Button */}
@@ -285,9 +302,13 @@ export function Navigation() {
                   playSound('click');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full py-4 text-center bg-[#CCFF00] text-[#050505] font-heading font-black text-base tracking-widest uppercase hover:bg-[#b8e600] transition-colors rounded-xl shadow-lg shadow-[#CCFF00]/20"
+                className={`w-full py-4 text-center font-heading font-black text-base tracking-widest uppercase transition-colors rounded-xl shadow-lg ${
+                  !isRegistrationOpen
+                    ? 'bg-amber-400 text-black hover:bg-amber-300 shadow-amber-400/20'
+                    : 'bg-[#CCFF00] text-[#050505] hover:bg-[#b8e600] shadow-[#CCFF00]/20'
+                }`}
               >
-                REGISTER NOW
+                {isRegistrationOpen ? 'REGISTER NOW' : 'REGISTRATION ON HOLD'}
               </Link>
 
               <div className="flex items-center justify-between text-xs font-mono text-[#999999]">

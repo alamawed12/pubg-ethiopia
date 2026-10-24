@@ -73,11 +73,24 @@ export async function POST(req: NextRequest) {
 
     const data = parseResult.data;
 
-    // 3. Capacity & Quota Management
-    const [existingCount, capacitySetting] = await Promise.all([
+    // 3. Capacity & Quota Management and Registration Gate Check
+    const [existingCount, capacitySetting, regOpenSetting] = await Promise.all([
       prisma.registration.count(),
       prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'registration_open' } }),
     ]);
+
+    // Check if registrations are currently placed on hold by Head Admin
+    if (regOpenSetting && regOpenSetting.value === 'false') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Event registration is temporarily on hold by event organizers. Please check back later or visit your attendee portal.',
+          isHeld: true,
+        },
+        { status: 403 }
+      );
+    }
 
     const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : DEFAULT_CAPACITY;
     const capacityLimit = isNaN(maxCapacity) || maxCapacity < 1 ? DEFAULT_CAPACITY : maxCapacity;
