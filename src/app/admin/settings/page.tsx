@@ -19,16 +19,15 @@ type TabKey = 'event' | 'announcements' | 'vip' | 'admins' | 'ai';
 interface TabItem {
   id: TabKey;
   label: string;
-  badge?: string;
   Icon: React.ComponentType<{ className?: string }>;
 }
 
 const TABS: TabItem[] = [
-  { id: 'event', label: 'Event & Gate', badge: 'Live Controls', Icon: CalendarIcon },
-  { id: 'announcements', label: 'Homepage Bulletin', badge: 'Alerts', Icon: MegaphoneIcon },
-  { id: 'vip', label: 'VIP & Bank Accounts', badge: 'Pricing', Icon: CreditCardIcon },
-  { id: 'admins', label: 'Admin Staff & Roles', badge: 'Head Admin', Icon: ShieldSecurityIcon },
-  { id: 'ai', label: 'AI Biometrics & Socials', badge: 'Security', Icon: LightningBoltIcon },
+  { id: 'event', label: 'Event & Gate', Icon: CalendarIcon },
+  { id: 'announcements', label: 'Announcements', Icon: MegaphoneIcon },
+  { id: 'vip', label: 'VIP & Banking', Icon: CreditCardIcon },
+  { id: 'admins', label: 'Admin Team', Icon: ShieldSecurityIcon },
+  { id: 'ai', label: 'AI & Socials', Icon: LightningBoltIcon },
 ];
 
 function SettingsContent() {
@@ -306,34 +305,28 @@ function SettingsContent() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          APPLE-STYLE TAB NAVIGATION PILLS (DIVIDED INTO CLEAN SUB-PAGES)
+          APPLE-STYLE TAB NAVIGATION PILLS (ALL TABS 100% VISIBLE)
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#141414] border border-white/10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {TABS.map((tab) => {
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-1.5 rounded-2xl bg-[#141414] border border-white/10">
+        {TABS.map((tab, idx) => {
           const isSelected = activeTab === tab.id;
           const TabIcon = tab.Icon;
+          const isLastOnMobile = idx === 4;
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => switchTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all duration-200 shrink-0 cursor-pointer ${
+              className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer text-center ${
+                isLastOnMobile ? 'col-span-2 sm:col-span-1 lg:col-span-1' : ''
+              } ${
                 isSelected
-                  ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.3)]'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.35)]'
+                  : 'text-neutral-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.08] border border-white/5'
               }`}
             >
-              <TabIcon className={`w-4 h-4 ${isSelected ? 'text-black' : 'text-[#CCFF00]'}`} />
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span
-                  className={`hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                    isSelected ? 'bg-black/15 text-black' : 'bg-white/5 text-neutral-400'
-                  }`}
-                >
-                  {tab.badge}
-                </span>
-              )}
+              <TabIcon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-black' : 'text-[#CCFF00]'}`} />
+              <span className="whitespace-nowrap">{tab.label}</span>
             </button>
           );
         })}

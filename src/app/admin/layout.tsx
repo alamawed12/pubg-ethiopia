@@ -146,33 +146,38 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       <AdminWelcomeIntro />
       {/* ─── Desktop Sidebar ─── */}
       <aside
-        className="w-64 flex-shrink-0 border-r hidden md:flex flex-col justify-between"
+        className="w-72 flex-shrink-0 border-r hidden md:flex flex-col justify-between"
         style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div>
           {/* Brand Header */}
-          <div className="p-5 border-b border-white/10 flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/pubg-mobile-logo.png"
-              alt="PUBG Mobile"
-              className="h-9 w-auto object-contain"
-            />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-sans text-sm font-bold tracking-tight text-white uppercase">
+          <div className="p-4 sm:p-5 border-b border-white/10 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/pubg-mobile-logo.png"
+                  alt="PUBG Mobile"
+                  className="h-8 w-auto object-contain shrink-0"
+                />
+                <span className="font-sans text-sm font-black tracking-tight text-white uppercase whitespace-nowrap">
                   {isScannerRole ? 'GATE SCANNER' : 'ADMIN HQ'}
                 </span>
-                <span className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider ${
+              </div>
+              <span
+                className={`px-2.5 py-0.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 ${
                   isScannerRole
                     ? 'bg-amber-500/15 border border-amber-500/40 text-amber-400'
                     : 'bg-[#CCFF00]/15 border border-[#CCFF00]/40 text-[#CCFF00]'
-                }`}>
-                  {isScannerRole ? 'STAFF' : 'HEAD ADMIN'}
-                </span>
-              </div>
-              <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-wider font-medium mt-0.5">
-                {isScannerRole ? 'ADMISSION CHECK-IN PORTAL' : 'PUBG·M ETHIOPIA COMMAND'}
+                }`}
+              >
+                {isScannerRole ? 'STAFF' : 'HEAD ADMIN'}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 pl-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse shrink-0" />
+              <p className="font-sans text-[11px] text-neutral-400 uppercase tracking-wider font-semibold truncate">
+                {isScannerRole ? 'ADMISSION SCANNER PORTAL' : 'PUBG·M ETHIOPIA COMMAND'}
               </p>
             </div>
           </div>
@@ -188,11 +193,11 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-sans transition-all duration-200 ${
                     isActive
                       ? 'bg-[#CCFF00] text-[#050505] font-bold shadow-[0_0_20px_rgba(204,255,0,0.3)]'
-                      : 'text-neutral-400 hover:text-white hover:bg-white/5 font-medium'
+                      : 'text-neutral-300 hover:text-white hover:bg-white/5 font-medium'
                   }`}
                 >
                   <span className={isActive ? 'text-[#050505]' : 'text-[#CCFF00]'}>{item.icon}</span>
-                  <span className="tracking-tight">
+                  <span className="tracking-tight whitespace-nowrap">
                     {item.label}
                   </span>
                 </Link>
