@@ -270,7 +270,7 @@ export function RegistrationForm() {
       </AnimatePresence>
 
       {/* Animated Step Form Container */}
-      <div className="relative overflow-hidden rounded-xl bg-[var(--color-charcoal,#111111)]/70 p-4 sm:p-8 md:p-10 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-md w-full max-w-full">
+      <div className="relative overflow-visible rounded-xl bg-[var(--color-charcoal,#111111)]/70 p-4 sm:p-8 md:p-10 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-md w-full max-w-full">
         {/* Subtle decorative grid lines */}
         <div className="pointer-events-none absolute inset-0 tactical-grid opacity-30" />
 

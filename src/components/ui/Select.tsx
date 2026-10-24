@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, forwardRef, useId } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useId, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
@@ -28,6 +28,7 @@ export interface SelectProps {
   value?: string | number;
   defaultValue?: string | number;
   onChange?: (e: SelectChangeEvent) => void;
+  onOpenChange?: (isOpen: boolean) => void;
   required?: boolean;
   disabled?: boolean;
   className?: string;
@@ -45,6 +46,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       value,
       defaultValue,
       onChange,
+      onOpenChange,
       required,
       placeholder = 'Select an option...',
       className,
@@ -58,6 +60,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     const generatedId = useId();
     const selectId = id || name || generatedId;
 
+    const setDropdownOpen = useCallback(
+      (next: boolean) => {
+        setIsOpen(next);
+        onOpenChange?.(next);
+      },
+      [onOpenChange]
+    );
+
     const currentValue = value !== undefined ? value : defaultValue;
     const selectedOption = options.find((opt) => String(opt.value) === String(currentValue));
 
@@ -65,12 +75,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-          setIsOpen(false);
+          setDropdownOpen(false);
         }
       };
 
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setIsOpen(false);
+        if (e.key === 'Escape') setDropdownOpen(false);
       };
 
       if (isOpen) {
@@ -82,7 +92,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleKeyDown);
       };
-    }, [isOpen]);
+    }, [isOpen, setDropdownOpen]);
 
     const handleSelect = (option: SelectOption) => {
       if (option.disabled || disabled) return;
@@ -94,7 +104,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
           },
         } as unknown as React.ChangeEvent<HTMLSelectElement>);
       }
-      setIsOpen(false);
+      setDropdownOpen(false);
     };
 
     return (
@@ -110,8 +120,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            onClick={() => !disabled && setIsOpen(!isOpen)}
-            className="mb-1.5 block font-mono text-xs uppercase tracking-wider text-[var(--color-silver,#999999)] cursor-pointer"
+            onClick={() => !disabled && setDropdownOpen(!isOpen)}
+            className="mb-1.5 block font-sans text-xs font-semibold uppercase tracking-wider text-neutral-300 cursor-pointer"
           >
             {label}
             {required && <span className="ml-1 text-[var(--color-lime,#CCFF00)]">*</span>}
@@ -130,16 +140,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         <button
           type="button"
           disabled={disabled}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setDropdownOpen(!isOpen)}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           className={clsx(
-            'group relative w-full flex items-center justify-between rounded-xl font-body text-sm text-left transition-all duration-200 cursor-pointer',
-            'bg-[var(--color-charcoal,#111111)] px-4 py-3.5 border outline-none',
+            'group relative w-full flex items-center justify-between rounded-xl font-sans text-sm text-left transition-all duration-200 cursor-pointer',
+            'bg-[#141414] px-4 py-3.5 border outline-none',
             error
               ? 'border-red-500 focus:border-red-500 ring-1 ring-red-500/30'
               : isOpen
-              ? 'border-[var(--color-lime,#CCFF00)] ring-1 ring-[var(--color-lime,#CCFF00)]/40 shadow-[0_0_20px_rgba(204,255,0,0.15)]'
+              ? 'border-[var(--color-lime,#CCFF00)] ring-1 ring-[var(--color-lime,#CCFF00)]/40 shadow-[0_0_20px_rgba(204,255,0,0.15)] bg-[#181818]'
               : 'border-white/10 hover:border-white/25 focus:border-[var(--color-lime,#CCFF00)]',
             disabled && 'opacity-50 cursor-not-allowed bg-black/40'
           )}
@@ -187,7 +197,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             >
               <ul
                 role="listbox"
-                className="max-h-64 overflow-y-auto p-1.5 divide-y divide-white/5 scrollbar-thin scrollbar-thumb-white/20"
+                className="max-h-80 sm:max-h-96 overflow-y-auto p-1.5 divide-y divide-white/5 scrollbar-thin scrollbar-thumb-white/20 font-sans"
               >
                 {options.map((option) => {
                   const isSelected = String(option.value) === String(currentValue);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -74,6 +74,24 @@ export function StepVipPayment({
   const [dragOver, setDragOver] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Dynamic payment accounts configured by Head Admin
+  const [telebirrNumber, setTelebirrNumber] = useState('+251950986841');
+  const [telebirrName, setTelebirrName] = useState('Tsige Dagne');
+  const [awashAccount, setAwashAccount] = useState('013201378990300');
+  const [awashName, setAwashName] = useState('Tsige Dagne');
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.telebirrNumber) setTelebirrNumber(data.telebirrNumber);
+        if (data.telebirrName) setTelebirrName(data.telebirrName);
+        if (data.awashAccount) setAwashAccount(data.awashAccount);
+        if (data.awashName) setAwashName(data.awashName);
+      })
+      .catch((err) => console.warn('Failed to load dynamic payment accounts in StepVipPayment', err));
+  }, []);
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -220,10 +238,10 @@ export function StepVipPayment({
                   </span>
                 </div>
                 <div className="font-mono text-xs text-neutral-300 mt-0.5">
-                  Account Name: <strong className="text-white">Alamawed Begashawe</strong>
+                  Account Name: <strong className="text-white">{telebirrName}</strong>
                 </div>
                 <div className="font-mono text-sm sm:text-base font-bold text-amber-400 mt-1">
-                  +251950986841
+                  {telebirrNumber}
                 </div>
               </div>
             </div>
@@ -233,7 +251,7 @@ export function StepVipPayment({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleCopy('+251950986841', 'telebirr');
+                handleCopy(telebirrNumber, 'telebirr');
               }}
               className="px-4 py-2.5 rounded-lg border text-xs font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 bg-black/60 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 active:scale-95"
             >
@@ -279,10 +297,10 @@ export function StepVipPayment({
                   </span>
                 </div>
                 <div className="font-mono text-xs text-neutral-300 mt-0.5">
-                  Account Name: <strong className="text-white">Tsige Dagne</strong>
+                  Account Name: <strong className="text-white">{awashName}</strong>
                 </div>
                 <div className="font-mono text-sm sm:text-base font-bold text-amber-400 mt-1">
-                  013201378990300
+                  {awashAccount}
                 </div>
               </div>
             </div>
@@ -292,7 +310,7 @@ export function StepVipPayment({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                handleCopy('013201378990300', 'awash');
+                handleCopy(awashAccount, 'awash');
               }}
               className="px-4 py-2.5 rounded-lg border text-xs font-mono font-bold tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 bg-black/60 border-amber-500/40 text-amber-300 hover:bg-amber-500/20 active:scale-95"
             >

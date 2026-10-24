@@ -12,6 +12,8 @@ export function HeroSection() {
   const { playSound } = useSoundContext();
   const [mousePos, setMousePos] = useState({ x: '50%', y: '40%' });
   const [heroDisplay, setHeroDisplay] = useState<string>('100-1000');
+  const [eventDate, setEventDate] = useState<string>('COMING SOON');
+  const [eventVenue, setEventVenue] = useState<string>('ADDIS ABABA, ETHIOPIA');
 
   // Fetch dynamic capacity setting configured by admin
   useEffect(() => {
@@ -23,6 +25,8 @@ export function HeroSection() {
         } else if (data?.maxCapacity && typeof data.maxCapacity === 'number') {
           setHeroDisplay(`${data.maxCapacity}+`);
         }
+        if (data?.eventDate) setEventDate(data.eventDate);
+        if (data?.eventVenue) setEventVenue(data.eventVenue);
       })
       .catch(() => {});
   }, []);
@@ -261,11 +265,11 @@ export function HeroSection() {
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 md:gap-8 font-mono text-[11px] md:text-xs text-[#999999]/70 tracking-wider">
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>DATE: <strong className="text-white">COMING SOON</strong></span>
+            <span>DATE: <strong className="text-white">{eventDate}</strong></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>VENUE: <strong className="text-white">ADDIS ABABA, ETHIOPIA</strong></span>
+            <span>VENUE: <strong className="text-white">{eventVenue}</strong></span>
           </div>
         </div>
 

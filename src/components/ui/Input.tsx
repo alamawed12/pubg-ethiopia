@@ -62,6 +62,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       onChange?.(e);
     };
 
+    const cleanLabel = label ? label.replace(/\s*\*+\s*$/, '') : '';
+
     return (
       <div className={clsx('relative w-full', className)}>
         <div className="relative w-full">
@@ -74,49 +76,49 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             defaultValue={defaultValue}
             required={required}
             disabled={disabled}
-            placeholder={isFocused ? placeholder : ''}
+            placeholder={isFloating ? placeholder : (placeholder && !label ? placeholder : '')}
             onChange={handleChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${inputId}-error` : undefined}
             className={clsx(
-              'peer w-full rounded-xl font-body text-sm text-white',
-              'bg-[var(--color-charcoal,#111111)] px-4 py-3.5 outline-none transition-all duration-200',
-              'placeholder:text-[var(--color-silver,#999999)]/40',
+              'peer w-full rounded-xl font-sans text-sm font-medium text-white',
+              'bg-[#141414] px-4 py-3.5 outline-none transition-all duration-200',
+              'placeholder:text-neutral-400 placeholder:opacity-80',
               'border',
               error
                 ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500/40'
                 : success
                 ? 'border-[var(--color-lime,#CCFF00)] focus:border-[var(--color-lime,#CCFF00)] focus:ring-1 focus:ring-[var(--color-lime,#CCFF00)]/40'
-                : 'border-white/10 hover:border-white/20 focus:border-[var(--color-lime,#CCFF00)] focus:ring-1 focus:ring-[var(--color-lime,#CCFF00)]/40',
+                : 'border-white/10 hover:border-white/25 focus:border-[var(--color-lime,#CCFF00)] focus:ring-1 focus:ring-[var(--color-lime,#CCFF00)]/40',
               disabled && 'opacity-50 cursor-not-allowed bg-black/40',
               (success || error) && 'pr-11'
             )}
             {...restProps}
           />
 
-          {/* Floating Label */}
-          {label && (
+          {/* Floating Label (Clean Apple-style font, guaranteed no duplicate **) */}
+          {cleanLabel && (
             <label
               htmlFor={inputId}
               className={clsx(
-                'pointer-events-none absolute left-3 transition-all duration-200 ease-out select-none',
+                'pointer-events-none absolute left-3 transition-all duration-200 ease-out select-none font-sans',
                 isFloating
                   ? clsx(
-                      '-top-2.5 px-1.5 text-xs font-mono font-medium',
-                      'bg-[var(--color-charcoal,#111111)] rounded',
+                      '-top-2.5 px-1.5 text-xs font-semibold tracking-wider uppercase',
+                      'bg-[#141414] rounded',
                       error
                         ? 'text-red-400'
                         : isFocused
                         ? 'text-[var(--color-lime,#CCFF00)]'
-                        : 'text-[var(--color-silver,#999999)]'
+                        : 'text-neutral-300'
                     )
-                  : 'top-3.5 left-4 text-sm text-[var(--color-silver,#999999)]'
+                  : 'top-3.5 left-4 text-sm font-medium text-neutral-400'
               )}
             >
-              {label}
-              {required && <span className="ml-0.5 text-[var(--color-lime,#CCFF00)]">*</span>}
+              {cleanLabel}
+              {required && <span className="ml-1 text-[var(--color-lime,#CCFF00)] font-bold">*</span>}
             </label>
           )}
 

@@ -233,3 +233,46 @@ export function XMarkIcon({ className = 'w-4 h-4', ...props }: IconProps) {
     </svg>
   );
 }
+
+// 22. Megaphone / Broadcast Announcement
+export function MegaphoneIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M3 11l18-5v12L3 13v-2z" />
+      <path d="M11.6 16.8L14 21l3-1.5-2.4-4.2" />
+      <path d="M3 11v2a2 2 0 0 0 2 2h1" />
+    </svg>
+  );
+}
+
+// 23. Calendar / Date
+export function CalendarIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+// 24. Map Pin / Location Venue
+export function MapPinIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+// 25. Link / Hyperlink
+export function LinkChainIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+  );
+}

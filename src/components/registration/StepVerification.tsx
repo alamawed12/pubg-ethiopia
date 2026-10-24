@@ -122,9 +122,9 @@ export function StepVerification({
               <button
                 type="button"
                 onClick={() => onEditStep(1)}
-                className="font-mono text-xs uppercase tracking-wider text-[var(--color-lime,#CCFF00)] hover:text-white transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-md bg-white/5 hover:bg-[var(--color-lime,#CCFF00)] hover:text-black text-[var(--color-lime,#CCFF00)] font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-[var(--color-lime,#CCFF00)]/30 hover:border-[var(--color-lime,#CCFF00)] shadow-sm active:scale-95"
               >
-                [ EDIT ]
+                EDIT
               </button>
             )}
           </div>
@@ -181,9 +181,9 @@ export function StepVerification({
               <button
                 type="button"
                 onClick={() => onEditStep(2)}
-                className="font-mono text-xs uppercase tracking-wider text-[var(--color-lime,#CCFF00)] hover:text-white transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-md bg-white/5 hover:bg-[var(--color-lime,#CCFF00)] hover:text-black text-[var(--color-lime,#CCFF00)] font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-[var(--color-lime,#CCFF00)]/30 hover:border-[var(--color-lime,#CCFF00)] shadow-sm active:scale-95"
               >
-                [ EDIT ]
+                EDIT
               </button>
             )}
           </div>
@@ -289,9 +289,9 @@ export function StepVerification({
               <button
                 type="button"
                 onClick={() => onEditStep(3)}
-                className="font-mono text-xs uppercase tracking-wider text-[var(--color-lime,#CCFF00)] hover:text-white transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-md bg-white/5 hover:bg-[var(--color-lime,#CCFF00)] hover:text-black text-[var(--color-lime,#CCFF00)] font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-[var(--color-lime,#CCFF00)]/30 hover:border-[var(--color-lime,#CCFF00)] shadow-sm active:scale-95"
               >
-                [ EDIT ]
+                EDIT
               </button>
             )}
           </div>
@@ -342,9 +342,9 @@ export function StepVerification({
               <button
                 type="button"
                 onClick={() => onEditStep(4)}
-                className="font-mono text-xs uppercase tracking-wider text-[var(--color-lime,#CCFF00)] hover:text-white transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-md bg-white/5 hover:bg-[var(--color-lime,#CCFF00)] hover:text-black text-[var(--color-lime,#CCFF00)] font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-[var(--color-lime,#CCFF00)]/30 hover:border-[var(--color-lime,#CCFF00)] shadow-sm active:scale-95"
               >
-                [ EDIT ]
+                EDIT
               </button>
             )}
           </div>

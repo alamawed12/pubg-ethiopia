@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectOption } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
@@ -54,6 +55,8 @@ export function StepPlayerIdentity({
   onNext,
 }: StepPlayerIdentityProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isRegionOpen, setIsRegionOpen] = useState(false);
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
 
   const handleValidation = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,14 +157,14 @@ export function StepPlayerIdentity({
             type="text"
             inputMode="numeric"
           />
-          <p className="mt-1 font-mono text-[11px] text-[var(--color-silver,#999999)] pl-1">
-            * Your numeric player ID found in your PUBG MOBILE profile (5-15 digits).
+          <p className="mt-1 font-sans text-xs text-neutral-400 pl-1">
+            Your numeric player ID found in your PUBG MOBILE profile (5-15 digits).
           </p>
         </div>
 
         {/* Phone Number with Country Code */}
         <div>
-          <label className="mb-1.5 block font-mono text-xs uppercase tracking-wider text-[var(--color-silver,#999999)]">
+          <label className="mb-1.5 block font-sans text-xs font-semibold uppercase tracking-wider text-neutral-300">
             Phone Number <span className="text-[var(--color-lime,#CCFF00)]">*</span>
           </label>
           <div className="flex gap-2.5">
@@ -170,6 +173,7 @@ export function StepPlayerIdentity({
                 name="countryCode"
                 value={formData.countryCode || '+251'}
                 onChange={(e) => updateField('countryCode', e.target.value)}
+                onOpenChange={setIsCountryOpen}
                 options={COUNTRY_CODES}
                 aria-label="Country Code"
               />
@@ -191,20 +195,28 @@ export function StepPlayerIdentity({
           </div>
         </div>
 
-        {/* City / Region */}
-        <Select
-          label="City / Region"
-          name="cityRegion"
-          value={formData.cityRegion}
-          onChange={(e) => {
-            updateField('cityRegion', e.target.value);
-            if (errors.cityRegion) setErrors((prev) => ({ ...prev, cityRegion: '' }));
-          }}
-          options={ETHIOPIAN_REGIONS}
-          placeholder="Select your region in Ethiopia"
-          error={errors.cityRegion}
-          required
-        />
+        {/* City / Region (Expands box smoothly when popped up so no country/region is ever unseen) */}
+        <div
+          className={clsx(
+            'transition-all duration-300 ease-out',
+            isRegionOpen ? 'pb-72 sm:pb-64' : isCountryOpen ? 'pb-60 sm:pb-52' : 'pb-0'
+          )}
+        >
+          <Select
+            label="City / Region"
+            name="cityRegion"
+            value={formData.cityRegion}
+            onChange={(e) => {
+              updateField('cityRegion', e.target.value);
+              if (errors.cityRegion) setErrors((prev) => ({ ...prev, cityRegion: '' }));
+            }}
+            onOpenChange={setIsRegionOpen}
+            options={ETHIOPIAN_REGIONS}
+            placeholder="Select your region in Ethiopia"
+            error={errors.cityRegion}
+            required
+          />
+        </div>
       </div>
 
       {/* Action Buttons */}

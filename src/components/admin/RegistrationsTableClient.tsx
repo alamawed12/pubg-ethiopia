@@ -11,6 +11,7 @@ import {
   ClockPendingIcon,
   AlertTriangleIcon,
 } from '@/components/ui/TacticalIcons';
+import { TacticalCheckbox } from '@/components/ui/TacticalCheckbox';
 
 export interface RegistrationRow {
   id: string;
@@ -152,21 +153,20 @@ export function RegistrationsTableClient({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* Master Select All Toggle Button */}
-          <button
-            type="button"
-            onClick={handleToggleSelectAll}
-            disabled={registrations.length === 0}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer bg-white/5 hover:bg-white/10 text-white disabled:opacity-40"
-            style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+          <div
+            onClick={registrations.length > 0 ? handleToggleSelectAll : undefined}
+            className={`inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg border text-xs font-sans font-bold uppercase tracking-wider transition-all cursor-pointer bg-[#141414] hover:bg-[#1a1a1a] text-white ${
+              registrations.length === 0 ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'border-white/10 hover:border-white/25'
+            }`}
           >
-            <input
-              type="checkbox"
+            <TacticalCheckbox
               checked={allVisibleSelected}
               onChange={handleToggleSelectAll}
-              className="w-4 h-4 rounded accent-[#CCFF00] cursor-pointer"
+              ariaLabel="Select all visible registrations"
+              size="md"
             />
             <span>{allVisibleSelected ? 'Deselect All' : 'Select All'}</span>
-          </button>
+          </div>
 
           {someSelected && (
             <span className="font-mono text-xs text-[#CCFF00] font-bold">
@@ -288,13 +288,14 @@ export function RegistrationsTableClient({
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 {/* Checkbox column */}
                 <th className="px-3 py-3 w-10 text-center">
-                  <input
-                    type="checkbox"
-                    checked={allVisibleSelected}
-                    onChange={handleToggleSelectAll}
-                    aria-label="Select all registrations"
-                    className="w-4 h-4 rounded accent-[#CCFF00] cursor-pointer"
-                  />
+                  <div className="flex items-center justify-center">
+                    <TacticalCheckbox
+                      checked={allVisibleSelected}
+                      onChange={handleToggleSelectAll}
+                      ariaLabel="Select all registrations"
+                      size="md"
+                    />
+                  </div>
                 </th>
                 {['Ref', 'Player', 'IGN & UID', 'Tier', 'VIP Payment / Txn', 'Category', 'Status', 'Date', 'Action'].map(
                   (h) => (
@@ -338,13 +339,14 @@ export function RegistrationsTableClient({
                     >
                       {/* Row Checkbox */}
                       <td className="px-3 py-3 text-center">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => handleToggleRow(r.id)}
-                          aria-label={`Select registration ${r.referenceId}`}
-                          className="w-4 h-4 rounded accent-[#CCFF00] cursor-pointer"
-                        />
+                        <div className="flex items-center justify-center">
+                          <TacticalCheckbox
+                            checked={isSelected}
+                            onChange={() => handleToggleRow(r.id)}
+                            ariaLabel={`Select registration ${r.referenceId}`}
+                            size="md"
+                          />
+                        </div>
                       </td>
 
                       {/* Reference */}

@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { CursorGlow } from '@/components/cinematic/CursorGlow';
 import { IntroSequence } from '@/components/cinematic/IntroSequence';
 import { HeroSection } from '@/components/cinematic/HeroSection';
+import { AnnouncementPopup } from '@/components/ui/AnnouncementPopup';
 import { EventStory } from '@/components/sections/EventStory';
 import { EventDashboard } from '@/components/sections/EventDashboard';
 import { FAQ } from '@/components/sections/FAQ';
@@ -22,6 +23,7 @@ export default function HomePage() {
       )}
 
       <CursorGlow />
+      <AnnouncementPopup />
       <Navigation />
 
       <main>

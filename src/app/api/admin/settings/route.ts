@@ -13,32 +13,22 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [
-      priceSetting,
-      enabledSetting,
-      capacitySetting,
-      heroDisplaySetting,
-      geminiKeySetting,
-      vipCount,
-      standardCount,
-      totalRegistrations,
-    ] = await Promise.all([
-      prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_price' } }),
-      prisma.systemSetting.findUnique({ where: { key: 'vip_ticket_enabled' } }),
-      prisma.systemSetting.findUnique({ where: { key: 'max_capacity' } }),
-      prisma.systemSetting.findUnique({ where: { key: 'hero_attendees_display' } }),
-      prisma.systemSetting.findUnique({ where: { key: 'gemini_api_key' } }),
+    const [settingsList, vipCount, standardCount, totalRegistrations] = await Promise.all([
+      prisma.systemSetting.findMany(),
       prisma.registration.count({ where: { ticketTier: 'VIP' } }),
       prisma.registration.count({ where: { ticketTier: 'STANDARD' } }),
       prisma.registration.count(),
     ]);
 
-    const vipPrice = priceSetting ? parseInt(priceSetting.value, 10) : 500;
-    const vipEnabled = enabledSetting ? enabledSetting.value === 'true' : true;
-    const maxCapacity = capacitySetting ? parseInt(capacitySetting.value, 10) : 300;
-    const heroAttendeesDisplay = heroDisplaySetting?.value || (capacitySetting ? `${capacitySetting.value}+` : '300+');
+    const map = new Map<string, string>();
+    settingsList.forEach((s) => map.set(s.key, s.value));
 
-    const rawKey = geminiKeySetting?.value || process.env.GEMINI_API_KEY || '';
+    const vipPrice = map.has('vip_ticket_price') ? parseInt(map.get('vip_ticket_price')!, 10) : 500;
+    const vipEnabled = map.has('vip_ticket_enabled') ? map.get('vip_ticket_enabled') === 'true' : true;
+    const maxCapacity = map.has('max_capacity') ? parseInt(map.get('max_capacity')!, 10) : 300;
+    const heroAttendeesDisplay = map.get('hero_attendees_display') || (map.has('max_capacity') ? `${map.get('max_capacity')}+` : '100-1000');
+
+    const rawKey = map.get('gemini_api_key') || process.env.GEMINI_API_KEY || '';
     const hasGeminiKey = Boolean(rawKey && rawKey.trim().length > 10);
     const maskedGeminiKey = hasGeminiKey ? `${rawKey.slice(0, 4)}••••••••${rawKey.slice(-4)}` : '';
 
@@ -50,6 +40,25 @@ export async function GET() {
       heroAttendeesDisplay,
       hasGeminiKey,
       geminiApiKey: maskedGeminiKey,
+      // Announcement controls
+      announcementEnabled: map.get('announcement_enabled') === 'true',
+      announcementType: map.get('announcement_type') || 'warning',
+      announcementTitle: map.get('announcement_title') || 'IMPORTANT EVENT ANNOUNCEMENT',
+      announcementMessage: map.get('announcement_message') || 'Welcome to PUBG MOBILE Community Assembly Ethiopia! Registrations are open. Secure your pass today.',
+      announcementLinkText: map.get('announcement_link_text') || 'REGISTER NOW',
+      announcementLinkUrl: map.get('announcement_link_url') || '/register',
+      // Event Metadata
+      eventDate: map.get('event_date') || 'DATE: TO BE ANNOUNCED',
+      eventVenue: map.get('event_venue') || 'ADDIS ABABA, ETHIOPIA',
+      registrationOpen: map.has('registration_open') ? map.get('registration_open') === 'true' : true,
+      // Official Payment Accounts
+      telebirrNumber: map.get('telebirr_number') || '+251950986841',
+      telebirrName: map.get('telebirr_name') || 'Tsige Dagne',
+      awashAccount: map.get('awash_account') || '013201378990300',
+      awashName: map.get('awash_name') || 'Tsige Dagne',
+      // Community links
+      telegramLink: map.get('telegram_link') || 'https://t.me/pubgmethiopia',
+      discordLink: map.get('discord_link') || 'https://discord.gg/pubgethiopia',
       stats: {
         vipCount,
         standardCount,
@@ -71,7 +80,29 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { action, vipPrice, vipEnabled, maxCapacity, heroAttendeesDisplay, geminiApiKey } = body;
+    const {
+      action,
+      vipPrice,
+      vipEnabled,
+      maxCapacity,
+      heroAttendeesDisplay,
+      geminiApiKey,
+      announcementEnabled,
+      announcementType,
+      announcementTitle,
+      announcementMessage,
+      announcementLinkText,
+      announcementLinkUrl,
+      eventDate,
+      eventVenue,
+      registrationOpen,
+      telebirrNumber,
+      telebirrName,
+      awashAccount,
+      awashName,
+      telegramLink,
+      discordLink,
+    } = body;
 
     // Handle instant Gemini API Key test connection
     if (action === 'TEST_GEMINI') {
@@ -236,12 +267,136 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Announcement controls
+    if (announcementEnabled !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_enabled' },
+        update: { value: String(Boolean(announcementEnabled)) },
+        create: { key: 'announcement_enabled', value: String(Boolean(announcementEnabled)) },
+      });
+    }
+
+    if (announcementType !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_type' },
+        update: { value: String(announcementType).trim() },
+        create: { key: 'announcement_type', value: String(announcementType).trim() },
+      });
+    }
+
+    if (announcementTitle !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_title' },
+        update: { value: String(announcementTitle).trim() },
+        create: { key: 'announcement_title', value: String(announcementTitle).trim() },
+      });
+    }
+
+    if (announcementMessage !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_message' },
+        update: { value: String(announcementMessage).trim() },
+        create: { key: 'announcement_message', value: String(announcementMessage).trim() },
+      });
+    }
+
+    if (announcementLinkText !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_link_text' },
+        update: { value: String(announcementLinkText).trim() },
+        create: { key: 'announcement_link_text', value: String(announcementLinkText).trim() },
+      });
+    }
+
+    if (announcementLinkUrl !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'announcement_link_url' },
+        update: { value: String(announcementLinkUrl).trim() },
+        create: { key: 'announcement_link_url', value: String(announcementLinkUrl).trim() },
+      });
+    }
+
+    // Event Date & Venue & Registration status
+    if (eventDate !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'event_date' },
+        update: { value: String(eventDate).trim() },
+        create: { key: 'event_date', value: String(eventDate).trim() },
+      });
+    }
+
+    if (eventVenue !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'event_venue' },
+        update: { value: String(eventVenue).trim() },
+        create: { key: 'event_venue', value: String(eventVenue).trim() },
+      });
+    }
+
+    if (registrationOpen !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'registration_open' },
+        update: { value: String(Boolean(registrationOpen)) },
+        create: { key: 'registration_open', value: String(Boolean(registrationOpen)) },
+      });
+    }
+
+    // Payment Accounts (Telebirr & Awash Bank)
+    if (telebirrNumber !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'telebirr_number' },
+        update: { value: String(telebirrNumber).trim() },
+        create: { key: 'telebirr_number', value: String(telebirrNumber).trim() },
+      });
+    }
+
+    if (telebirrName !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'telebirr_name' },
+        update: { value: String(telebirrName).trim() },
+        create: { key: 'telebirr_name', value: String(telebirrName).trim() },
+      });
+    }
+
+    if (awashAccount !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'awash_account' },
+        update: { value: String(awashAccount).trim() },
+        create: { key: 'awash_account', value: String(awashAccount).trim() },
+      });
+    }
+
+    if (awashName !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'awash_name' },
+        update: { value: String(awashName).trim() },
+        create: { key: 'awash_name', value: String(awashName).trim() },
+      });
+    }
+
+    // Social Links
+    if (telegramLink !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'telegram_link' },
+        update: { value: String(telegramLink).trim() },
+        create: { key: 'telegram_link', value: String(telegramLink).trim() },
+      });
+    }
+
+    if (discordLink !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'discord_link' },
+        update: { value: String(discordLink).trim() },
+        create: { key: 'discord_link', value: String(discordLink).trim() },
+      });
+    }
+
     // Audit log
     await prisma.auditLog.create({
       data: {
         adminEmail: session.user.email || session.user.name || 'admin',
         action: 'UPDATE_SYSTEM_SETTINGS',
-        details: JSON.stringify({ vipPrice, vipEnabled, maxCapacity, updatedGeminiKey: Boolean(geminiApiKey) }),
+        details: JSON.stringify({ vipPrice, vipEnabled, maxCapacity, announcementEnabled, updatedGeminiKey: Boolean(geminiApiKey) }),
       },
     });
 
