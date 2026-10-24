@@ -17,35 +17,20 @@ interface StepFaceVerificationProps {
 export function StepFaceVerification({
   idFrontImage,
   selfieImage,
-  faceMatchScore,
-  faceMatchStatus,
-  ticketTier,
   updateField,
   onNext,
   onBack,
 }: StepFaceVerificationProps) {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [analysisStep, setAnalysisStep] = useState<string>('Initializing AI engine...');
   const [capturedSelfie, setCapturedSelfie] = useState<string>(selfieImage || '');
-
-  const [matchResult, setMatchResult] = useState<{
-    score: number;
-    status: 'PASSED' | 'FAILED' | 'NONE';
-    details: string;
-  }>({
-    score: faceMatchScore || 0,
-    status: (faceMatchStatus as 'PASSED' | 'FAILED') || (faceMatchScore >= 70 ? 'PASSED' : 'NONE'),
-    details: '',
-  });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Play audio tones for instant shutter feedback
+  // Shutter audio feedback
   const playShutterSound = useCallback(() => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -95,7 +80,6 @@ export function StepFaceVerification({
           audio: false,
         });
       } catch {
-        // Fallback for older iOS / Android devices
         newStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: mode },
           audio: false,
@@ -134,7 +118,7 @@ export function StepFaceVerification({
     return () => {
       stopCamera();
     };
-  }, [facingMode]);
+  }, [facingMode, capturedSelfie, startCamera, stopCamera]);
 
   // Flip camera between front and rear
   const toggleCameraFacing = () => {
@@ -143,92 +127,34 @@ export function StepFaceVerification({
     startCamera(nextMode);
   };
 
-  // Run AI Facial Verification against National ID
-  const runAiVerification = useCallback(
-    async (selfieDataUrl: string) => {
-      setIsAnalyzing(true);
-      setAnalysisStep('Detecting ID card facial portrait...');
-
-      try {
-        setTimeout(() => setAnalysisStep('Analyzing cranial structure & facial landmarks...'), 600);
-        setTimeout(() => setAnalysisStep('Running AI anti-fraud sibling & identity match...'), 1200);
-
-        const res = await fetch('/api/verify-face', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            idFrontImage,
-            selfieImage: selfieDataUrl,
-          }),
-        });
-
-        const data = await res.json();
-
-        if (data.success && data.status === 'PASSED') {
-          const score = data.confidence || 85;
-          setMatchResult({
-            score,
-            status: 'PASSED',
-            details: data.details || 'Biometric identity verified with high confidence.',
-          });
-
-          updateField('selfieImage', selfieDataUrl);
-          updateField('faceMatchScore', score);
-          updateField('faceMatchStatus', 'PASSED');
-        } else {
-          const score = data.confidence || 32;
-          setMatchResult({
-            score,
-            status: 'FAILED',
-            details:
-              data.details ||
-              data.error ||
-              'Facial geometry differs from National ID portrait (brother/sibling detected). Face match rejected.',
-          });
-          updateField('selfieImage', selfieDataUrl);
-          updateField('faceMatchScore', score);
-          updateField('faceMatchStatus', 'FAILED');
-        }
-      } catch (e) {
-        console.error('Face verification error', e);
-        setMatchResult({
-          score: 30,
-          status: 'FAILED',
-          details: 'Verification network timeout. Please ensure good lighting and retry.',
-        });
-        updateField('faceMatchStatus', 'FAILED');
-      } finally {
-        setIsAnalyzing(false);
-      }
-    },
-    [idFrontImage, updateField]
-  );
-
-  // Take photo from live camera
+  // Shutter action
   const handleTakePhoto = useCallback(() => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !canvasRef.current) return;
+
     playShutterSound();
 
     const video = videoRef.current;
-    const canvas = canvasRef.current || document.createElement('canvas');
+    const canvas = canvasRef.current;
     canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 640;
+    canvas.height = video.videoHeight || 480;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Flip horizontal if front camera
     if (facingMode === 'user') {
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
-
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
 
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     setCapturedSelfie(dataUrl);
+    updateField('selfieImage', dataUrl);
+    updateField('faceMatchStatus', 'PENDING_ADMIN_REVIEW');
+    updateField('faceMatchScore', 100);
     stopCamera();
-    runAiVerification(dataUrl);
-  }, [facingMode, playShutterSound, stopCamera, runAiVerification]);
+  }, [facingMode, playShutterSound, stopCamera, updateField]);
 
   // Upload photo fallback
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,8 +165,10 @@ export function StepFaceVerification({
     reader.onload = () => {
       const dataUrl = reader.result as string;
       setCapturedSelfie(dataUrl);
+      updateField('selfieImage', dataUrl);
+      updateField('faceMatchStatus', 'PENDING_ADMIN_REVIEW');
+      updateField('faceMatchScore', 100);
       stopCamera();
-      runAiVerification(dataUrl);
     };
     reader.readAsDataURL(file);
   };
@@ -248,14 +176,13 @@ export function StepFaceVerification({
   // Retake photo
   const retakePhoto = () => {
     setCapturedSelfie('');
-    setMatchResult({ score: 0, status: 'NONE', details: '' });
     updateField('selfieImage', '');
     updateField('faceMatchScore', 0);
-    updateField('faceMatchStatus', 'PENDING');
+    updateField('faceMatchStatus', 'NOT_VERIFIED');
     startCamera(facingMode);
   };
 
-  const isVerified = matchResult.status === 'PASSED' && matchResult.score >= 70;
+  const hasPhoto = Boolean(capturedSelfie);
 
   return (
     <div className="space-y-6">
@@ -263,10 +190,10 @@ export function StepFaceVerification({
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="font-mono text-xs uppercase tracking-widest text-[#CCFF00]">
-            STEP 03.5 // BIOMETRIC VERIFICATION
+            STEP 04 // IDENTITY VERIFICATION
           </span>
           <span className="bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
-            AI ID MATCH
+            FACE PHOTO
           </span>
         </div>
         <h2
@@ -276,11 +203,11 @@ export function StepFaceVerification({
           TAKE YOUR FACE PHOTO
         </h2>
         <p className="text-sm text-[#999999] mt-1">
-          Position your face in the center of the frame and click <strong>Take Photo</strong>. Our AI will compare your facial features directly against your National ID card portrait.
+          Position your face in the center of the frame and click <strong>Take Photo</strong>. Our event administrators will verify your photo with your ID card before approving your ticket.
         </p>
       </div>
 
-      {/* Main Verification Card */}
+      {/* Main Card */}
       <div
         className="p-5 sm:p-6 rounded-2xl border"
         style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.08)' }}
@@ -360,7 +287,7 @@ export function StepFaceVerification({
                   onClick={() => fileInputRef.current?.click()}
                   className="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-[#888888] hover:text-[#CCFF00] transition-all cursor-pointer"
                 >
-                  Upload from gallery →
+                  Upload photo →
                 </button>
               </div>
 
@@ -381,15 +308,14 @@ export function StepFaceVerification({
           </div>
         )}
 
-        {/* State B: Photo Taken -> AI Biometric Match Result */}
+        {/* State B: Photo Captured -> Ready for Admin Review */}
         {capturedSelfie && (
           <div className="space-y-6">
-            {/* Side-by-side Biometric Comparison Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* ID Card Front Photo */}
               <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-[#888888] block mb-2">
-                  01. NATIONAL ID PORTRAIT
+                  01. NATIONAL ID CARD (FRONT)
                 </span>
                 <div className="h-48 rounded-lg overflow-hidden bg-black/60 flex items-center justify-center border border-white/5">
                   {idFrontImage ? (
@@ -405,124 +331,55 @@ export function StepFaceVerification({
                 </div>
               </div>
 
-              {/* Captured Photo */}
+              {/* Captured Face Photo */}
               <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
                 <span className="text-[10px] font-mono uppercase tracking-widest text-[#888888] block mb-2">
-                  02. YOUR CAPTURED PHOTO
+                  02. YOUR CAPTURED FACE PHOTO
                 </span>
-                <div className="relative h-48 rounded-lg overflow-hidden bg-black/60 flex items-center justify-center border border-white/5">
+                <div className="h-48 rounded-lg overflow-hidden bg-black/60 flex items-center justify-center border border-white/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={capturedSelfie}
-                    alt="Captured Selfie"
+                    alt="Captured Face Photo"
                     className="w-full h-full object-contain"
                   />
-                  {isAnalyzing && (
-                    <div className="absolute inset-x-0 h-1 bg-[#CCFF00] shadow-[0_0_12px_#CCFF00] animate-bounce pointer-events-none" />
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* AI Analysis In Progress */}
-            {isAnalyzing && (
-              <div className="p-4 rounded-xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-center space-y-2">
-                <div className="flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4 text-[#CCFF00] animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  <span className="font-heading text-sm font-bold text-white uppercase tracking-wider">
-                    AI BIOMETRIC MATCH IN PROGRESS...
+            {/* Instant Confirmation Banner */}
+            <div className="p-4 rounded-xl border bg-green-500/10 border-green-500/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-green-500 text-black flex items-center justify-center font-bold text-xs">
+                    ✓
+                  </span>
+                  <span className="font-heading text-base font-bold tracking-wider uppercase text-green-400">
+                    FACE PHOTO ATTACHED
                   </span>
                 </div>
-                <p className="text-xs font-mono text-[#CCFF00] animate-pulse">
-                  {analysisStep}
-                </p>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-green-500/20 text-green-300 border border-green-500/30">
+                  READY FOR ADMIN REVIEW
+                </span>
               </div>
-            )}
-
-            {/* Verification Result Banner */}
-            {!isAnalyzing && matchResult.status !== 'NONE' && (
-              <div
-                className={`p-4 rounded-xl border space-y-2 ${
-                  isVerified
-                    ? 'bg-green-500/10 border-green-500/40'
-                    : 'bg-red-500/10 border-red-500/40'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                        isVerified ? 'bg-green-500 text-black' : 'bg-red-500 text-white'
-                      }`}
-                    >
-                      {isVerified ? '✓' : '✗'}
-                    </span>
-                    <span
-                      className={`font-heading text-base font-bold tracking-wider uppercase ${
-                        isVerified ? 'text-green-400' : 'text-red-400'
-                      }`}
-                    >
-                      {isVerified
-                        ? `BIOMETRIC MATCH CONFIRMED (${matchResult.score}%)`
-                        : `MATCH REJECTED (${matchResult.score}% CONFIDENCE)`}
-                    </span>
-                  </div>
-
-                  <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                      isVerified
-                        ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                    }`}
-                  >
-                    {isVerified ? 'KYC VERIFIED' : 'IDENTITY MISMATCH'}
-                  </span>
-                </div>
-
-                <p className="text-xs font-mono text-[#cccccc]">
-                  {matchResult.details}
-                </p>
-
-                {/* Biometric verification notice */}
-                {isVerified && (
-                  <div className="mt-2 pt-2 border-t border-green-500/20 flex items-center gap-2 text-xs font-mono text-[#CCFF00]">
-                    <span>✓</span>
-                    <span>
-                      <strong>Biometric Verification Passed:</strong> Your live face matches your National ID ({matchResult.score}%). After submitting, your application will be reviewed by the admin team, and your official {ticketTier === 'VIP' ? 'VIP' : 'Standard'} QR ticket will unlock in your Attendee Portal upon approval!
-                    </span>
-                  </div>
-                )}
-
-                {/* REJECTION NOTICE */}
-                {!isVerified && (
-                  <div className="mt-2 pt-2 border-t border-red-500/20 flex items-center gap-2 text-xs font-mono text-red-400">
-                    <span>⛔</span>
-                    <span>
-                      <strong>REGISTRATION BLOCKED:</strong> You cannot proceed with this registration. The captured face does not match the person on the National ID card.
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+              <p className="text-xs font-mono text-[#cccccc] leading-relaxed">
+                Your face photo has been captured. The event administration team will review and verify your identity photo alongside your National ID before confirming your registration.
+              </p>
+            </div>
 
             {/* Retake Photo Button */}
-            {!isAnalyzing && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={retakePhoto}
-                  className="text-xs font-mono text-[#999999] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Retake photo
-                </button>
-              </div>
-            )}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={retakePhoto}
+                className="text-xs font-mono text-[#999999] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Retake photo
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -536,11 +393,11 @@ export function StepFaceVerification({
         <Button
           variant="primary"
           type="button"
-          disabled={!isVerified || isAnalyzing}
+          disabled={!hasPhoto}
           onClick={onNext}
           className="px-8 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {isVerified ? 'CONTINUE TO REVIEW →' : 'PASS FACE MATCH TO PROCEED'}
+          {hasPhoto ? 'CONTINUE →' : 'TAKE PHOTO TO PROCEED'}
         </Button>
       </div>
 

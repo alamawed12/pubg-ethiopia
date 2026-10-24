@@ -145,38 +145,50 @@ export async function POST(req: NextRequest) {
       lightColor: '#FFFFFF',
     });
 
-    // 7. Process Biometric AI Face Match & Instant Pass Issuance
-    const rawTier = (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD';
-    const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
+    // 7. Process Category, Ticket Tier & Captured Face Photo
+    const isCreator = data.category === 'content_creator';
+    const isVolunteer = data.category === 'volunteer';
 
-    const rawSelfieImage = ((rawBody as Record<string, unknown>).selfieImage as string) || null;
-    const rawFaceScore = Number((rawBody as Record<string, unknown>).faceMatchScore) || 0;
-    const rawFaceStatus = ((rawBody as Record<string, unknown>).faceMatchStatus as string) || 'NOT_VERIFIED';
-
-    // STRICT BIOMETRIC KYC GATING:
-    // Prevent fraud, brothers/relatives using another person's ID, or bypassed face scans.
-    // If the live selfie does not pass facial matching against the National ID (score >= 70 and status === 'PASSED'),
-    // reject registration immediately with HTTP 403.
-    if (rawFaceStatus !== 'PASSED' || rawFaceScore < 70) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Biometric Identity Verification Failed (Match Score: ${rawFaceScore}%). Your face does not match the National ID card portrait. Registration cannot proceed.`,
-        },
-        { status: 403 }
-      );
+    // Content Creators automatically receive complimentary VIP. Volunteers receive Free Crew Pass.
+    let rawTier = 'STANDARD';
+    if (isCreator) {
+      rawTier = 'VIP';
+    } else if (isVolunteer) {
+      rawTier = 'STANDARD';
+    } else {
+      rawTier = (rawBody as Record<string, unknown>).ticketTier === 'VIP' ? 'VIP' : 'STANDARD';
     }
 
-    // BOTH STANDARD AND VIP:
-    // Both tiers enter the Admin Review Queue with verified biometric credentials.
-    // VIP requires admin verification of payment; Standard requires slot confirmation.
-    // Once approved by admin, tickets unlock in their Attendee Portal (/portal).
+    const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
+    const rawSelfieImage = ((rawBody as Record<string, unknown>).selfieImage as string) || null;
+
+    // Consolidate Creator & Volunteer specific information into details
+    let consolidatedDetails = data.squadDetails || '';
+    if (isCreator) {
+      const platform = ((rawBody as Record<string, unknown>).socialMediaPlatform as string) || 'Social';
+      const link = ((rawBody as Record<string, unknown>).socialMediaLink as string) || '';
+      const followers = ((rawBody as Record<string, unknown>).socialMediaFollowers as string) || '';
+      consolidatedDetails = `[Content Creator] Platform: ${platform} | Link: ${link}${followers ? ` | Audience: ${followers}` : ''}${consolidatedDetails ? `\n${consolidatedDetails}` : ''}`;
+    } else if (isVolunteer) {
+      const role = ((rawBody as Record<string, unknown>).volunteerRole as string) || 'gate_security';
+      const exp = ((rawBody as Record<string, unknown>).volunteerExperience as string) || '';
+      consolidatedDetails = `[Volunteer Application] Role: ${role}${exp ? ` | Experience: ${exp}` : ''}${consolidatedDetails ? `\n${consolidatedDetails}` : ''}`;
+    }
+
+    // Both Standard and VIP registrations enter the Admin Review Queue.
+    // The event administrators manually review the face photo side-by-side with the National ID.
     const isWaitlisted = registrationStatus === 'WAITLISTED';
     const initialRegistrationStatus = isWaitlisted ? 'WAITLISTED' : 'PENDING';
-    const initialPaymentStatus = rawTier === 'VIP' ? 'PENDING_APPROVAL' : 'UNPAID';
+    const initialPaymentStatus = isCreator
+      ? 'APPROVED' // Complimentary Creator VIP is approved for payment
+      : isVolunteer
+      ? 'UNPAID'
+      : rawTier === 'VIP'
+      ? 'PENDING_APPROVAL'
+      : 'UNPAID';
 
     // Check SMS Bot transaction match if txn code provided
-    if (rawTier === 'VIP' && submittedTxnCode) {
+    if (rawTier === 'VIP' && !isCreator && submittedTxnCode) {
       try {
         const matchedPayment = await prisma.verifiedPayment.findFirst({
           where: {
@@ -213,23 +225,23 @@ export async function POST(req: NextRequest) {
         category: data.category,
         teamName: data.teamName || null,
         tournamentInterest: data.tournamentInterest,
-        squadDetails: data.squadDetails || null,
+        squadDetails: consolidatedDetails || null,
         idFrontImage: ((rawBody as Record<string, unknown>).idFrontImage as string) || null,
         idBackImage: ((rawBody as Record<string, unknown>).idBackImage as string) || null,
         selfieImage: rawSelfieImage,
-        faceMatchScore: rawFaceScore,
-        faceMatchStatus: rawFaceStatus,
-        faceMatchDetails: `AI Biometric Face Match: ${rawFaceScore}% (${rawFaceStatus}). Awaiting Admin Portal Approval.`,
+        faceMatchScore: 100,
+        faceMatchStatus: 'PENDING_ADMIN_REVIEW',
+        faceMatchDetails: 'Face photo captured by attendee. Awaiting Admin Manual Verification alongside National ID.',
         ticketTier: rawTier,
-        vipPrice: rawTier === 'VIP' ? Number((rawBody as Record<string, unknown>).vipPrice || 500) : null,
-        paymentMethod: ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
+        vipPrice: rawTier === 'VIP' ? (isCreator ? 0 : Number((rawBody as Record<string, unknown>).vipPrice || 500)) : null,
+        paymentMethod: isCreator ? 'COMPLIMENTARY_CREATOR' : isVolunteer ? 'FREE_VOLUNTEER' : ((rawBody as Record<string, unknown>).paymentMethod as string) || null,
         paymentTxnCode: submittedTxnCode || null,
         telegramUsername: ((rawBody as Record<string, unknown>).telegramUsername as string) || null,
         paymentReceiptImage: ((rawBody as Record<string, unknown>).paymentReceiptImage as string) || null,
         paymentStatus: initialPaymentStatus,
         status: initialRegistrationStatus,
-        paymentApprovedAt: null,
-        paymentApprovedBy: null,
+        paymentApprovedAt: isCreator ? new Date() : null,
+        paymentApprovedBy: isCreator ? 'SYSTEM_CREATOR_PERK' : null,
       },
     });
 

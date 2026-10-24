@@ -18,6 +18,11 @@ export interface RegistrationReviewData {
   teamName: string;
   tournamentInterest: boolean;
   squadDetails: string;
+  socialMediaPlatform?: string;
+  socialMediaLink?: string;
+  socialMediaFollowers?: string;
+  volunteerRole?: string;
+  volunteerExperience?: string;
   idFrontImage: string;
   idBackImage: string;
   selfieImage?: string;
@@ -39,6 +44,15 @@ export interface StepVerificationProps {
   apiError?: string | null;
 }
 
+const VOLUNTEER_ROLE_LABELS: Record<string, string> = {
+  gate_security: '🛡️ Gate Security & Registration Check-in',
+  tournament_admin: '🏆 Tournament Admin / Match Referee',
+  stage_av: '🎙️ Stage Setup & Audio/Visual Crew',
+  crowd_usher: '👥 Crowd Management & Guest Ushering',
+  media_photo: '📸 Media, Photography & Content Assistant',
+  logistics_medic: '🚑 Logistics & Refreshments Support',
+};
+
 export function StepVerification({
   formData,
   onSubmit,
@@ -48,16 +62,17 @@ export function StepVerification({
   apiError,
 }: StepVerificationProps) {
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
-  const [agreedToMarketing, setAgreedToMarketing] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
 
+  const isVolunteer = formData.category === 'volunteer';
+  const isCreator = formData.category === 'content_creator';
   const isVip = formData.ticketTier === 'VIP';
-  const isFaceVerified = formData.faceMatchStatus === 'PASSED' && (formData.faceMatchScore || 0) >= 70;
+  const isVipPaid = isVip && !isCreator && !isVolunteer;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFaceVerified) {
-      setConsentError('Biometric verification failed. Your live selfie does not match the National ID card portrait.');
+    if (!formData.selfieImage) {
+      setConsentError('Please take your face photo in Step 4 before proceeding.');
       return;
     }
     if (!agreedToPrivacy) {
@@ -84,15 +99,13 @@ export function StepVerification({
       {/* Step Header */}
       <div>
         <div className="font-mono text-xs font-semibold tracking-widest text-[var(--color-lime,#CCFF00)] uppercase">
-          {isVip ? 'STEP 06' : 'STEP 05'}
+          {isVipPaid ? 'STEP 06' : 'STEP 05'}
         </div>
         <h2 className="mt-1 font-heading text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white">
           REVIEW &amp; CONFIRM
         </h2>
         <p className="mt-1 text-xs sm:text-sm text-[var(--color-silver,#999999)]">
-          {isVip
-            ? 'Verify all player, ID, AI face match, and VIP transaction details before submitting for Head Admin confirmation.'
-            : 'Verify your details before generating your official PUBG Mobile Community Assembly pass.'}
+          Verify your identity, role, and uploaded photos before submitting for administrative approval.
         </p>
       </div>
 
@@ -161,7 +174,7 @@ export function StepVerification({
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-white flex items-center gap-2">
-              <span className="text-[var(--color-lime,#CCFF00)]">02.</span> PARTICIPATION DETAILS
+              <span className="text-[var(--color-lime,#CCFF00)]">02.</span> PARTICIPATION &amp; ROLE
             </h3>
             {onEditStep && (
               <button
@@ -182,26 +195,20 @@ export function StepVerification({
               <span className="font-semibold text-white">{categoryLabel}</span>
             </div>
 
+            {/* Access Pass Tier */}
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
-                Tournament Intent
-              </span>
-              <span
-                className={`font-semibold ${
-                  formData.tournamentInterest
-                    ? 'text-[var(--color-lime,#CCFF00)]'
-                    : 'text-[var(--color-silver,#999999)]'
-                }`}
-              >
-                {formData.tournamentInterest ? 'Yes (Active Competitor)' : 'Spectating / Non-competitor'}
-              </span>
-            </div>
-
-            <div className="sm:col-span-2">
               <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
                 Access Pass Tier
               </span>
-              {isVip ? (
+              {isVolunteer ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--color-lime,#CCFF00)]/15 text-[var(--color-lime,#CCFF00)] font-bold font-mono text-xs border border-[var(--color-lime,#CCFF00)]/30">
+                  EVENT CREW PASS (100% FREE)
+                </span>
+              ) : isCreator ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-300 font-bold font-mono text-xs border border-amber-500/40">
+                  ⭐ COMPLIMENTARY CREATOR VIP (FREE)
+                </span>
+              ) : isVip ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-mono text-xs border border-amber-500/40">
                   ★ VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
                 </span>
@@ -212,6 +219,41 @@ export function StepVerification({
               )}
             </div>
 
+            {/* Volunteer specific role */}
+            {isVolunteer && (
+              <div className="sm:col-span-2 space-y-1 bg-black/40 p-3 rounded-lg border border-[var(--color-lime,#CCFF00)]/20">
+                <span className="block font-mono text-[11px] text-[var(--color-lime,#CCFF00)] uppercase font-bold">
+                  Assigned Volunteer Role
+                </span>
+                <span className="text-white font-medium text-xs block">
+                  {VOLUNTEER_ROLE_LABELS[formData.volunteerRole || ''] || formData.volunteerRole || 'Gate Security & Check-in'}
+                </span>
+                {formData.volunteerExperience && (
+                  <p className="text-[11px] text-[#888888] font-mono mt-1">
+                    Skills: {formData.volunteerExperience}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Creator specific social link */}
+            {isCreator && (
+              <div className="sm:col-span-2 space-y-1 bg-black/40 p-3 rounded-lg border border-amber-500/20">
+                <span className="block font-mono text-[11px] text-amber-300 uppercase font-bold">
+                  Creator Channel &amp; Platform
+                </span>
+                <span className="text-white font-mono text-xs block">
+                  [{formData.socialMediaPlatform || 'Social'}] {formData.socialMediaLink}
+                </span>
+                {formData.socialMediaFollowers && (
+                  <span className="text-[11px] text-[#888888] font-mono block">
+                    Audience: {formData.socialMediaFollowers}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Team name for Esports */}
             {formData.teamName && (
               <div className="sm:col-span-2">
                 <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
@@ -281,11 +323,11 @@ export function StepVerification({
           </div>
         </div>
 
-        {/* Section 4: AI Biometric KYC Match */}
+        {/* Section 4: Face Photo (For Admin Review) */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-white flex items-center gap-2">
-              <span className="text-[var(--color-lime,#CCFF00)]">04.</span> AI BIOMETRIC KYC MATCH
+              <span className="text-[var(--color-lime,#CCFF00)]">04.</span> FACE PHOTO
             </h3>
             {onEditStep && (
               <button
@@ -308,33 +350,33 @@ export function StepVerification({
                   className="w-16 h-16 rounded-full object-cover border border-[#CCFF00]/40 shrink-0"
                 />
                 <div className="text-xs font-mono">
-                  <span className="text-[#CCFF00] font-bold block">✓ KYC FACE VERIFIED</span>
+                  <span className="text-[#CCFF00] font-bold block">✓ PHOTO ATTACHED</span>
                   <span className="text-[#888888] text-[11px]">
-                    Match Score: {formData.faceMatchScore || 90}%
+                    Ready for Admin Verification
                   </span>
                 </div>
               </div>
             ) : (
               <div className="rounded-lg border border-red-500/30 bg-red-950/20 flex items-center justify-center p-3">
-                <span className="font-mono text-xs text-red-400">NO SELFIE CAPTURED</span>
+                <span className="font-mono text-xs text-red-400">NO PHOTO TAKEN</span>
               </div>
             )}
 
             <div className="rounded-lg border border-white/10 bg-black/40 p-3 flex flex-col justify-center text-xs font-mono">
               <span className="text-white font-bold block mb-1">
-                ⏳ {isVip ? 'VIP ADMIN APPROVAL QUEUE' : 'ADMIN REVIEW QUEUE'}
+                ⏳ ADMIN APPROVAL QUEUE
               </span>
               <span className="text-[#888888] text-[11px] leading-relaxed">
-                Biometric face match verified. Once you submit, your application will be audited by the admin team, and your official QR ticket will unlock in your Attendee Portal upon approval!
+                Your face photo and ID card have been recorded. The event administration team will review your application and confirm your pass.
               </span>
             </div>
           </div>
         </div>
 
-        {/* Section 5 (VIP Only): Payment Verification Details */}
-        {isVip && (
+        {/* Section 5 (If Paid VIP): Payment Review */}
+        {isVipPaid && (
           <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
               <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
                 <span>05.</span> VIP PAYMENT DETAILS
               </h3>
@@ -349,31 +391,20 @@ export function StepVerification({
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm bg-black/40 p-4 rounded-lg border border-amber-500/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
               <div>
-                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
+                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
                   Payment Method
                 </span>
-                <span className="font-bold text-white uppercase">
-                  {formData.paymentMethod === 'AWASH_BANK' ? 'Awash Bank (Tsige Dagne)' : 'Telebirr (Alamawed Begashawe)'}
-                </span>
+                <span className="font-bold text-amber-400">{formData.paymentMethod || 'TELEBIRR'}</span>
               </div>
 
               <div>
-                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
-                  Transaction Code / Ref
+                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                  Transaction Code
                 </span>
-                <span className="font-mono font-bold text-amber-400">
-                  {formData.paymentTxnCode || 'Not provided'}
-                </span>
-              </div>
-
-              <div className="sm:col-span-2">
-                <span className="block font-mono text-[11px] text-amber-300/70 uppercase">
-                  Telegram Delivery Contact
-                </span>
-                <span className="font-mono font-bold text-white">
-                  {formData.telegramUsername || 'Not provided'}
+                <span className="font-mono font-bold text-white tracking-wider">
+                  {formData.paymentTxnCode || 'NOT PROVIDED'}
                 </span>
               </div>
             </div>
@@ -381,107 +412,40 @@ export function StepVerification({
         )}
       </Card>
 
-      {/* Info notice */}
-      <div className="flex items-start gap-3 rounded-sm border border-sky-500/30 bg-sky-950/20 p-4 text-sky-200">
-        <svg
-          className="h-5 w-5 shrink-0 text-sky-400 mt-0.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <div className="text-xs font-mono space-y-1">
-          <p className="font-semibold text-sky-300 uppercase tracking-wide">
-            {isVip ? 'VIP APPROVAL TIMELINE' : 'APPLICATION REVIEW TIMELINE'}
-          </p>
-          <p className="text-sky-200/80 leading-relaxed">
-            {isVip
-              ? 'VIP tickets are issued once your payment receipt is verified by Head Admin. Your QR pass will unlock automatically in your Attendee Portal.'
-              : 'Your identity and National ID have been matched by AI. Once the admin team approves your slot, your digital pass will unlock in your Attendee Portal.'}
-          </p>
-        </div>
-      </div>
-
-      {/* Registration & Privacy Policy Consent Checkbox */}
-      <div className="space-y-3 pt-1">
-        <label className="flex items-start gap-3 cursor-pointer select-none">
+      {/* Consent Checkboxes */}
+      <div className="space-y-3 pt-2">
+        <label className="flex items-start gap-3 cursor-pointer group">
           <input
             type="checkbox"
             checked={agreedToPrivacy}
-            onChange={(e) => {
-              setAgreedToPrivacy(e.target.checked);
-              if (consentError) setConsentError(null);
-            }}
-            className="mt-1 h-4 w-4 rounded border-white/20 bg-[var(--color-charcoal,#111111)] text-[var(--color-lime,#CCFF00)] accent-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer shrink-0"
+            onChange={(e) => setAgreedToPrivacy(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-white/20 bg-black/50 text-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer"
           />
-          <span className="text-xs sm:text-sm text-[var(--color-silver,#999999)] leading-relaxed">
-            I have read and agree to the{' '}
-            <Link
-              href="/privacy"
-              target="_blank"
-              className="text-[var(--color-lime,#CCFF00)] underline hover:text-white transition-colors"
-            >
-              Registration and Privacy Policy
-            </Link>
-            . I confirm that the information and biometric selfie I provide are accurate and truthful. <span className="text-red-400">*</span>
-          </span>
-        </label>
-
-        {consentError && (
-          <p className="font-mono text-xs text-red-400 pl-7">{consentError}</p>
-        )}
-
-        {/* Optional Marketing Checkbox */}
-        <label className="flex items-start gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={agreedToMarketing}
-            onChange={(e) => setAgreedToMarketing(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-white/20 bg-[var(--color-charcoal,#111111)] text-[var(--color-lime,#CCFF00)] accent-[var(--color-lime,#CCFF00)] focus:ring-[var(--color-lime,#CCFF00)] cursor-pointer shrink-0"
-          />
-          <span className="text-xs sm:text-sm text-[var(--color-silver,#999999)]/80 leading-relaxed">
-            I agree to receive future event announcements and promotional updates. <span className="text-[#666666] font-mono text-[11px]">(Optional; not required to register.)</span>
+          <span className="text-xs text-[var(--color-silver,#999999)] leading-relaxed group-hover:text-white transition-colors">
+            I confirm that the provided information, ID card photos, and face photo are genuine and belong to me. I agree to the{' '}
+            <Link href="/privacy" className="text-[var(--color-lime,#CCFF00)] underline hover:text-white" target="_blank">
+              Registration Terms and Privacy Policy
+            </Link>.
           </span>
         </label>
       </div>
 
-      {/* API Submission Error Banner */}
+      {/* Error Display */}
       <AnimatePresence>
-        {apiError && (
+        {(consentError || apiError) && (
           <motion.div
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            className="flex items-center gap-2 rounded-sm border border-red-500/40 bg-red-950/30 p-3.5 text-xs font-mono text-red-400"
+            className="rounded border border-red-500/40 bg-red-950/40 p-3 text-xs font-mono text-red-300"
           >
-            <svg
-              className="h-4 w-4 shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <span>{apiError}</span>
+            {consentError || apiError}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-4">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <Button
           type="button"
           variant="secondary"
@@ -490,17 +454,7 @@ export function StepVerification({
           disabled={isSubmitting}
           className="w-full sm:w-auto min-w-[140px]"
         >
-          <svg
-            className="mr-2 h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          BACK
+          ← BACK
         </Button>
 
         <Button
@@ -508,14 +462,10 @@ export function StepVerification({
           variant="primary"
           size="lg"
           loading={isSubmitting}
-          disabled={isSubmitting || !isFaceVerified}
-          className="w-full sm:w-auto min-w-[220px] disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto min-w-[220px]"
         >
-          {isFaceVerified
-            ? isVip
-              ? 'SUBMIT FOR VIP APPROVAL →'
-              : 'SUBMIT FOR ADMIN APPROVAL →'
-            : 'FACE MATCH REQUIRED'}
+          {isSubmitting ? 'SUBMITTING...' : 'COMPLETE REGISTRATION ✓'}
         </Button>
       </div>
     </motion.form>

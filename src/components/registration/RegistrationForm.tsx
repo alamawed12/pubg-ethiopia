@@ -23,6 +23,11 @@ export interface RegistrationFormData {
   teamName: string;
   tournamentInterest: boolean;
   squadDetails: string;
+  socialMediaPlatform: string;
+  socialMediaLink: string;
+  socialMediaFollowers: string;
+  volunteerRole: string;
+  volunteerExperience: string;
   idFrontImage: string;
   idBackImage: string;
   selfieImage: string;
@@ -47,11 +52,16 @@ const INITIAL_FORM_DATA: RegistrationFormData = {
   teamName: '',
   tournamentInterest: false,
   squadDetails: '',
+  socialMediaPlatform: 'TikTok',
+  socialMediaLink: '',
+  socialMediaFollowers: '',
+  volunteerRole: 'gate_security',
+  volunteerExperience: '',
   idFrontImage: '',
   idBackImage: '',
   selfieImage: '',
-  faceMatchScore: 0,
-  faceMatchStatus: 'NOT_VERIFIED',
+  faceMatchScore: 100,
+  faceMatchStatus: 'PENDING_ADMIN_REVIEW',
   ticketTier: 'STANDARD',
   vipPrice: 500,
   paymentMethod: 'TELEBIRR',
@@ -84,25 +94,32 @@ export function RegistrationForm() {
   const [registrationResult, setRegistrationResult] = useState<RegistrationSuccessData | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const isVip = formData.ticketTier === 'VIP';
-  const formSteps: StepItem[] = isVip
+  // VIP Payment is only required for standard attendees/players upgrading to VIP.
+  // Content Creators get Complimentary VIP (Free).
+  // Volunteers get Free Crew Pass.
+  const isVipPaid =
+    formData.ticketTier === 'VIP' &&
+    formData.category !== 'content_creator' &&
+    formData.category !== 'volunteer';
+
+  const formSteps: StepItem[] = isVipPaid
     ? [
-        { number: 1, label: 'Player Identity' },
-        { number: 2, label: 'Participation' },
+        { number: 1, label: 'Identity' },
+        { number: 2, label: 'Role' },
         { number: 3, label: 'ID Upload' },
-        { number: 4, label: 'Face Match' },
+        { number: 4, label: 'Face Photo' },
         { number: 5, label: 'VIP Payment' },
-        { number: 6, label: 'Verification' },
+        { number: 6, label: 'Review' },
       ]
     : [
-        { number: 1, label: 'Player Identity' },
-        { number: 2, label: 'Participation' },
+        { number: 1, label: 'Identity' },
+        { number: 2, label: 'Role' },
         { number: 3, label: 'ID Upload' },
-        { number: 4, label: 'Face Match' },
-        { number: 5, label: 'Verification' },
+        { number: 4, label: 'Face Photo' },
+        { number: 5, label: 'Review' },
       ];
 
-  const maxSteps = isVip ? 6 : 5;
+  const maxSteps = isVipPaid ? 6 : 5;
 
   // Field updater
   const updateField = (field: string, value: string | boolean | number) => {
@@ -135,10 +152,13 @@ export function RegistrationForm() {
 
   // Form submission handler
   const handleSubmit = async () => {
-    if (formData.faceMatchStatus !== 'PASSED' || (formData.faceMatchScore || 0) < 70) {
-      setApiError(
-        'Identity Mismatch: Your live face does not match the National ID card portrait. You cannot complete registration without passing biometric facial matching.'
-      );
+    if (!formData.selfieImage) {
+      setApiError('Please take your face photo in Step 4 before submitting registration.');
+      return;
+    }
+
+    if (!formData.idFrontImage) {
+      setApiError('Please upload your National ID card before submitting registration.');
       return;
     }
 
@@ -281,7 +301,7 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {/* Step 2: Participation */}
+            {/* Step 2: Participation & Role */}
             {currentStep === 2 && (
               <motion.div
                 key="step-2"
@@ -321,7 +341,7 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {/* Step 4: AI Biometric Face Match (Bybit-style KYC) */}
+            {/* Step 4: Face Photo Capture */}
             {currentStep === 4 && (
               <motion.div
                 key="step-4-face-kyc"
@@ -345,8 +365,8 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {/* Step 5 (VIP Only): VIP Payment & Accounts */}
-            {isVip && currentStep === 5 && (
+            {/* Step 5 (Paid VIP Only): VIP Payment */}
+            {isVipPaid && currentStep === 5 && (
               <motion.div
                 key="step-5-vip-payment"
                 custom={direction}
@@ -365,8 +385,8 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {/* Final Step: Verification & Review (Step 6 for VIP, Step 5 for Standard) */}
-            {((isVip && currentStep === 6) || (!isVip && currentStep === 5)) && (
+            {/* Final Step: Verification & Review */}
+            {((isVipPaid && currentStep === 6) || (!isVipPaid && currentStep === 5)) && (
               <motion.div
                 key="step-verification"
                 custom={direction}

@@ -583,23 +583,23 @@ export default function RegistrationDetailPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                AI BIOMETRIC FACE MATCH (KYC)
+                FACE PHOTO &amp; ID MATCH VERIFICATION
               </h2>
 
               <span
                 className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${
-                  reg.faceMatchStatus === 'PASSED' || (reg.faceMatchScore && reg.faceMatchScore >= 70)
+                  reg.status === 'CONFIRMED'
                     ? 'bg-green-500/20 text-green-300 border border-green-500/40'
-                    : reg.faceMatchStatus === 'FAILED'
+                    : reg.status === 'REJECTED'
                     ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                    : 'bg-white/10 text-white/70'
+                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                 }`}
               >
-                {reg.faceMatchStatus === 'PASSED' || (reg.faceMatchScore && reg.faceMatchScore >= 70)
-                  ? `✓ ${reg.faceMatchScore || 90}% MATCH CONFIRMED`
-                  : reg.faceMatchStatus === 'FAILED'
-                  ? `✗ ${reg.faceMatchScore || 45}% LOW CONFIDENCE`
-                  : 'PENDING VERIFICATION'}
+                {reg.status === 'CONFIRMED'
+                  ? '✓ VERIFIED & APPROVED'
+                  : reg.status === 'REJECTED'
+                  ? '✗ REJECTED'
+                  : '⏳ PENDING ADMIN REVIEW'}
               </span>
             </div>
 
