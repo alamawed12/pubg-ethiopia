@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { SettingsCogIcon, ShieldSecurityIcon, CheckCircleIcon, XCircleIcon, AlertTriangleIcon, LightningBoltIcon } from '@/components/ui/TacticalIcons';
 
 export default function AdminSettingsPage() {
   const [maxCapacity, setMaxCapacity] = useState(300);
@@ -192,7 +193,7 @@ export default function AdminSettingsPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl">🤖</span>
+            <ShieldSecurityIcon className="w-6 h-6 text-[#CCFF00] shrink-0" />
             <div>
               <h2
                 className="text-xl uppercase tracking-wider text-white"
@@ -207,13 +208,23 @@ export default function AdminSettingsPage() {
           </div>
 
           <span
-            className={`text-xs font-mono font-bold px-3 py-1 rounded-full border self-start sm:self-auto ${
+            className={`text-xs font-mono font-bold px-3 py-1 rounded-full border self-start sm:self-auto flex items-center gap-1.5 ${
               hasGeminiKey
                 ? 'bg-green-500/20 text-green-300 border-green-500/40'
                 : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
             }`}
           >
-            {hasGeminiKey ? '✓ ACTIVE (GEMINI VISION CONNECTED)' : '⚠️ API KEY NOT CONFIGURED'}
+            {hasGeminiKey ? (
+              <>
+                <CheckCircleIcon className="w-3.5 h-3.5 text-green-400" />
+                <span>ACTIVE (GEMINI VISION CONNECTED)</span>
+              </>
+            ) : (
+              <>
+                <AlertTriangleIcon className="w-3.5 h-3.5 text-amber-400" />
+                <span>API KEY NOT CONFIGURED</span>
+              </>
+            )}
           </span>
         </div>
 
@@ -229,7 +240,11 @@ export default function AdminSettingsPage() {
                 : 'bg-red-500/10 border-red-500/30 text-red-300'
             }`}
           >
-            <span>{geminiTestFeedback.success ? '✓' : '✗'}</span>
+            {geminiTestFeedback.success ? (
+              <CheckCircleIcon className="w-4 h-4 text-green-400 shrink-0" />
+            ) : (
+              <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />
+            )}
             <span>{geminiTestFeedback.message}</span>
           </div>
         )}
@@ -251,9 +266,16 @@ export default function AdminSettingsPage() {
               type="button"
               onClick={handleTestGemini}
               disabled={isTestingGemini}
-              className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold tracking-wider uppercase bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl text-xs font-mono font-bold tracking-wider uppercase bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              {isTestingGemini ? 'TESTING...' : '⚡ TEST KEY'}
+              {isTestingGemini ? (
+                'TESTING...'
+              ) : (
+                <>
+                  <LightningBoltIcon className="w-3.5 h-3.5 text-[#CCFF00]" />
+                  <span>TEST KEY</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -280,7 +302,8 @@ export default function AdminSettingsPage() {
           className="text-xl uppercase tracking-wider mb-6 flex items-center gap-2"
           style={{ fontFamily: 'var(--font-heading)', color: '#CCFF00' }}
         >
-          <span>⚙️</span> ATTENDEE QUOTA &amp; VIP PASS CONFIGURATION
+          <SettingsCogIcon className="w-5 h-5 text-[#CCFF00]" />
+          <span>ATTENDEE QUOTA &amp; VIP PASS CONFIGURATION</span>
         </h2>
 
         {saveSuccess && (
@@ -292,7 +315,8 @@ export default function AdminSettingsPage() {
               color: '#22c55e',
             }}
           >
-            <span>✓</span> Settings saved successfully! Capacity quota, VIP pricing, and Gemini AI key are updated live.
+            <CheckCircleIcon className="w-5 h-5 text-green-400 shrink-0" />
+            <span>Settings saved successfully! Capacity quota, VIP pricing, and Gemini AI key are updated live.</span>
           </div>
         )}
 

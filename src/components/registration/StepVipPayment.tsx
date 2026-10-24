@@ -4,6 +4,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { StarVipIcon, CameraIcon, ShieldSecurityIcon, CheckMarkIcon } from '@/components/ui/TacticalIcons';
 
 export interface StepVipPaymentProps {
   formData: {
@@ -151,7 +152,8 @@ export function StepVipPayment({
       {/* Step Header */}
       <div>
         <div className="font-mono text-xs font-semibold tracking-widest text-amber-400 uppercase flex items-center gap-1.5">
-          <span>⭐</span> STEP 04 • VIP PASS PAYMENT
+          <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
+          <span>STEP 05 • VIP PASS PAYMENT</span>
         </div>
         <h2 className="mt-1 font-heading text-2xl sm:text-3xl font-bold uppercase tracking-wider text-white">
           VIP PAYMENT & APPROVAL
@@ -238,7 +240,7 @@ export function StepVipPayment({
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
               </svg>
-              <span>{copiedKey === 'telebirr' ? 'COPIED! ✓' : 'COPY NUMBER'}</span>
+              <span>{copiedKey === 'telebirr' ? 'COPIED!' : 'COPY NUMBER'}</span>
             </button>
           </div>
         </div>
@@ -297,7 +299,7 @@ export function StepVipPayment({
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
               </svg>
-              <span>{copiedKey === 'awash' ? 'COPIED! ✓' : 'COPY ACCOUNT'}</span>
+              <span>{copiedKey === 'awash' ? 'COPIED!' : 'COPY ACCOUNT'}</span>
             </button>
           </div>
         </div>
@@ -308,7 +310,10 @@ export function StepVipPayment({
         <label className="block text-xs uppercase font-mono tracking-wider text-amber-300 font-bold flex items-center justify-between">
           <span>UPLOAD PAYMENT SCREENSHOT (REQUIRED) *</span>
           {formData.paymentReceiptImage && (
-            <span className="text-emerald-400 text-[10px]">✓ Screenshot Attached</span>
+            <span className="text-emerald-400 text-[10px] flex items-center gap-1">
+              <CheckMarkIcon className="w-2.5 h-2.5 stroke-[3]" />
+              <span>Screenshot Attached</span>
+            </span>
           )}
         </label>
 
@@ -322,8 +327,9 @@ export function StepVipPayment({
                 className="w-16 h-16 object-cover rounded-lg border border-emerald-500/30"
               />
               <div>
-                <span className="text-xs font-mono font-bold text-emerald-400 block">
-                  ✓ Receipt Attached Successfully
+                <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+                  <CheckMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Receipt Attached Successfully</span>
                 </span>
                 <span className="text-[11px] font-mono text-neutral-400">
                   Ready for admin payment verification
@@ -371,8 +377,8 @@ export function StepVipPayment({
               }}
             />
             <div className="flex flex-col items-center justify-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-xl text-amber-400">
-                📸
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <CameraIcon className="w-5 h-5" />
               </div>
               <div className="font-heading font-black text-sm uppercase text-white tracking-wider">
                 {isCompressing ? 'OPTIMIZING SCREENSHOT...' : 'CLICK OR DRAG TO UPLOAD RECEIPT SCREENSHOT'}
@@ -425,7 +431,7 @@ export function StepVipPayment({
 
       {/* Security Info Card */}
       <div className="p-3.5 rounded-lg bg-black/40 border border-white/10 flex items-start gap-3 text-xs text-neutral-300">
-        <span className="text-lg">🛡️</span>
+        <ShieldSecurityIcon className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
           <span className="font-heading uppercase font-bold text-white tracking-wider block mb-0.5">
             PRIORITY VIP APPROVAL SYSTEM

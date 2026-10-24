@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { XMarkIcon } from '@/components/ui/TacticalIcons';
 
 interface GateMetrics {
   maxCapacity: number;
@@ -308,9 +309,9 @@ export default function AdminGateMonitorPage() {
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1.5 text-[10px] text-[#999999] hover:text-white"
+                className="absolute right-2.5 top-2 text-[#999999] hover:text-white cursor-pointer"
               >
-                ✕
+                <XMarkIcon className="w-3.5 h-3.5" />
               </button>
             )}
           </div>

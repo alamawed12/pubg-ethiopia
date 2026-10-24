@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
+import { TargetCrosshairIcon, CameraIcon, CheckCircleIcon } from '@/components/ui/TacticalIcons';
 
 interface StepFaceVerificationProps {
   idFrontImage: string;
@@ -217,7 +218,7 @@ export function StepFaceVerification({
           <div className="flex flex-col items-center justify-center space-y-5">
             <div className="text-center space-y-1">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 border border-[#CCFF00]/40 text-[#CCFF00] font-heading font-black text-xs uppercase tracking-wider shadow-[0_0_15px_rgba(204,255,0,0.2)]">
-                <span>🎯</span>
+                <TargetCrosshairIcon className="w-4 h-4 text-[#CCFF00]" />
                 <span>CENTER YOUR FACE &amp; LOOK AT THE CAMERA</span>
               </div>
               <p className="text-xs font-mono text-[#888888]">Hold steady and ensure good lighting</p>
@@ -266,7 +267,7 @@ export function StepFaceVerification({
                 onClick={handleTakePhoto}
                 className="w-full py-4 px-6 rounded-2xl bg-[#CCFF00] hover:bg-[#b8e600] active:scale-95 text-black font-heading font-black text-base uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_25px_rgba(204,255,0,0.4)] flex items-center justify-center gap-2"
               >
-                <span className="text-xl">📸</span>
+                <CameraIcon className="w-5 h-5 text-black" />
                 <span>TAKE PHOTO</span>
               </button>
 
@@ -351,9 +352,7 @@ export function StepFaceVerification({
             <div className="p-4 rounded-xl border bg-green-500/10 border-green-500/40 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-green-500 text-black flex items-center justify-center font-bold text-xs">
-                    ✓
-                  </span>
+                  <CheckCircleIcon className="w-6 h-6 text-green-400 shrink-0" />
                   <span className="font-heading text-base font-bold tracking-wider uppercase text-green-400">
                     FACE PHOTO ATTACHED
                   </span>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AlertTriangleIcon } from '@/components/ui/TacticalIcons';
 
 export default function PrivacyPage() {
   return (
@@ -67,8 +68,9 @@ export default function PrivacyPage() {
               <li>Registration status and event participation records.</li>
               <li>Any additional information you voluntarily provide through the form (such as National ID front/back photos for identity verification).</li>
             </ul>
-            <p className="text-amber-400/90 font-mono text-xs pt-1">
-              ⚠️ Please do not submit passwords, payment card details, or unnecessary sensitive personal information through the registration form.
+            <p className="text-amber-400/90 font-mono text-xs pt-1 flex items-center gap-1.5">
+              <AlertTriangleIcon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Please do not submit passwords, payment card details, or unnecessary sensitive personal information through the registration form.</span>
             </p>
           </section>
 

@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
           return NextResponse.json({
             success: true,
-            message: `✓ Connected successfully to Google Gemini (${workingModel})! Anti-fraud brother biometric checks active.`,
+            message: `Connected successfully to Google Gemini (${workingModel})! Anti-fraud biometric checks active.`,
           });
         } else {
           return NextResponse.json(

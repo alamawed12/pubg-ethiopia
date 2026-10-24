@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EventPass } from '@/components/registration/EventPass';
+import { StarVipIcon, ClockPendingIcon, XCircleIcon, CheckCircleIcon } from '@/components/ui/TacticalIcons';
 
 interface AttendeeData {
   id: string;
@@ -231,16 +232,19 @@ export default function AttendeePortalPage() {
 
                 <div className="flex items-center gap-3">
                   {attendee.status === 'CONFIRMED' || attendee.status === 'CHECKED_IN' ? (
-                    <div className="px-4 py-2 rounded-xl bg-[#22c55e]/20 border border-[#22c55e]/50 text-[#22c55e] font-mono font-bold text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                      ✓ APPLICATION ACCEPTED
+                    <div className="px-4 py-2 rounded-xl bg-[#22c55e]/20 border border-[#22c55e]/50 text-[#22c55e] font-mono font-bold text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(34,197,94,0.3)] flex items-center gap-2">
+                      <CheckCircleIcon className="w-4 h-4 text-[#22c55e] shrink-0" />
+                      <span>APPLICATION ACCEPTED</span>
                     </div>
                   ) : attendee.status === 'REJECTED' ? (
-                    <div className="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/50 text-red-400 font-mono font-bold text-xs uppercase tracking-widest">
-                      ✗ APPLICATION DECLINED
+                    <div className="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/50 text-red-400 font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                      <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>APPLICATION DECLINED</span>
                     </div>
                   ) : (
-                    <div className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-400 font-mono font-bold text-xs uppercase tracking-widest animate-pulse">
-                      ⏳ UNDER ADMIN REVIEW
+                    <div className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/50 text-amber-400 font-mono font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                      <ClockPendingIcon className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>UNDER ADMIN REVIEW</span>
                     </div>
                   )}
                 </div>
@@ -251,8 +255,9 @@ export default function AttendeePortalPage() {
                 /* APPROVED STATE: Show full Event Pass with QR */
                 <div className="space-y-6 text-center">
                   <div className="max-w-md mx-auto">
-                    <div className="p-4 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] text-xs font-mono mb-6">
-                      ✓ You have been approved by the PUBG Mobile Ethiopia Committee! Present this QR code at the check-in gate.
+                    <div className="p-4 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/30 text-[#22c55e] text-xs font-mono mb-6 flex items-center justify-center gap-2">
+                      <CheckCircleIcon className="w-4 h-4 text-[#22c55e] shrink-0" />
+                      <span>You have been approved by the PUBG Mobile Ethiopia Committee! Present this QR code at the check-in gate.</span>
                     </div>
 
                     <EventPass
@@ -269,8 +274,8 @@ export default function AttendeePortalPage() {
               ) : attendee.status === 'REJECTED' ? (
                 /* REJECTED STATE */
                 <div className="p-8 rounded-2xl bg-[#111111] border border-red-500/30 text-center max-w-lg mx-auto space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto text-2xl text-red-400">
-                    ✕
+                  <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
+                    <XCircleIcon className="w-8 h-8" />
                   </div>
                   <h3 className="font-heading text-2xl font-bold uppercase text-white">
                     Registration Not Approved
@@ -282,8 +287,8 @@ export default function AttendeePortalPage() {
               ) : attendee.ticketTier === 'VIP' ? (
                 /* VIP PENDING STATE */
                 <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-[#1c1810] via-[#12100d] to-[#0a0805] border-2 border-amber-500/40 text-center max-w-lg mx-auto space-y-5 shadow-2xl">
-                  <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center mx-auto text-2xl text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-                    ⭐
+                  <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center mx-auto text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                    <StarVipIcon className="w-8 h-8" />
                   </div>
                   <div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-400 font-mono text-[10px] tracking-widest uppercase mb-2">
@@ -306,8 +311,8 @@ export default function AttendeePortalPage() {
               ) : (
                 /* STANDARD PENDING STATE */
                 <div className="p-8 sm:p-12 rounded-2xl bg-[#111111] border border-amber-500/30 text-center max-w-lg mx-auto space-y-5">
-                  <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-2xl text-amber-400 animate-pulse">
-                    ⏳
+                  <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+                    <ClockPendingIcon className="w-8 h-8" />
                   </div>
                   <h3 className="font-heading text-2xl sm:text-3xl font-black uppercase text-white tracking-wider">
                     Application Under Review

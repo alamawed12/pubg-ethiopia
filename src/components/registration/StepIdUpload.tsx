@@ -3,6 +3,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { CheckMarkIcon } from '@/components/ui/TacticalIcons';
 
 interface StepIdUploadProps {
   formData: {
@@ -124,8 +125,9 @@ function ImageUploadZone({
           />
         </div>
         <div className="flex items-center justify-between px-3 py-2 bg-[#111111] border-t border-white/10">
-          <span className="font-mono text-[10px] text-[#CCFF00] uppercase tracking-wider">
-            {label} ✓
+          <span className="font-mono text-[10px] text-[#CCFF00] uppercase tracking-wider flex items-center gap-1">
+            <span>{label}</span>
+            <CheckMarkIcon className="w-3 h-3 text-[#CCFF00] stroke-[3]" />
           </span>
           <button
             type="button"

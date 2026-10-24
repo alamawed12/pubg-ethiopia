@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { EventPass } from '@/components/registration/EventPass';
+import {
+  StarVipIcon,
+  CameraIcon,
+  AlertTriangleIcon,
+  CheckMarkIcon,
+  XMarkIcon,
+} from '@/components/ui/TacticalIcons';
 
 interface Registration {
   id: string;
@@ -160,7 +167,9 @@ export default function RegistrationDetailPage() {
   if (!reg) {
     return (
       <div className="text-center py-20">
-        <div className="text-4xl mb-3">⚠️</div>
+        <div className="flex justify-center mb-3">
+          <AlertTriangleIcon className="w-10 h-10 text-amber-400" />
+        </div>
         <p style={{ color: '#ef4444', fontFamily: 'var(--font-heading)', fontSize: '18px' }}>
           Registration not found
         </p>
@@ -216,8 +225,9 @@ export default function RegistrationDetailPage() {
                 {statusConfig.label}
               </span>
               {isVip && (
-                <span className="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-black bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.35)]">
-                  ★ VIP ALL-ACCESS ({reg.vipPrice || 500} ETB)
+                <span className="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-black bg-amber-500/20 text-amber-400 border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.35)] inline-flex items-center gap-1.5">
+                  <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
+                  <span>VIP ALL-ACCESS ({reg.vipPrice || 500} ETB)</span>
                 </span>
               )}
             </div>
@@ -250,7 +260,7 @@ export default function RegistrationDetailPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-500/20 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl">⭐</span>
+                <StarVipIcon className="w-5 h-5 text-amber-400 shrink-0" />
                 <h2 className="font-heading font-black text-lg sm:text-xl text-white uppercase tracking-wider">
                   VIP PAYMENT VERIFICATION & DISPATCH
                 </h2>
@@ -263,12 +273,14 @@ export default function RegistrationDetailPage() {
             {/* Payment Status Pill */}
             <div>
               {reg.paymentStatus === 'APPROVED' ? (
-                <span className="px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 font-heading font-black text-xs uppercase tracking-wider">
-                  ✓ PAYMENT VERIFIED & APPROVED
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 font-heading font-black text-xs uppercase tracking-wider">
+                  <CheckMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>PAYMENT VERIFIED & APPROVED</span>
                 </span>
               ) : reg.paymentStatus === 'REJECTED' ? (
-                <span className="px-3.5 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/50 font-heading font-black text-xs uppercase tracking-wider">
-                  ✗ PAYMENT REJECTED
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/50 font-heading font-black text-xs uppercase tracking-wider">
+                  <XMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>PAYMENT REJECTED</span>
                 </span>
               ) : (
                 <span className="px-3.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/60 font-heading font-black text-xs uppercase tracking-wider flex items-center gap-2">
@@ -314,10 +326,10 @@ export default function RegistrationDetailPage() {
                   <button
                     type="button"
                     onClick={() => handleCopy(reg.paymentTxnCode || '')}
-                    className="p-1 rounded bg-white/10 hover:bg-white/20 text-xs text-white"
+                    className="p-1 px-1.5 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono text-white"
                     title="Copy Transaction Code"
                   >
-                    {copiedTxn ? '✓' : '📋'}
+                    {copiedTxn ? 'COPIED' : 'COPY'}
                   </button>
                 )}
               </div>
@@ -348,7 +360,8 @@ export default function RegistrationDetailPage() {
           <div className="p-4 rounded-xl bg-black/60 border border-amber-500/30">
             <div className="flex items-center justify-between mb-3">
               <span className="text-amber-300 uppercase text-xs font-mono font-bold tracking-wider flex items-center gap-2">
-                <span>📸</span> PAYMENT RECEIPT SCREENSHOT (UPLOADED BY ATTENDEE)
+                <CameraIcon className="w-4 h-4 text-amber-400" />
+                <span>PAYMENT RECEIPT SCREENSHOT (UPLOADED BY ATTENDEE)</span>
               </span>
               {reg.paymentReceiptImage && (
                 <button
@@ -356,7 +369,7 @@ export default function RegistrationDetailPage() {
                   onClick={() => setIdModalImage(reg.paymentReceiptImage!)}
                   className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono uppercase font-bold hover:bg-amber-500/30"
                 >
-                  CLICK TO ENLARGE 🔍
+                  CLICK TO ENLARGE
                 </button>
               )}
             </div>
@@ -379,7 +392,10 @@ export default function RegistrationDetailPage() {
                 </div>
 
                 <div className="text-xs font-mono text-neutral-300 space-y-1">
-                  <div className="text-emerald-400 font-bold">✓ Screenshot successfully submitted</div>
+                  <div className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>Screenshot successfully submitted</span>
+                  </div>
                   <div className="text-neutral-400">Match the amount ({reg.vipPrice || 500} ETB) &amp; timestamp with your Telebirr / Awash statement.</div>
                   <div className="text-neutral-400">Transaction Code: <strong className="text-amber-400">{reg.paymentTxnCode || 'Not specified'}</strong></div>
                 </div>
@@ -400,7 +416,7 @@ export default function RegistrationDetailPage() {
                 disabled={!!actionLoading}
                 className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-heading font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all cursor-pointer disabled:opacity-50"
               >
-                {actionLoading === 'APPROVED' ? 'APPROVING...' : '✓ APPROVE PAYMENT & ISSUE VIP TICKET'}
+                {actionLoading === 'APPROVED' ? 'APPROVING...' : 'APPROVE PAYMENT & ISSUE VIP TICKET'}
               </button>
             )}
 
@@ -411,7 +427,7 @@ export default function RegistrationDetailPage() {
                 disabled={!!actionLoading}
                 className="px-6 py-3 rounded-lg bg-red-950/70 border border-red-500/40 hover:bg-red-900 text-red-300 font-heading font-black text-sm uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
               >
-                {actionLoading === 'REJECTED' ? 'REJECTING...' : '✗ REJECT TRANSACTION (INVALID CODE)'}
+                {actionLoading === 'REJECTED' ? 'REJECTING...' : 'REJECT TRANSACTION (INVALID CODE)'}
               </button>
             )}
 
@@ -480,7 +496,7 @@ export default function RegistrationDetailPage() {
               <Field label="Phone" value={`${reg.countryCode} ${reg.phoneNumber}`} mono />
               <Field label="Portal Login Info" value={`Name: ${reg.fullName} | Phone: ${reg.phoneNumber}`} color="#CCFF00" mono />
               <Field label="City / Region" value={reg.cityRegion} />
-              <Field label="Ticket Tier" value={reg.ticketTier === 'VIP' ? '★ VIP All-Access' : 'Standard'} color={reg.ticketTier === 'VIP' ? '#f59e0b' : '#CCFF00'} />
+              <Field label="Ticket Tier" value={reg.ticketTier === 'VIP' ? 'VIP All-Access' : 'Standard'} color={reg.ticketTier === 'VIP' ? '#f59e0b' : '#CCFF00'} />
             </div>
           </div>
 
@@ -497,7 +513,7 @@ export default function RegistrationDetailPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Category" value={CATEGORY_LABELS[reg.category] || reg.category} />
-              <Field label="Tournament Interest" value={reg.tournamentInterest ? '✓ Yes' : '✗ No'} color={reg.tournamentInterest ? '#CCFF00' : '#999999'} />
+              <Field label="Tournament Interest" value={reg.tournamentInterest ? 'Yes' : 'No'} color={reg.tournamentInterest ? '#CCFF00' : '#999999'} />
               <Field label="Team Name" value={reg.teamName || '—'} />
               {reg.squadDetails && (
                 <div className="sm:col-span-2">
@@ -596,10 +612,10 @@ export default function RegistrationDetailPage() {
                 }`}
               >
                 {reg.status === 'CONFIRMED'
-                  ? '✓ VERIFIED & APPROVED'
+                  ? 'VERIFIED & APPROVED'
                   : reg.status === 'REJECTED'
-                  ? '✗ REJECTED'
-                  : '⏳ PENDING ADMIN REVIEW'}
+                  ? 'REJECTED'
+                  : 'PENDING ADMIN REVIEW'}
               </span>
             </div>
 
@@ -698,18 +714,32 @@ export default function RegistrationDetailPage() {
                 <button
                   onClick={() => updateStatus('CONFIRMED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-emerald-500 text-black font-heading"
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-emerald-500 text-black font-heading flex items-center justify-center gap-2"
                 >
-                  {actionLoading === 'CONFIRMED' ? 'Processing...' : '✓ Set Confirmed'}
+                  {actionLoading === 'CONFIRMED' ? (
+                    'Processing...'
+                  ) : (
+                    <>
+                      <CheckMarkIcon className="w-4 h-4 stroke-[2.5]" />
+                      <span>Set Confirmed</span>
+                    </>
+                  )}
                 </button>
               )}
               {reg.status !== 'REJECTED' && (
                 <button
                   onClick={() => updateStatus('REJECTED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-red-600 text-white font-heading"
+                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-red-600 text-white font-heading flex items-center justify-center gap-2"
                 >
-                  {actionLoading === 'REJECTED' ? 'Processing...' : '✗ Set Rejected'}
+                  {actionLoading === 'REJECTED' ? (
+                    'Processing...'
+                  ) : (
+                    <>
+                      <XMarkIcon className="w-4 h-4 stroke-[2.5]" />
+                      <span>Set Rejected</span>
+                    </>
+                  )}
                 </button>
               )}
               {reg.status !== 'WAITLISTED' && (
@@ -718,7 +748,7 @@ export default function RegistrationDetailPage() {
                   disabled={!!actionLoading}
                   className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase border cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 border-blue-500 text-blue-400 font-heading"
                 >
-                  {actionLoading === 'WAITLISTED' ? 'Processing...' : '⏳ Set Waitlisted'}
+                  {actionLoading === 'WAITLISTED' ? 'Processing...' : 'Set Waitlisted'}
                 </button>
               )}
             </div>

@@ -73,11 +73,11 @@ export default function AdminTeamsPage() {
 
   const copyRoster = (team: TeamGroup) => {
     const lines = [
-      `🎮 PUBG MOBILE ETHIOPIA - SQUAD ROSTER`,
-      `🏆 TEAM: ${team.teamName.toUpperCase()}`,
-      `👥 PLAYERS (${team.memberCount}/4):`,
+      `PUBG MOBILE ETHIOPIA - SQUAD ROSTER`,
+      `TEAM: ${team.teamName.toUpperCase()}`,
+      `PLAYERS (${team.memberCount}/4):`,
       ...team.members.map((m, idx) => `  ${idx + 1}. ${m.inGameName} (UID: ${m.pubgUid}) - ${m.ticketTier}`),
-      `📞 CONTACT: ${team.members[0]?.phoneNumber || 'N/A'}`,
+      `CONTACT: ${team.members[0]?.phoneNumber || 'N/A'}`,
     ];
     navigator.clipboard.writeText(lines.join('\n'));
     setCopiedTeam(team.teamName);

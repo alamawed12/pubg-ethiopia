@@ -6,6 +6,17 @@ import { Select, SelectOption } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { participationSchema, ParticipationCategory } from '@/lib/validation';
+import {
+  ShieldSecurityIcon,
+  TrophyIcon,
+  MicrophoneIcon,
+  UsersIcon,
+  CameraIcon,
+  FirstAidIcon,
+  StarVipIcon,
+  ClipboardListIcon,
+  CheckMarkIcon,
+} from '@/components/ui/TacticalIcons';
 
 export interface StepParticipationProps {
   formData: {
@@ -49,7 +60,7 @@ const CATEGORY_OPTIONS: SelectOption[] = [
     value: 'content_creator',
     label: 'Content Creator / Media / Streamer',
     description: 'YouTube, TikTok, Telegram creators. Includes Free VIP pass upon approval.',
-    badge: '⭐ FREE VIP',
+    badge: 'FREE VIP',
   },
   {
     value: 'volunteer',
@@ -60,12 +71,42 @@ const CATEGORY_OPTIONS: SelectOption[] = [
 ];
 
 const VOLUNTEER_ROLES = [
-  { id: 'gate_security', label: '🛡️ Gate Security & Registration Check-in', desc: 'Scan QR passes & verify attendee IDs at entrance' },
-  { id: 'tournament_admin', label: '🏆 Tournament Admin / Match Referee', desc: 'Manage custom lobbies, record scores & enforce match rules' },
-  { id: 'stage_av', label: '🎙️ Stage Setup & Audio/Visual Crew', desc: 'Help with screens, sound equipment, stage lighting & cables' },
-  { id: 'crowd_usher', label: '👥 Crowd Management & Guest Ushering', desc: 'Guide guests to seating areas and assist attendees' },
-  { id: 'media_photo', label: '📸 Media, Photography & Content Assistant', desc: 'Take photos, record event highlights & interview players' },
-  { id: 'logistics_medic', label: '🚑 Logistics & Refreshments Support', desc: 'Distribute badges, manage water/snacks, assist organizing team' },
+  {
+    id: 'gate_security',
+    label: 'Gate Security & Registration Check-in',
+    desc: 'Scan QR passes & verify attendee IDs at entrance',
+    Icon: ShieldSecurityIcon,
+  },
+  {
+    id: 'tournament_admin',
+    label: 'Tournament Admin / Match Referee',
+    desc: 'Manage custom lobbies, record scores & enforce match rules',
+    Icon: TrophyIcon,
+  },
+  {
+    id: 'stage_av',
+    label: 'Stage Setup & Audio/Visual Crew',
+    desc: 'Help with screens, sound equipment, stage lighting & cables',
+    Icon: MicrophoneIcon,
+  },
+  {
+    id: 'crowd_usher',
+    label: 'Crowd Management & Guest Ushering',
+    desc: 'Guide guests to seating areas and assist attendees',
+    Icon: UsersIcon,
+  },
+  {
+    id: 'media_photo',
+    label: 'Media, Photography & Content Assistant',
+    desc: 'Take photos, record event highlights & interview players',
+    Icon: CameraIcon,
+  },
+  {
+    id: 'logistics_medic',
+    label: 'Logistics & Refreshments Support',
+    desc: 'Distribute badges, manage water/snacks, assist organizing team',
+    Icon: FirstAidIcon,
+  },
 ];
 
 const CREATOR_PLATFORMS = ['TikTok', 'YouTube', 'Telegram', 'Instagram', 'Twitch', 'Kick', 'Facebook Gaming'];
@@ -113,7 +154,6 @@ export function StepParticipation({
         updateField('volunteerRole', VOLUNTEER_ROLES[0].id);
       }
     } else if (newCategory === 'content_creator') {
-      // Content Creators automatically get complimentary VIP!
       updateField('ticketTier', 'VIP');
       updateField('vipPrice', 0);
       if (!formData.socialMediaPlatform) {
@@ -148,7 +188,6 @@ export function StepParticipation({
       return;
     }
 
-    // Additional validations for Creator & Volunteer
     if (isCreator && !formData.socialMediaLink?.trim()) {
       setErrors((prev) => ({ ...prev, socialMediaLink: 'Please provide your channel link or handle.' }));
       return;
@@ -225,6 +264,7 @@ export function StepParticipation({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {VOLUNTEER_ROLES.map((role) => {
                     const isSelected = formData.volunteerRole === role.id;
+                    const RoleIcon = role.Icon;
                     return (
                       <div
                         key={role.id}
@@ -235,11 +275,14 @@ export function StepParticipation({
                             : 'border-white/10 bg-[#141414] hover:border-white/25'
                         }`}
                       >
-                        <div className="font-semibold text-xs text-white flex items-center justify-between mb-1">
-                          <span>{role.label}</span>
-                          {isSelected && <span className="text-[var(--color-lime,#CCFF00)] font-mono text-xs">✓</span>}
+                        <div className="font-semibold text-xs text-white flex items-center justify-between mb-1.5">
+                          <span className="flex items-center gap-2">
+                            <RoleIcon className={`w-4 h-4 ${isSelected ? 'text-[var(--color-lime,#CCFF00)]' : 'text-neutral-400'}`} />
+                            {role.label}
+                          </span>
+                          {isSelected && <CheckMarkIcon className="w-3.5 h-3.5 text-[var(--color-lime,#CCFF00)] stroke-[3]" />}
                         </div>
-                        <p className="text-[11px] text-[#888888] font-mono leading-tight">{role.desc}</p>
+                        <p className="text-[11px] text-[#888888] font-mono leading-tight pl-6">{role.desc}</p>
                       </div>
                     );
                   })}
@@ -262,24 +305,25 @@ export function StepParticipation({
 
               {/* Dedicated Perks & Duties Card */}
               <div className="rounded-lg border border-white/10 bg-black/50 p-4 space-y-2">
-                <h4 className="font-mono text-xs uppercase tracking-wider text-white font-bold flex items-center gap-1.5">
-                  <span>📋</span> WHAT HAPPENS IF YOU ARE ACCEPTED AS EVENT CREW
+                <h4 className="font-mono text-xs uppercase tracking-wider text-white font-bold flex items-center gap-2">
+                  <ClipboardListIcon className="w-4 h-4 text-[var(--color-lime,#CCFF00)]" />
+                  WHAT HAPPENS IF YOU ARE ACCEPTED AS EVENT CREW
                 </h4>
                 <ul className="text-xs text-[#999999] space-y-1.5 font-mono">
                   <li className="flex items-start gap-2">
-                    <span className="text-[var(--color-lime,#CCFF00)] font-bold">✓</span>
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-[var(--color-lime,#CCFF00)] shrink-0 mt-0.5 stroke-[2.5]" />
                     <span><strong>100% Free Event Admission:</strong> No registration or ticket fee required.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[var(--color-lime,#CCFF00)] font-bold">✓</span>
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-[var(--color-lime,#CCFF00)] shrink-0 mt-0.5 stroke-[2.5]" />
                     <span><strong>Official Crew Gear:</strong> Official PUBG Mobile Ethiopia Staff Lanyard &amp; Crew Badge.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[var(--color-lime,#CCFF00)] font-bold">✓</span>
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-[var(--color-lime,#CCFF00)] shrink-0 mt-0.5 stroke-[2.5]" />
                     <span><strong>Complimentary Food &amp; Drinks:</strong> Meals and refreshments provided on event day.</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[var(--color-lime,#CCFF00)] font-bold">✓</span>
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-[var(--color-lime,#CCFF00)] shrink-0 mt-0.5 stroke-[2.5]" />
                     <span><strong>Volunteer Certificate:</strong> Official Certificate of Contribution for your CV/portfolio.</span>
                   </li>
                 </ul>
@@ -300,8 +344,10 @@ export function StepParticipation({
             >
               {/* Creator VIP Banner */}
               <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-amber-400 text-lg">⭐</span>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-lg bg-amber-400/20 text-amber-400 border border-amber-400/30">
+                    <StarVipIcon className="w-5 h-5" />
+                  </div>
                   <div>
                     <h3 className="font-heading text-base font-bold text-amber-300 uppercase tracking-wider">
                       COMPLIMENTARY CREATOR VIP PASS
@@ -364,21 +410,26 @@ export function StepParticipation({
 
               {/* Creator VIP Perks Card */}
               <div className="rounded-lg border border-amber-500/30 bg-black/60 p-4 space-y-2">
-                <h4 className="font-mono text-xs uppercase tracking-wider text-amber-300 font-bold flex items-center gap-1.5">
-                  <span>★</span> YOUR CREATOR VIP PRIVILEGES INCLUDE:
+                <h4 className="font-mono text-xs uppercase tracking-wider text-amber-300 font-bold flex items-center gap-2">
+                  <StarVipIcon className="w-4 h-4 text-amber-400" />
+                  YOUR CREATOR VIP PRIVILEGES INCLUDE:
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#cccccc] font-mono">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400">✓</span> VIP Lounge &amp; Streamer Zone Access
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-amber-400 shrink-0 stroke-[2.5]" />
+                    <span>VIP Lounge &amp; Streamer Zone Access</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400">✓</span> Priority Front-Row Arena Seating
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-amber-400 shrink-0 stroke-[2.5]" />
+                    <span>Priority Front-Row Arena Seating</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400">✓</span> Fast-Track VIP Check-In Queue
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-amber-400 shrink-0 stroke-[2.5]" />
+                    <span>Fast-Track VIP Check-In Queue</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-amber-400">✓</span> Official Creator Assembly Lanyard
+                    <CheckMarkIcon className="w-3.5 h-3.5 text-amber-400 shrink-0 stroke-[2.5]" />
+                    <span>Official Creator Assembly Lanyard</span>
                   </div>
                 </div>
               </div>
@@ -408,10 +459,19 @@ export function StepParticipation({
                     FREE
                   </span>
                 </div>
-                <ul className="text-[11px] text-[#999999] space-y-1 font-mono">
-                  <li>✓ General Event Admission</li>
-                  <li>✓ Tournament Spectator Area</li>
-                  <li>✓ Digital QR Event Pass</li>
+                <ul className="text-[11px] text-[#999999] space-y-1.5 font-mono">
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#CCFF00] shrink-0 stroke-[2.5]" />
+                    <span>General Event Admission</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#CCFF00] shrink-0 stroke-[2.5]" />
+                    <span>Tournament Spectator Area</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#CCFF00] shrink-0 stroke-[2.5]" />
+                    <span>Digital QR Event Pass</span>
+                  </li>
                 </ul>
               </div>
 
@@ -426,17 +486,30 @@ export function StepParticipation({
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-heading font-black text-base uppercase text-[#f59e0b] flex items-center gap-1.5">
-                    <span>⭐</span> VIP ACCESS PASS
+                    <StarVipIcon className="w-4 h-4 text-[#f59e0b]" />
+                    VIP ACCESS PASS
                   </span>
                   <span className="font-mono text-xs font-bold text-[#f59e0b] px-2 py-0.5 rounded bg-black/40 border border-[#f59e0b]/40">
                     {activeVipPrice.toLocaleString()} ETB
                   </span>
                 </div>
-                <ul className="text-[11px] text-[#cccccc] space-y-1 font-mono">
-                  <li>★ Priority Front-Row Arena Seating</li>
-                  <li>★ Fast-Track VIP Check-In Queue</li>
-                  <li>★ Official Assembly Lanyard &amp; Badge</li>
-                  <li>★ Pro Player &amp; Creator Lounge Access</li>
+                <ul className="text-[11px] text-[#cccccc] space-y-1.5 font-mono">
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#f59e0b] shrink-0 stroke-[2.5]" />
+                    <span>Priority Front-Row Arena Seating</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#f59e0b] shrink-0 stroke-[2.5]" />
+                    <span>Fast-Track VIP Check-In Queue</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#f59e0b] shrink-0 stroke-[2.5]" />
+                    <span>Official Assembly Lanyard &amp; Badge</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3 h-3 text-[#f59e0b] shrink-0 stroke-[2.5]" />
+                    <span>Pro Player &amp; Creator Lounge Access</span>
+                  </li>
                 </ul>
               </div>
             </div>

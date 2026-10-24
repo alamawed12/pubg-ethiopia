@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { CheckedInDeviceIcon, StarVipIcon, CheckCircleIcon, AlertTriangleIcon, XCircleIcon } from '@/components/ui/TacticalIcons';
 
 interface RegistrationDetail {
   id: string;
@@ -275,7 +276,7 @@ export default function CheckInPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <span className="px-2.5 py-0.5 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-mono text-[10px] tracking-widest uppercase">
-            ⭐ OFFICIAL PUBG MOBILE TEAM ADMISSION SYSTEM
+            OFFICIAL PUBG MOBILE TEAM ADMISSION SYSTEM
           </span>
         </div>
         <h1
@@ -292,7 +293,9 @@ export default function CheckInPage() {
       {/* Native Android APK Download Banner */}
       <div className="p-4 rounded-xl border border-[#CCFF00]/30 bg-[#0d140d] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">📱</span>
+          <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00]">
+            <CheckedInDeviceIcon className="w-5 h-5" />
+          </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-heading font-bold text-sm text-white uppercase tracking-wider">
@@ -345,7 +348,7 @@ export default function CheckInPage() {
               >
                 {availableCameras.map((cam) => (
                   <option key={cam.id} value={cam.id}>
-                    📷 {cam.label}
+                    {cam.label}
                   </option>
                 ))}
               </select>
@@ -357,7 +360,7 @@ export default function CheckInPage() {
               disabled={isUploadingPhoto}
               className="px-4 py-2.5 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 text-xs font-mono text-white tracking-wider uppercase transition-colors cursor-pointer"
             >
-              {isUploadingPhoto ? '⏳ SCANNING PHOTO...' : '📁 SCAN FROM PHOTO'}
+              {isUploadingPhoto ? 'SCANNING PHOTO...' : 'SCAN FROM PHOTO'}
             </button>
             <input
               ref={fileInputRef}
@@ -376,7 +379,7 @@ export default function CheckInPage() {
                   : 'bg-[#CCFF00] text-[#050505] hover:bg-[#b8e600] shadow-[0_0_20px_rgba(204,255,0,0.35)]'
               }`}
             >
-              {scanning ? '⏹ STOP CAMERA' : '📷 OPEN CAMERA SCANNER'}
+              {scanning ? 'STOP CAMERA' : 'OPEN CAMERA SCANNER'}
             </button>
           </div>
         </div>
@@ -417,7 +420,7 @@ export default function CheckInPage() {
         </div>
 
         <p className="text-center text-[11px] font-mono text-[#666666] mt-3">
-          💡 Hold QR code 15–25cm away. If glare or focus is an issue, tap &quot;Scan From Photo&quot; or switch camera lens above.
+          Hold QR code 15–25cm away. If glare or focus is an issue, tap &quot;Scan From Photo&quot; or switch camera lens above.
         </p>
       </div>
 
@@ -472,9 +475,15 @@ export default function CheckInPage() {
         >
           {/* Header Banner */}
           <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-white/10">
-            <span className="text-3xl">
-              {result.status === 'SUCCESS' ? '✅' : result.status === 'ALREADY_CHECKED_IN' ? '⚠️' : '❌'}
-            </span>
+            <div className="shrink-0">
+              {result.status === 'SUCCESS' ? (
+                <CheckCircleIcon className="w-8 h-8 text-[#CCFF00]" />
+              ) : result.status === 'ALREADY_CHECKED_IN' ? (
+                <AlertTriangleIcon className="w-8 h-8 text-amber-400" />
+              ) : (
+                <XCircleIcon className="w-8 h-8 text-red-400" />
+              )}
+            </div>
             <div>
               <h2
                 className={`text-xl sm:text-2xl font-black uppercase tracking-wider ${
@@ -512,7 +521,8 @@ export default function CheckInPage() {
                 <div>
                   {result.registration.ticketTier === 'VIP' ? (
                     <div className="px-4 py-2 rounded-lg bg-amber-500/20 border-2 border-amber-500 text-amber-400 font-black font-heading text-sm tracking-widest uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] flex items-center gap-2">
-                      <span>⭐</span> VIP ALL-ACCESS PASS
+                      <StarVipIcon className="w-4 h-4 text-amber-400" />
+                      <span>VIP ALL-ACCESS PASS</span>
                     </div>
                   ) : (
                     <div className="px-3.5 py-1.5 rounded-lg bg-white/10 border border-white/20 text-[#cccccc] font-bold font-heading text-xs tracking-wider uppercase">
@@ -562,8 +572,8 @@ export default function CheckInPage() {
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
                   {result.registration.ticketTier === 'VIP'
-                    ? '⭐ VIP ALL-ACCESS PASS TICKET'
-                    : '🎫 STANDARD ASSEMBLY PASS TICKET'}
+                    ? 'VIP ALL-ACCESS PASS TICKET'
+                    : 'STANDARD ASSEMBLY PASS TICKET'}
                 </div>
                 <div className="flex items-center justify-center gap-3 mt-2 font-mono text-xs text-[#cccccc]">
                   <span>CATEGORY: <strong className="text-white uppercase">{result.registration.category.replace('_', ' ')}</strong></span>

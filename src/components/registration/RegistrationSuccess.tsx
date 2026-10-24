@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { EventPass } from './EventPass';
 import { Button } from '@/components/ui/Button';
+import { ShieldSecurityIcon } from '@/components/ui/TacticalIcons';
 
 export interface RegistrationSuccessData {
   referenceId: string;
@@ -214,8 +215,9 @@ export function RegistrationSuccess({ registrationData }: RegistrationSuccessPro
 
           {/* Verification Protocol Notice */}
           <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 font-body text-xs text-amber-200/90 leading-relaxed">
-            <strong className="text-amber-400 block font-mono text-[11px] uppercase mb-1">
-              🛡️ AUTOMATIC VERIFICATION IN EFFECT
+            <strong className="text-amber-400 font-mono text-[11px] uppercase mb-1 flex items-center gap-1.5">
+              <ShieldSecurityIcon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>AUTOMATIC VERIFICATION IN EFFECT</span>
             </strong>
             When our phone receives the Telebirr or Awash Bank confirmation SMS, this page will update automatically and reveal your <strong>Horizontal Luxury VIP Ticket</strong> with QR credentials.
           </div>

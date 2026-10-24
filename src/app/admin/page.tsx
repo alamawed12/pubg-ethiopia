@@ -1,5 +1,21 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import {
+  UsersIcon,
+  ClockPendingIcon,
+  CheckCircleIcon,
+  CheckedInDeviceIcon,
+  XCircleIcon,
+  ClipboardListIcon,
+  CreditCardIcon,
+  TrophyIcon,
+  ShieldSecurityIcon,
+  QrScannerIcon,
+  SettingsCogIcon,
+  EmptyInboxIcon,
+  StarVipIcon,
+  AlertTriangleIcon,
+} from '@/components/ui/TacticalIcons';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,12 +88,12 @@ export default async function AdminDashboardPage() {
   const capacityPct = Math.round((total / capacity) * 100);
 
   const stats = [
-    { label: 'Total Registered', value: total, color: '#CCFF00', icon: '📊' },
-    { label: 'Pending Review', value: pending, color: '#f59e0b', icon: '⏳' },
-    { label: 'Confirmed', value: confirmed, color: '#22c55e', icon: '✓' },
-    { label: 'Checked In', value: checkedIn, color: '#CCFF00', icon: '📱' },
-    { label: 'Rejected', value: rejected, color: '#ef4444', icon: '✗' },
-    { label: 'Waitlisted', value: waitlisted, color: '#3b82f6', icon: '📋' },
+    { label: 'Total Registered', value: total, color: '#CCFF00', Icon: UsersIcon },
+    { label: 'Pending Review', value: pending, color: '#f59e0b', Icon: ClockPendingIcon },
+    { label: 'Confirmed', value: confirmed, color: '#22c55e', Icon: CheckCircleIcon },
+    { label: 'Checked In', value: checkedIn, color: '#CCFF00', Icon: CheckedInDeviceIcon },
+    { label: 'Rejected', value: rejected, color: '#ef4444', Icon: XCircleIcon },
+    { label: 'Waitlisted', value: waitlisted, color: '#3b82f6', Icon: ClipboardListIcon },
   ];
 
   return (
@@ -105,7 +121,9 @@ export default async function AdminDashboardPage() {
       {pendingVip > 0 && (
         <div className="mb-8 p-4 sm:p-5 rounded-xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_0_25px_rgba(245,158,11,0.25)]">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">⭐</span>
+            <div className="p-2.5 rounded-xl bg-amber-400/20 text-amber-400 border border-amber-400/30">
+              <StarVipIcon className="w-6 h-6" />
+            </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-heading font-black text-lg text-white uppercase tracking-wider">
@@ -139,7 +157,16 @@ export default async function AdminDashboardPage() {
             style={{ backgroundColor: '#0a0a0a', borderColor: `${s.color}22` }}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-lg">{s.icon}</span>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center border"
+                style={{
+                  backgroundColor: `${s.color}15`,
+                  borderColor: `${s.color}35`,
+                  color: s.color,
+                }}
+              >
+                <s.Icon className="w-4 h-4" />
+              </div>
               <span
                 className="text-3xl sm:text-4xl font-black"
                 style={{ fontFamily: 'var(--font-heading)', color: s.color }}
@@ -161,7 +188,9 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-amber-400/50 bg-[#14120a] group"
           style={{ borderColor: 'rgba(251,191,36,0.25)' }}
         >
-          <span className="text-xl">💳</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-amber-300 shrink-0 group-hover:scale-105 transition-transform">
+            <CreditCardIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase text-amber-300" style={{ fontFamily: 'var(--font-heading)' }}>VIP Payments</p>
             <p className="text-[9px] text-[#888888]">Receipt clearing</p>
@@ -172,10 +201,12 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <span className="text-xl">📋</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#CCFF00]/10 border border-[#CCFF00]/25 text-[#CCFF00] shrink-0 group-hover:scale-105 transition-transform">
+            <ClipboardListIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Registrations</p>
-            <p className="text-[9px]" style={{ color: '#666666' }}>Players & passes</p>
+            <p className="text-[9px]" style={{ color: '#666666' }}>Players &amp; passes</p>
           </div>
         </Link>
         <Link
@@ -183,7 +214,9 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <span className="text-xl">🏆</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-400/10 border border-amber-400/25 text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+            <TrophyIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Squads &amp; Teams</p>
             <p className="text-[9px]" style={{ color: '#666666' }}>Esports rosters</p>
@@ -194,7 +227,9 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <span className="text-xl">🛡️</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-400/10 border border-cyan-400/25 text-cyan-400 shrink-0 group-hover:scale-105 transition-transform">
+            <ShieldSecurityIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Gate Monitor</p>
             <p className="text-[9px]" style={{ color: '#666666' }}>Live check-ins</p>
@@ -205,7 +240,9 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <span className="text-xl">📱</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#CCFF00]/10 border border-[#CCFF00]/25 text-[#CCFF00] shrink-0 group-hover:scale-105 transition-transform">
+            <QrScannerIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Scanner</p>
             <p className="text-[9px]" style={{ color: '#666666' }}>Scan QR tickets</p>
@@ -216,7 +253,9 @@ export default async function AdminDashboardPage() {
           className="flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 hover:border-[#CCFF00]/30 group"
           style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
         >
-          <span className="text-xl">⚙️</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-neutral-400/10 border border-neutral-400/25 text-neutral-300 shrink-0 group-hover:scale-105 transition-transform">
+            <SettingsCogIcon className="w-4 h-4" />
+          </div>
           <div>
             <p className="text-xs font-bold uppercase" style={{ color: '#ffffff', fontFamily: 'var(--font-heading)' }}>Settings</p>
             <p className="text-[9px]" style={{ color: '#666666' }}>Capacity &amp; VIP</p>
@@ -261,8 +300,9 @@ export default async function AdminDashboardPage() {
           />
         </div>
         {capacityPct > 90 && (
-          <p className="mt-2 text-xs" style={{ color: '#ef4444', fontFamily: 'var(--font-mono)' }}>
-            ⚠ APPROACHING MAXIMUM CAPACITY
+          <p className="mt-2 text-xs flex items-center gap-1.5" style={{ color: '#ef4444', fontFamily: 'var(--font-mono)' }}>
+            <AlertTriangleIcon className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <span>APPROACHING MAXIMUM CAPACITY</span>
           </p>
         )}
       </div>
@@ -316,7 +356,9 @@ export default async function AdminDashboardPage() {
               {recent.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center" style={{ color: '#666666' }}>
-                    <div className="text-3xl mb-2">📭</div>
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-neutral-500 mx-auto mb-3">
+                      <EmptyInboxIcon className="w-6 h-6 text-neutral-400" />
+                    </div>
                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>No registrations yet</p>
                   </td>
                 </tr>

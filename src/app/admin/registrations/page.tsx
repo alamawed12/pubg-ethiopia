@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { RegistrationsTableClient } from '@/components/admin/RegistrationsTableClient';
+import { StarVipIcon } from '@/components/ui/TacticalIcons';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -101,7 +102,7 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
             href="/admin/registrations?tier=VIP&status=PENDING"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border-2 border-amber-500/60 text-amber-300 font-heading font-black text-xs uppercase tracking-wider hover:bg-amber-500/30 transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)] animate-pulse"
           >
-            <span>⭐</span>
+            <StarVipIcon className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{pendingVipCount} VIP PAYMENT{pendingVipCount > 1 ? 'S' : ''} AWAITING APPROVAL</span>
           </Link>
         )}
@@ -125,7 +126,7 @@ export default async function RegistrationsPage({ searchParams }: PageProps) {
           style={{ backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.1)' }}
         >
           <option value="">All Tiers</option>
-          <option value="VIP">★ VIP Passes Only</option>
+          <option value="VIP">VIP Passes Only</option>
           <option value="STANDARD">Standard Passes Only</option>
         </select>
 

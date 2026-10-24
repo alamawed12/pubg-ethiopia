@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { CATEGORY_LABELS, ParticipationCategory } from '@/lib/validation';
+import { StarVipIcon, CheckMarkIcon } from '@/components/ui/TacticalIcons';
 
 export interface RegistrationReviewData {
   fullName: string;
@@ -45,12 +46,12 @@ export interface StepVerificationProps {
 }
 
 const VOLUNTEER_ROLE_LABELS: Record<string, string> = {
-  gate_security: '🛡️ Gate Security & Registration Check-in',
-  tournament_admin: '🏆 Tournament Admin / Match Referee',
-  stage_av: '🎙️ Stage Setup & Audio/Visual Crew',
-  crowd_usher: '👥 Crowd Management & Guest Ushering',
-  media_photo: '📸 Media, Photography & Content Assistant',
-  logistics_medic: '🚑 Logistics & Refreshments Support',
+  gate_security: 'Gate Security & Registration Check-in',
+  tournament_admin: 'Tournament Admin / Match Referee',
+  stage_av: 'Stage Setup & Audio/Visual Crew',
+  crowd_usher: 'Crowd Management & Guest Ushering',
+  media_photo: 'Media, Photography & Content Assistant',
+  logistics_medic: 'Logistics & Refreshments Support',
 };
 
 export function StepVerification({
@@ -206,11 +207,13 @@ export function StepVerification({
                 </span>
               ) : isCreator ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-300 font-bold font-mono text-xs border border-amber-500/40">
-                  ⭐ COMPLIMENTARY CREATOR VIP (FREE)
+                  <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
+                  COMPLIMENTARY CREATOR VIP (FREE)
                 </span>
               ) : isVip ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-mono text-xs border border-amber-500/40">
-                  ★ VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
+                  <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
+                  VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#CCFF00]/10 text-[#CCFF00] font-bold font-mono text-xs border border-[#CCFF00]/30">
@@ -299,7 +302,10 @@ export function StepVerification({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={formData.idFrontImage} alt="Front of ID" className="w-full h-24 object-contain p-1" />
                 <div className="px-2 py-1 bg-[var(--color-charcoal,#111111)] text-center">
-                  <span className="font-mono text-[9px] text-[var(--color-lime,#CCFF00)] uppercase">Front ✓</span>
+                  <span className="font-mono text-[9px] text-[var(--color-lime,#CCFF00)] uppercase flex items-center justify-center gap-1">
+                    <span>Front</span>
+                    <CheckMarkIcon className="w-2.5 h-2.5 stroke-[3]" />
+                  </span>
                 </div>
               </div>
             ) : (
@@ -312,7 +318,10 @@ export function StepVerification({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={formData.idBackImage} alt="Back of ID" className="w-full h-24 object-contain p-1" />
                 <div className="px-2 py-1 bg-[var(--color-charcoal,#111111)] text-center">
-                  <span className="font-mono text-[9px] text-[var(--color-lime,#CCFF00)] uppercase">Back ✓</span>
+                  <span className="font-mono text-[9px] text-[var(--color-lime,#CCFF00)] uppercase flex items-center justify-center gap-1">
+                    <span>Back</span>
+                    <CheckMarkIcon className="w-2.5 h-2.5 stroke-[3]" />
+                  </span>
                 </div>
               </div>
             ) : (
@@ -350,7 +359,10 @@ export function StepVerification({
                   className="w-16 h-16 rounded-full object-cover border border-[#CCFF00]/40 shrink-0"
                 />
                 <div className="text-xs font-mono">
-                  <span className="text-[#CCFF00] font-bold block">✓ PHOTO ATTACHED</span>
+                  <span className="text-[#CCFF00] font-bold flex items-center gap-1.5">
+                    <CheckMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>PHOTO ATTACHED</span>
+                  </span>
                   <span className="text-[#888888] text-[11px]">
                     Ready for Admin Verification
                   </span>
@@ -364,7 +376,7 @@ export function StepVerification({
 
             <div className="rounded-lg border border-white/10 bg-black/40 p-3 flex flex-col justify-center text-xs font-mono">
               <span className="text-white font-bold block mb-1">
-                ⏳ ADMIN APPROVAL QUEUE
+                ADMIN APPROVAL QUEUE
               </span>
               <span className="text-[#888888] text-[11px] leading-relaxed">
                 Your face photo and ID card have been recorded. The event administration team will review your application and confirm your pass.
@@ -465,7 +477,7 @@ export function StepVerification({
           disabled={isSubmitting}
           className="w-full sm:w-auto min-w-[220px]"
         >
-          {isSubmitting ? 'SUBMITTING...' : 'COMPLETE REGISTRATION ✓'}
+          {isSubmitting ? 'SUBMITTING...' : 'COMPLETE REGISTRATION'}
         </Button>
       </div>
     </motion.form>

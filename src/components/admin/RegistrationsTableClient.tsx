@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import {
+  CheckMarkIcon,
+  XMarkIcon,
+  StarVipIcon,
+  ClockPendingIcon,
+  AlertTriangleIcon,
+} from '@/components/ui/TacticalIcons';
 
 export interface RegistrationRow {
   id: string;
@@ -218,7 +225,7 @@ export function RegistrationsTableClient({
               {isBatchLoading ? (
                 <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
               ) : (
-                <span>✓</span>
+                <CheckMarkIcon className="w-3.5 h-3.5 stroke-[3]" />
               )}
               <span>ACCEPT SELECTED ({selectedIds.length})</span>
             </button>
@@ -233,7 +240,7 @@ export function RegistrationsTableClient({
               {isBatchLoading ? (
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <span>✗</span>
+                <XMarkIcon className="w-3.5 h-3.5 stroke-[3]" />
               )}
               <span>DECLINE SELECTED ({selectedIds.length})</span>
             </button>
@@ -263,9 +270,9 @@ export function RegistrationsTableClient({
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-white/60 hover:text-white font-bold ml-2"
+            className="text-white/60 hover:text-white p-1 ml-2 cursor-pointer"
           >
-            ✕
+            <XMarkIcon className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
@@ -352,7 +359,8 @@ export function RegistrationsTableClient({
                         <div className="font-semibold text-white">{r.fullName}</div>
                         {r.faceMatchScore && r.faceMatchScore >= 70 ? (
                           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 mt-0.5">
-                            ✓ KYC Match {r.faceMatchScore}%
+                            <CheckMarkIcon className="w-3 h-3 stroke-[3]" />
+                            <span>KYC Match {r.faceMatchScore}%</span>
                           </span>
                         ) : null}
                       </td>
@@ -367,7 +375,8 @@ export function RegistrationsTableClient({
                       <td className="px-4 py-3">
                         {isVip ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                            ★ VIP
+                            <StarVipIcon className="w-3 h-3" />
+                            <span>VIP</span>
                           </span>
                         ) : (
                           <span className="text-xs font-mono text-[#666666]">STD</span>
@@ -379,16 +388,19 @@ export function RegistrationsTableClient({
                         {isVip ? (
                           <div className="space-y-1">
                             {r.paymentStatus === 'APPROVED' ? (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                                ✓ PAID & APPROVED
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                                <CheckMarkIcon className="w-3 h-3 stroke-[2.5]" />
+                                <span>PAID &amp; APPROVED</span>
                               </span>
                             ) : r.paymentStatus === 'REJECTED' ? (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40">
-                                ✗ PAYMENT REJECTED
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40">
+                                <XMarkIcon className="w-3 h-3 stroke-[2.5]" />
+                                <span>PAYMENT REJECTED</span>
                               </span>
                             ) : (
-                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/50">
-                                ⏳ APPROVAL REQUIRED
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/50">
+                                <ClockPendingIcon className="w-3 h-3" />
+                                <span>APPROVAL REQUIRED</span>
                               </span>
                             )}
 
@@ -505,7 +517,7 @@ export function RegistrationsTableClient({
                 {isClearing ? (
                   <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <span>⚠</span>
+                  <AlertTriangleIcon className="w-3.5 h-3.5" />
                 )}
                 <span>YES, PURGE EVERYTHING</span>
               </button>
