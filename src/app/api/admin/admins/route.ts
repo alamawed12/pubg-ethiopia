@@ -15,6 +15,15 @@ interface AdminSession {
   } | null;
 }
 
+// Known hardcoded accounts and their default passwords
+const KNOWN_PASSWORDS: Record<string, string> = {
+  'pmcaheadadmin@pubgmethiopia.et': 'pmcahead12',
+  'pmcaeventscanner@pubgmethiopia.et': 'pmcascan12',
+  'pubgmethiopia.et': 'pubget1213',
+  'admin@pubgmethiopia.et': 'pubget1213',
+  'admin@pubg-ethiopia.com': 'pubget1213',
+};
+
 // Helper to determine if the session user is Head Administrator
 function isUserHeadAdmin(session: AdminSession | null | undefined): boolean {
   if (!session?.user) return false;
@@ -28,7 +37,7 @@ function isUserHeadAdmin(session: AdminSession | null | undefined): boolean {
   );
 }
 
-// GET: List all registered administrators (Head Admin only)
+// GET: List all registered administrators with their viewable credentials (Head Admin only)
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -39,31 +48,53 @@ export async function GET() {
     if (!isUserHeadAdmin(session)) {
       return NextResponse.json(
         {
-          error: 'Forbidden: Only the Head Administrator has permission to view admin accounts.',
+          error: 'Forbidden: Only the Head Administrator has permission to view admin credentials.',
           isHeadAdmin: false,
         },
         { status: 403 }
       );
     }
 
-    const admins = await prisma.admin.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const [admins, passSettings] = await Promise.all([
+      prisma.admin.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      prisma.systemSetting.findMany({
+        where: {
+          key: { startsWith: 'admin_pass_' },
+        },
+      }),
+    ]);
+
+    const passMap = new Map<string, string>();
+    passSettings.forEach((s) => {
+      const email = s.key.replace(/^admin_pass_/, '').toLowerCase();
+      passMap.set(email, s.value);
+    });
+
+    const enrichedAdmins = admins.map((admin) => {
+      const lowerEmail = admin.email.toLowerCase();
+      const storedPass = passMap.get(lowerEmail) || KNOWN_PASSWORDS[lowerEmail] || null;
+      return {
+        ...admin,
+        password: storedPass,
+      };
     });
 
     return NextResponse.json({
       success: true,
       isHeadAdmin: true,
-      admins,
+      admins: enrichedAdmins,
     });
   } catch (error) {
     console.error('[ADMINS_GET_ERROR]', error);
@@ -119,7 +150,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hash the password
+    // Hash the password for NextAuth authentication
     const passwordHash = await bcrypt.hash(cleanPassword, 10);
 
     // Create the admin record in the database
@@ -139,6 +170,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Store assigned password so Head Admin can view/copy it anytime
+    await prisma.systemSetting.upsert({
+      where: { key: `admin_pass_${cleanEmail}` },
+      update: { value: cleanPassword },
+      create: { key: `admin_pass_${cleanEmail}`, value: cleanPassword },
+    });
+
     // Record audit log
     await prisma.auditLog.create({
       data: {
@@ -156,12 +194,110 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Admin account for ${createdAdmin.name} (${createdAdmin.email}) registered successfully! They can now log in at /admin/login.`,
-      admin: createdAdmin,
+      message: `Admin account for ${createdAdmin.name} (${createdAdmin.email}) registered successfully!`,
+      admin: {
+        ...createdAdmin,
+        password: cleanPassword,
+      },
     });
   } catch (error) {
     console.error('[ADMINS_POST_ERROR]', error);
     return NextResponse.json({ error: 'Failed to create administrator account' }, { status: 500 });
+  }
+}
+
+// PATCH: Update admin details, role, or reset password (Head Admin only)
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (!isUserHeadAdmin(session)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only the Head Administrator can update admin credentials.' },
+        { status: 403 }
+      );
+    }
+
+    const body = await req.json();
+    const { id, name, role, password } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing admin ID parameter.' }, { status: 400 });
+    }
+
+    const targetAdmin = await prisma.admin.findUnique({
+      where: { id },
+    });
+
+    if (!targetAdmin) {
+      return NextResponse.json({ error: 'Administrator account not found.' }, { status: 404 });
+    }
+
+    const updateData: { name?: string; role?: string; passwordHash?: string } = {};
+
+    if (name && String(name).trim()) {
+      updateData.name = String(name).trim();
+    }
+
+    if (role && ['admin', 'scanner', 'super_admin'].includes(role)) {
+      updateData.role = role;
+    }
+
+    let updatedPlainPass: string | null = null;
+    if (password && String(password).trim().length >= 6) {
+      const cleanPass = String(password).trim();
+      updateData.passwordHash = await bcrypt.hash(cleanPass, 10);
+      updatedPlainPass = cleanPass;
+
+      // Persist plaintext viewable copy for Head Admin
+      await prisma.systemSetting.upsert({
+        where: { key: `admin_pass_${targetAdmin.email.toLowerCase()}` },
+        update: { value: cleanPass },
+        create: { key: `admin_pass_${targetAdmin.email.toLowerCase()}`, value: cleanPass },
+      });
+    }
+
+    const updated = await prisma.admin.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        adminEmail: session.user.email || 'head-admin',
+        action: 'UPDATE_ADMIN_CREDENTIALS',
+        targetId: id,
+        details: JSON.stringify({
+          email: targetAdmin.email,
+          updatedFields: Object.keys(updateData),
+          hasNewPassword: Boolean(updatedPlainPass),
+          updatedBy: session.user.email,
+        }),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Administrator ${updated.name} credentials updated successfully.`,
+      admin: {
+        ...updated,
+        password: updatedPlainPass,
+      },
+    });
+  } catch (error) {
+    console.error('[ADMINS_PATCH_ERROR]', error);
+    return NextResponse.json({ error: 'Failed to update administrator credentials' }, { status: 500 });
   }
 }
 
@@ -217,6 +353,13 @@ export async function DELETE(req: NextRequest) {
     await prisma.admin.delete({
       where: { id: adminId },
     });
+
+    // Clean up stored password setting
+    try {
+      await prisma.systemSetting.delete({
+        where: { key: `admin_pass_${adminToDelete.email.toLowerCase()}` },
+      });
+    } catch {}
 
     await prisma.auditLog.create({
       data: {
