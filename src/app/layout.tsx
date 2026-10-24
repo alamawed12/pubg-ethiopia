@@ -33,7 +33,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "PUBG MOBILE Community Assembly — Ethiopia",
   description:
-    "An independently organized gathering of Ethiopia's PUBG MOBILE community. Players, teams, creators, and organizers — one battleground, one community.",
+    "Official PUBG MOBILE Community Assembly Ethiopia, officially organized and operated under PUBG MOBILE HQ. Players, teams, creators, and gaming enthusiasts — one battleground, one community.",
   keywords: [
     "PUBG MOBILE",
     "Ethiopia",

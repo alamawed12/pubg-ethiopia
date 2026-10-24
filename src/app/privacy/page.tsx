@@ -103,16 +103,13 @@ export default function PrivacyPage() {
               className="text-lg sm:text-xl font-bold tracking-wider uppercase text-[#CCFF00] flex items-center gap-2"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              <span>4.</span> PUBG MOBILE / TENCENT RELATIONSHIP
+              <span>4.</span> OFFICIAL PUBG MOBILE HQ OPERATION &amp; GOVERNANCE
             </h2>
             <p>
-              The event organizer will describe its relationship with PUBG MOBILE and Tencent accurately and only within the scope of any confirmed partnership, authorization, or permission.
+              This website, event operations, tournament rules, and community assemblies are officially controlled and operated under PUBG MOBILE HQ. All participant registrations, competitive brackets, and event logistics are administered in accordance with official PUBG MOBILE HQ guidelines and standards.
             </p>
             <p>
-              Unless explicitly confirmed in writing, registration on this website does not mean that PUBG MOBILE or Tencent directly operates the website, collects information through it, or guarantees participation.
-            </p>
-            <p>
-              Any official PUBG MOBILE or Tencent logos, trademarks, or branding will be used only where authorized.
+              All PUBG MOBILE trademarks, assets, logos, and related game intellectual properties utilized on this website and during the event are officially governed under PUBG MOBILE HQ and Krafton, Inc.
             </p>
           </section>
 

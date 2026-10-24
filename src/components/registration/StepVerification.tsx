@@ -131,39 +131,39 @@ export function StepVerification({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 Legal Full Name
               </span>
               <span className="font-semibold text-white">{formData.fullName}</span>
             </div>
 
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 In-Game Name (IGN)
               </span>
-              <span className="font-mono font-semibold text-[var(--color-lime,#CCFF00)]">
+              <span className="font-sans font-semibold text-[var(--color-lime,#CCFF00)]">
                 {formData.inGameName}
               </span>
             </div>
 
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 PUBG Mobile UID
               </span>
-              <span className="font-mono font-semibold text-white">{formData.pubgUid}</span>
+              <span className="font-sans font-semibold text-white">{formData.pubgUid}</span>
             </div>
 
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 Contact Phone
               </span>
-              <span className="font-mono text-white">
+              <span className="font-sans text-white">
                 {formData.countryCode} {formData.phoneNumber}
               </span>
             </div>
 
             <div className="sm:col-span-2">
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 City / Region
               </span>
               <span className="text-white">{formData.cityRegion}</span>
@@ -190,7 +190,7 @@ export function StepVerification({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 Category
               </span>
               <span className="font-semibold text-white">{categoryLabel}</span>
@@ -198,25 +198,25 @@ export function StepVerification({
 
             {/* Access Pass Tier */}
             <div>
-              <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+              <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                 Access Pass Tier
               </span>
               {isVolunteer ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--color-lime,#CCFF00)]/15 text-[var(--color-lime,#CCFF00)] font-bold font-mono text-xs border border-[var(--color-lime,#CCFF00)]/30">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[var(--color-lime,#CCFF00)]/15 text-[var(--color-lime,#CCFF00)] font-bold font-sans text-xs border border-[var(--color-lime,#CCFF00)]/30">
                   EVENT CREW PASS (100% FREE)
                 </span>
               ) : isCreator ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-300 font-bold font-mono text-xs border border-amber-500/40">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-300 font-bold font-sans text-xs border border-amber-500/40">
                   <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
                   COMPLIMENTARY CREATOR VIP (FREE)
                 </span>
               ) : isVip ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-mono text-xs border border-amber-500/40">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-bold font-sans text-xs border border-amber-500/40">
                   <StarVipIcon className="w-3.5 h-3.5 text-amber-400" />
                   VIP ALL-ACCESS PASS ({formData.vipPrice || 500} ETB)
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#CCFF00]/10 text-[#CCFF00] font-bold font-mono text-xs border border-[#CCFF00]/30">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#CCFF00]/10 text-[#CCFF00] font-bold font-sans text-xs border border-[#CCFF00]/30">
                   STANDARD PASS (FREE)
                 </span>
               )}
@@ -225,14 +225,14 @@ export function StepVerification({
             {/* Volunteer specific role */}
             {isVolunteer && (
               <div className="sm:col-span-2 space-y-1 bg-black/40 p-3 rounded-lg border border-[var(--color-lime,#CCFF00)]/20">
-                <span className="block font-mono text-[11px] text-[var(--color-lime,#CCFF00)] uppercase font-bold">
+                <span className="block font-sans text-xs text-[var(--color-lime,#CCFF00)] uppercase font-bold">
                   Assigned Volunteer Role
                 </span>
                 <span className="text-white font-medium text-xs block">
                   {VOLUNTEER_ROLE_LABELS[formData.volunteerRole || ''] || formData.volunteerRole || 'Gate Security & Check-in'}
                 </span>
                 {formData.volunteerExperience && (
-                  <p className="text-[11px] text-[#888888] font-mono mt-1">
+                  <p className="text-xs text-neutral-400 font-sans mt-1">
                     Skills: {formData.volunteerExperience}
                   </p>
                 )}
@@ -242,14 +242,16 @@ export function StepVerification({
             {/* Creator specific social link */}
             {isCreator && (
               <div className="sm:col-span-2 space-y-1 bg-black/40 p-3 rounded-lg border border-amber-500/20">
-                <span className="block font-mono text-[11px] text-amber-300 uppercase font-bold">
+                <span className="block font-sans text-xs text-amber-300 uppercase font-bold">
                   Creator Channel &amp; Platform
                 </span>
-                <span className="text-white font-mono text-xs block">
-                  [{formData.socialMediaPlatform || 'Social'}] {formData.socialMediaLink}
-                </span>
+                <div className="text-white font-sans text-xs flex items-center gap-2">
+                  <span className="font-semibold text-amber-300 uppercase">{formData.socialMediaPlatform || 'Social'}</span>
+                  <span>•</span>
+                  <span className="text-neutral-200">{formData.socialMediaLink}</span>
+                </div>
                 {formData.socialMediaFollowers && (
-                  <span className="text-[11px] text-[#888888] font-mono block">
+                  <span className="text-xs text-neutral-400 font-sans block">
                     Audience: {formData.socialMediaFollowers}
                   </span>
                 )}
@@ -259,19 +261,19 @@ export function StepVerification({
             {/* Team name for Esports */}
             {formData.teamName && (
               <div className="sm:col-span-2">
-                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                <span className="block font-sans text-xs text-neutral-400 uppercase">
                   Team / Clan Name
                 </span>
-                <span className="text-white font-mono">{formData.teamName}</span>
+                <span className="text-white font-sans font-semibold">{formData.teamName}</span>
               </div>
             )}
 
             {formData.squadDetails && (
               <div className="sm:col-span-2">
-                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                <span className="block font-sans text-xs text-neutral-400 uppercase">
                   Squad &amp; Roster Details
                 </span>
-                <p className="mt-1 font-body text-xs text-[var(--color-silver,#999999)] whitespace-pre-line bg-black/40 p-2.5 rounded border border-white/5">
+                <p className="mt-1 font-sans text-xs text-neutral-300 whitespace-pre-line bg-black/40 p-2.5 rounded border border-white/5">
                   {formData.squadDetails}
                 </p>
               </div>
@@ -396,26 +398,26 @@ export function StepVerification({
                 <button
                   type="button"
                   onClick={() => onEditStep(5)}
-                  className="font-mono text-xs uppercase tracking-wider text-amber-400 hover:text-white transition-colors cursor-pointer"
+                  className="px-3 py-1 rounded-md bg-white/5 hover:bg-amber-400 hover:text-black text-amber-400 font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-amber-400/30 hover:border-amber-400 shadow-sm active:scale-95"
                 >
-                  [ EDIT ]
+                  EDIT
                 </button>
               )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
               <div>
-                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                   Payment Method
                 </span>
-                <span className="font-bold text-amber-400">{formData.paymentMethod || 'TELEBIRR'}</span>
+                <span className="font-bold text-amber-400 font-sans">{formData.paymentMethod || 'TELEBIRR'}</span>
               </div>
 
               <div>
-                <span className="block font-mono text-[11px] text-[var(--color-silver,#999999)] uppercase">
+                <span className="block font-sans text-xs font-medium text-neutral-400 uppercase">
                   Transaction Code
                 </span>
-                <span className="font-mono font-bold text-white tracking-wider">
+                <span className="font-sans font-bold text-white tracking-wider">
                   {formData.paymentTxnCode || 'NOT PROVIDED'}
                 </span>
               </div>

@@ -206,7 +206,7 @@ export function EventDashboard() {
         <div className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-tight text-[#CCFF00]">
           {trimmed}
         </div>
-        <span className="font-mono text-xs uppercase tracking-widest text-[#999999] mt-2">
+        <span className="font-sans text-xs uppercase tracking-wider text-neutral-400 font-semibold mt-2">
           Expected Attendees
         </span>
       </div>
@@ -227,6 +227,7 @@ export function EventDashboard() {
           subtitle="Everything you need to know about the assembly"
           size="2xl"
           align="center"
+          tag="OFFICIAL PUBGM HQ"
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20">
@@ -263,9 +264,8 @@ export function EventDashboard() {
                   </h3>
                   {panel.tba && (
                     <div
-                      className="inline-block px-3 py-1 rounded text-xs tracking-widest mb-3 font-semibold"
+                      className="inline-block px-3 py-1 rounded text-xs tracking-wider mb-3 font-semibold font-sans"
                       style={{
-                        fontFamily: 'var(--font-mono)',
                         backgroundColor: 'rgba(204,255,0,0.1)',
                         color: '#CCFF00',
                         border: '1px solid rgba(204,255,0,0.2)',
@@ -274,7 +274,7 @@ export function EventDashboard() {
                       TO BE ANNOUNCED
                     </div>
                   )}
-                  <p className="text-sm leading-relaxed" style={{ color: '#999999' }}>
+                  <p className="text-sm leading-relaxed text-neutral-300 font-sans">
                     {panel.content}
                   </p>
                 </div>
@@ -331,24 +331,23 @@ export function EventDashboard() {
               style={{ backgroundColor: '#CCFF00', boxShadow: '0 0 10px #CCFF00' }}
             />
             <span
-              className="text-sm tracking-[0.3em] uppercase font-bold"
-              style={{ fontFamily: 'var(--font-mono)', color: '#CCFF00' }}
+              className="text-xs tracking-widest uppercase font-bold font-sans"
+              style={{ color: '#CCFF00' }}
             >
               Registration: OPEN
             </span>
           </div>
-          <p className="text-sm mb-4" style={{ color: '#999999' }}>
+          <p className="text-sm mb-4 font-sans text-neutral-300">
             {regCount > 0
               ? `${regCount} registration${regCount !== 1 ? 's' : ''} received so far.`
               : 'Be among the first to register for the assembly.'}
           </p>
           <a
             href="/register"
-            className="inline-block px-8 py-3 rounded-lg text-sm font-semibold tracking-wider uppercase transition-all duration-300 hover:shadow-lg hover:brightness-110"
+            className="inline-block px-8 py-3 rounded-lg text-sm font-semibold tracking-wider uppercase transition-all duration-300 hover:shadow-lg hover:brightness-110 font-heading"
             style={{
               backgroundColor: '#CCFF00',
               color: '#050505',
-              fontFamily: 'var(--font-heading)',
             }}
           >
             REGISTER NOW
@@ -364,8 +363,8 @@ export function EventDashboard() {
             className="mt-10"
           >
             <h3
-              className="text-sm tracking-[0.3em] uppercase mb-4"
-              style={{ fontFamily: 'var(--font-mono)', color: '#CCFF00' }}
+              className="text-xs tracking-widest uppercase mb-4 font-sans font-bold"
+              style={{ color: '#CCFF00' }}
             >
               {'LATEST ANNOUNCEMENTS'}
             </h3>

@@ -67,7 +67,7 @@ export function Badge({ status, label, className }: BadgeProps) {
     <span
       className={clsx(
         'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border',
-        'font-mono text-xs uppercase tracking-wider select-none transition-colors duration-200',
+        'font-sans text-[11px] font-bold uppercase tracking-wider select-none transition-colors duration-200',
         config.container,
         className
       )}

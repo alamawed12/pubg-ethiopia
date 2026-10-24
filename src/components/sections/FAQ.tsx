@@ -1,121 +1,175 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 
 const faqs = [
   {
+    id: '01',
     q: 'What is the PUBG MOBILE Community Assembly?',
-    a: 'An independently organized gathering of Ethiopia\'s PUBG MOBILE community. A space for players, teams, content creators, and organizers to connect, compete, and build together.',
+    a: 'It is a community-focused event bringing together PUBG MOBILE players, esports teams, content creators, and gaming enthusiasts in Ethiopia for community networking and esports activities.',
   },
   {
-    q: 'Is this an official PUBG MOBILE event?',
-    a: 'No. This is an independent community-organized event. It is not officially operated by or affiliated with PUBG MOBILE, Tencent, or Krafton, Inc.',
+    id: '02',
+    q: 'How can I register for the event?',
+    a: 'Complete the online registration form with your full name, PUBG MOBILE UID, in-game name, and required contact details. Follow the instructions to submit your registration.',
   },
   {
-    q: 'How do I register?',
-    a: 'Click the Register button on this website and complete the three-step registration process. You\'ll receive a unique reference number and digital event pass.',
+    id: '03',
+    q: 'Why do I need to provide my PUBG MOBILE UID?',
+    a: 'Your UID helps organizers identify your in-game account, manage tournament participation, and verify your player details when necessary.',
   },
   {
-    q: 'Is there a tournament?',
-    a: 'Yes, an esports tournament is planned as part of the assembly. Format, rules, and eligibility details will be announced.',
+    id: '04',
+    q: 'Do I need to verify my identity or face?',
+    a: 'Additional identity verification may be required if implemented by the organizers. If ID or facial verification is introduced, the website will explain the process, request consent, and describe how your information will be protected.',
   },
   {
-    q: 'What is the attendance capacity?',
-    a: 'We are planning for 200–300 attendees. Registration may close when capacity is reached.',
+    id: '05',
+    q: 'When and where will the event take place?',
+    a: 'The event is planned for Addis Ababa, Ethiopia. The exact date, venue, and schedule will be announced through the official event channels once confirmed.',
   },
   {
-    q: 'Where and when is the event?',
-    a: 'The event will be held in Addis Ababa, Ethiopia. The specific venue and date will be announced on our community channels.',
+    id: '06',
+    q: 'Will there be a PUBG MOBILE tournament?',
+    a: 'An esports tournament is part of the event plan. Tournament format, team requirements, rules, and any prizes will be announced when finalized.',
   },
   {
-    q: 'How is my data handled?',
-    a: 'Your registration data is used solely for event management. We do not share your personal information with third parties. See our Privacy Policy for details.',
+    id: '07',
+    q: 'Does registration guarantee my entry?',
+    a: 'No. Submitting the form does not automatically guarantee entry. Your place is confirmed only when the organizers approve your registration and provide confirmation.',
   },
   {
-    q: 'Can I cancel my registration?',
-    a: 'This is a free community event. You can request cancellation of your registration by contacting the organizing team.',
+    id: '08',
+    q: 'How can I contact the organizers or get updates?',
+    a: 'Follow the official event communication channels linked on this website for announcements about registration, tournament details, venue information, and event updates.',
   },
 ];
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [capacityText, setCapacityText] = useState('100–1000');
 
-  useEffect(() => {
-    fetch('/api/settings')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d?.heroAttendeesDisplay) {
-          setCapacityText(d.heroAttendeesDisplay);
-        } else if (d?.maxCapacity) {
-          setCapacityText(`${d.maxCapacity}+`);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const toggleAccordion = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
-    <section id="faq" className="relative py-32 px-6" style={{ backgroundColor: '#0a0a0a' }}>
+    <section id="faq" className="relative py-28 sm:py-36 px-4 sm:px-6 md:px-8 bg-[#0a0a0a]">
+      {/* Ambient background glow */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 20%, rgba(204,255,0,0.04), transparent 70%)',
+        }}
+      />
+
       <div className="max-w-3xl mx-auto relative z-10">
         <SectionHeading
           title="FREQUENTLY ASKED QUESTIONS"
+          subtitle="Essential details regarding registrations, event format, and assembly participation."
           size="xl"
           align="center"
+          tag="OFFICIAL INTELLIGENCE"
         />
 
-        <div className="mt-16 space-y-0">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="border-b"
-              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between py-6 text-left group cursor-pointer"
+        {/* FAQ Accordion List */}
+        <div className="mt-14 space-y-3.5">
+          {faqs.map((faq, i) => {
+            const isOpen = openIndex === i;
+            return (
+              <div
+                key={faq.id}
+                className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  isOpen
+                    ? 'border-[#CCFF00]/40 bg-[#141414] shadow-[0_0_25px_rgba(204,255,0,0.08)]'
+                    : 'border-white/10 bg-[#111111]/90 hover:border-white/20 hover:bg-[#141414]'
+                }`}
               >
-                <span
-                  className="text-base pr-8 transition-colors duration-300"
-                  style={{ color: openIndex === i ? '#CCFF00' : '#cccccc' }}
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion(i)}
+                  className="w-full flex items-center justify-between p-5 sm:p-6 text-left group cursor-pointer gap-4"
+                  aria-expanded={isOpen}
                 >
-                  {faq.q}
-                </span>
-                <motion.span
-                  animate={{ rotate: openIndex === i ? 45 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-xl flex-shrink-0 w-6 h-6 flex items-center justify-center"
-                  style={{ color: '#CCFF00' }}
-                >
-                  +
-                </motion.span>
-              </button>
-
-              <AnimatePresence>
-                {openIndex === i && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
-                  >
-                    <p
-                      className="pb-6 text-sm leading-relaxed"
-                      style={{ color: '#999999' }}
+                  <div className="flex items-center gap-3.5 sm:gap-4 flex-1">
+                    <span
+                      className={`font-sans text-xs font-bold px-2.5 py-1 rounded-md transition-colors shrink-0 ${
+                        isOpen
+                          ? 'bg-[#CCFF00] text-black shadow-[0_0_10px_rgba(204,255,0,0.5)]'
+                          : 'bg-white/5 text-[#CCFF00] border border-[#CCFF00]/25'
+                      }`}
                     >
-                      {faq.q.includes('capacity')
-                        ? `We are planning for ${capacityText} attendees. Registration may close when capacity is reached.`
-                        : faq.a}
-                    </p>
+                      {faq.id}
+                    </span>
+                    <h3
+                      className={`font-sans font-semibold text-base sm:text-lg transition-colors leading-snug tracking-tight ${
+                        isOpen ? 'text-[#CCFF00]' : 'text-white group-hover:text-neutral-200'
+                      }`}
+                    >
+                      {faq.q}
+                    </h3>
+                  </div>
+
+                  <motion.div
+                    animate={{ rotate: isOpen ? 45 : 0 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-colors bg-white/5 border-white/10 group-hover:border-[#CCFF00]/40"
+                  >
+                    <svg
+                      className="w-4 h-4 text-[#CCFF00]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
                   </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-white/5">
+                        <p className="font-sans text-sm sm:text-base text-neutral-300 leading-relaxed font-normal">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Official PUBGM HQ Governance Footer Note */}
+        <div className="mt-10 p-4 rounded-xl border border-[#CCFF00]/20 bg-[#CCFF00]/5 flex items-center gap-3 text-center sm:text-left flex-col sm:flex-row justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse shrink-0" />
+            <p className="font-sans text-xs text-neutral-300 leading-normal">
+              Official PUBG MOBILE Assembly FAQ • Controlled and operated directly under <strong className="text-white font-semibold">PUBG MOBILE HQ</strong>.
+            </p>
+          </div>
+          <a
+            href="https://t.me/pubgmethsupport"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-sans text-xs font-bold text-[#CCFF00] hover:underline shrink-0 uppercase tracking-wider"
+          >
+            NEED HELP? ASK SUPPORT →
+          </a>
         </div>
       </div>
     </section>
   );
 }
+
+export default FAQ;

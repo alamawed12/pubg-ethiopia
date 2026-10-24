@@ -740,20 +740,20 @@ Keep your login credentials confidential. Do not share your password.`;
             {/* ─── 2. QUICK STAFF ONBOARDING DISPATCH ─── */}
             <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-[#cccccc] font-bold">
+                <span className="text-xs font-sans uppercase tracking-wider text-neutral-200 font-bold">
                   SHARE CREDENTIALS TO STAFF
                 </span>
-                <span className="text-[10px] font-mono text-[#777777]">ONE-CLICK DISPATCH</span>
+                <span className="text-[10px] font-sans text-neutral-400 font-semibold">ONE-CLICK DISPATCH</span>
               </div>
 
-              <p className="text-xs text-[#999999] leading-relaxed font-sans">
+              <p className="text-xs text-neutral-400 leading-relaxed font-sans">
                 Click below to copy the full login package with portal URL, email, and password to send directly to this admin on Telegram or WhatsApp.
               </p>
 
               <button
                 type="button"
                 onClick={() => handleCopyOnboarding(selectedAdmin)}
-                className="w-full py-2.5 px-4 rounded-xl border border-[#CCFF00]/40 bg-[#CCFF00]/10 hover:bg-[#CCFF00]/20 text-[#CCFF00] font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="w-full py-2.5 px-4 rounded-xl border border-[#CCFF00]/40 bg-[#CCFF00]/10 hover:bg-[#CCFF00]/20 text-[#CCFF00] font-sans text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
               >
                 <span>{copiedOnboarding ? '✓ CREDENTIALS COPIED TO CLIPBOARD!' : '📋 COPY STAFF LOGIN ONBOARDING MESSAGE'}</span>
               </button>
@@ -761,14 +761,14 @@ Keep your login credentials confidential. Do not share your password.`;
 
             {/* ─── 3. UPDATE DETAILS OR RESET PASSWORD FORM ─── */}
             <form onSubmit={handleUpdateAdminCredentials} className="space-y-4 pt-2 border-t border-white/10">
-              <span className="text-xs font-mono uppercase tracking-wider text-white font-bold block">
+              <span className="text-xs font-sans uppercase tracking-wider text-white font-bold block">
                 EDIT ADMINISTRATOR DETAILS &amp; RESET PASSWORD
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Edit Name */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#cccccc] mb-1">
+                  <label className="block text-xs font-sans uppercase tracking-wider text-neutral-300 mb-1 font-semibold">
                     DISPLAY NAME
                   </label>
                   <input
@@ -782,13 +782,13 @@ Keep your login credentials confidential. Do not share your password.`;
 
                 {/* Edit Role */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-[#cccccc] mb-1">
+                  <label className="block text-xs font-sans uppercase tracking-wider text-neutral-300 mb-1 font-semibold">
                     ROLE / PERMISSION
                   </label>
                   <select
                     value={newRoleInput}
                     onChange={(e) => setNewRoleInput(e.target.value as 'admin' | 'scanner' | 'super_admin')}
-                    className="w-full px-3.5 py-2 rounded-xl border text-xs text-white font-mono outline-none focus:border-[#CCFF00] bg-[#1a1a1a] border-white/10 cursor-pointer"
+                    className="w-full px-3.5 py-2 rounded-xl border text-xs text-white font-sans outline-none focus:border-[#CCFF00] bg-[#1a1a1a] border-white/10 cursor-pointer"
                   >
                     <option value="admin">Operational Admin</option>
                     <option value="scanner">Gate Scanner Staff</option>
@@ -800,13 +800,13 @@ Keep your login credentials confidential. Do not share your password.`;
               {/* Set New Password */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-mono uppercase tracking-wider text-[#cccccc]">
+                  <label className="text-xs font-sans uppercase tracking-wider text-neutral-300 font-semibold">
                     ASSIGN NEW PASSWORD (OPTIONAL)
                   </label>
                   <button
                     type="button"
                     onClick={handleGenerateModalPassword}
-                    className="text-[11px] font-mono text-[#CCFF00] hover:underline cursor-pointer"
+                    className="text-[11px] font-sans font-bold text-[#CCFF00] hover:underline cursor-pointer"
                   >
                     + Generate Password
                   </button>

@@ -156,14 +156,14 @@ export function HeroSection() {
             />
           </motion.div>
 
-          {/* Pre-heading: Mono Terminal Tag */}
+          {/* Pre-heading: Official PUBGM HQ Tag */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center gap-1.5 sm:gap-2 mb-4 px-3 py-1.5 rounded-full border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm max-w-full"
+            className="flex items-center gap-1.5 sm:gap-2 mb-4 px-3.5 py-1.5 rounded-full border border-[#CCFF00]/40 bg-black/60 backdrop-blur-sm max-w-full"
           >
             <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#CCFF00] animate-pulse shrink-0" />
-            <span className="font-mono text-[10px] sm:text-xs md:text-sm text-[#CCFF00] tracking-normal sm:tracking-widest uppercase truncate">
-              {'OFFICIAL PUBG MOBILE TEAM • ADDIS ABABA, ETHIOPIA'}
+            <span className="font-sans text-[11px] sm:text-xs md:text-sm font-semibold text-[#CCFF00] tracking-wider uppercase truncate">
+              {'OFFICIAL PUBG MOBILE HQ • ADDIS ABABA, ETHIOPIA'}
             </span>
             <span className="inline-block w-1.5 h-3 bg-[#CCFF00] animate-pulse ml-0.5 shrink-0" />
           </motion.div>
@@ -239,7 +239,7 @@ export function HeroSection() {
               <span className="font-heading text-3xl md:text-4xl font-extrabold text-[#CCFF00] tracking-tight whitespace-nowrap">
                 {heroDisplay}
               </span>
-              <span className="font-mono text-xs text-[#999999] tracking-widest uppercase mt-1">
+              <span className="font-sans text-xs font-semibold text-neutral-400 tracking-wider uppercase mt-1.5">
                 EXPECTED ATTENDEES
               </span>
             </div>
@@ -249,7 +249,7 @@ export function HeroSection() {
               <span className="font-heading text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                 ESPORTS
               </span>
-              <span className="font-mono text-xs text-[#999999] tracking-widest uppercase mt-1">
+              <span className="font-sans text-xs font-semibold text-neutral-400 tracking-wider uppercase mt-1.5">
                 TOURNAMENT
               </span>
             </div>
@@ -259,7 +259,7 @@ export function HeroSection() {
               <span className="font-heading text-3xl md:text-4xl font-extrabold text-[#cccccc] tracking-tight">
                 ADDIS ABABA
               </span>
-              <span className="font-mono text-xs text-[#999999] tracking-widest uppercase mt-1">
+              <span className="font-sans text-xs font-semibold text-neutral-400 tracking-wider uppercase mt-1.5">
                 ETHIOPIA
               </span>
             </div>
@@ -270,14 +270,14 @@ export function HeroSection() {
       {/* ─── Hero Footer / Coming Soon Status & Scroll Indicator ─── */}
       <div className="relative z-20 w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5">
         {/* Status Labels */}
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 md:gap-8 font-mono text-[11px] md:text-xs text-[#999999]/70 tracking-wider">
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 md:gap-8 font-sans text-xs text-neutral-400 font-medium tracking-wide">
           <div className="flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>DATE: <strong className="text-white">{eventDate}</strong></span>
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]" />
+            <span>DATE: <strong className="text-white font-semibold">{eventDate}</strong></span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 bg-[#CCFF00]/70" />
-            <span>VENUE: <strong className="text-white">{eventVenue}</strong></span>
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]" />
+            <span>VENUE: <strong className="text-white font-semibold">{eventVenue}</strong></span>
           </div>
         </div>
 
@@ -288,7 +288,7 @@ export function HeroSection() {
             playSound('click');
             window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
           }}
-          className="flex items-center gap-2 font-mono text-[11px] text-[#999999] hover:text-[#CCFF00] tracking-widest uppercase transition-colors group cursor-pointer"
+          className="flex items-center gap-2 font-sans text-xs font-semibold text-neutral-400 hover:text-[#CCFF00] tracking-wider uppercase transition-colors group cursor-pointer"
           aria-label="Scroll down"
         >
           <span>SCROLL</span>

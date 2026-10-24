@@ -56,9 +56,9 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--color-lime,#CCFF00)]/30 bg-[var(--color-lime,#CCFF00)]/10 px-2.5 sm:px-3 py-1 font-mono text-[10px] sm:text-xs uppercase tracking-normal sm:tracking-widest text-[var(--color-lime,#CCFF00)] max-w-full">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--color-lime,#CCFF00)]/30 bg-[var(--color-lime,#CCFF00)]/10 px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wider text-[var(--color-lime,#CCFF00)] max-w-full">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-lime,#CCFF00)] animate-pulse shrink-0" />
-            <span className="truncate">OFFICIAL PUBG MOBILE TEAM REGISTRATION • LIMITED CAPACITY</span>
+            <span className="truncate">OFFICIAL PUBG MOBILE HQ REGISTRATION • LIMITED CAPACITY</span>
           </div>
 
           <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight sm:tracking-wider text-white break-words">
@@ -75,7 +75,7 @@ export default function RegisterPage() {
         <RegistrationForm />
 
         {/* Bottom Legal / Privacy Notice */}
-        <footer className="mt-12 text-center text-xs font-mono text-[var(--color-silver,#999999)]/80 space-y-2 border-t border-white/5 pt-8">
+        <footer className="mt-12 text-center text-xs font-sans text-neutral-400 space-y-2 border-t border-white/5 pt-8">
           <p>
             By submitting this registration, you agree to the collection and handling of your information as outlined in our{' '}
             <Link
@@ -86,8 +86,8 @@ export default function RegisterPage() {
             </Link>
             .
           </p>
-          <p className="text-[11px] text-white/30">
-            PUBG MOBILE Ethiopian Community Assembly • Addis Ababa • All Rights Reserved
+          <p className="text-[11px] text-neutral-400">
+            Official PUBG MOBILE Community Assembly • Officially Controlled and Operated under PUBG MOBILE HQ
           </p>
         </footer>
       </main>

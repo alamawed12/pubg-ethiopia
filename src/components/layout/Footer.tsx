@@ -39,13 +39,13 @@ export function Footer() {
               </span>
             </div>
 
-            <p className="text-[#999999] text-sm leading-relaxed font-body">
+            <p className="text-neutral-400 text-sm leading-relaxed font-sans">
               The premier in-person assembly uniting competitive squads, rising
               talents, and passionate fans across Ethiopia. One community. One battleground.
             </p>
 
-            <div className="mt-2 font-mono text-xs text-[#999999]/60 flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]/50 animate-pulse" />
+            <div className="mt-2 font-sans text-xs text-neutral-400 flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
               <span>{'ADDIS ABABA • 9.0249° N, 38.7469° E'}</span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export function Footer() {
             <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
               QUICK NAVIGATION
             </h2>
-            <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
+            <ul className="flex flex-col gap-2 font-sans text-xs text-neutral-400 font-medium">
               <li>
                 <Link
                   href="/#hero"
@@ -111,7 +111,7 @@ export function Footer() {
                   href="/register"
                   onClick={() => playSound('click')}
                   onMouseEnter={() => playSound('hover')}
-                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5 text-[#CCFF00]"
+                  className="hover:text-[#CCFF00] transition-colors duration-200 inline-block py-0.5 text-[#CCFF00] font-semibold"
                 >
                   {'REGISTRATION PORTAL'}
                 </Link>
@@ -124,7 +124,7 @@ export function Footer() {
             <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
               COMMUNITY CHANNELS
             </h2>
-            <ul className="flex flex-col gap-2 font-mono text-xs text-[#999999]">
+            <ul className="flex flex-col gap-2 font-sans text-xs text-neutral-400 font-medium">
               <li>
                 <a
                   href="https://t.me/pubgmethsupport"
@@ -179,7 +179,7 @@ export function Footer() {
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>TIKTOK CLIPS & HUBS</span>
+                  <span>TIKTOK CLIPS &amp; HUBS</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>
@@ -221,25 +221,24 @@ export function Footer() {
           {/* Column 4: Event Status & Advisory */}
           <div className="flex flex-col gap-3">
             <h2 className="font-heading font-bold text-sm text-white tracking-widest uppercase">
-              STATUS & PROTOCOLS
+              STATUS &amp; PROTOCOLS
             </h2>
-            <div className="bg-[#111111] p-3 border border-white/5 flex flex-col gap-2 font-mono text-xs">
+            <div className="bg-[#111111] p-3.5 rounded-xl border border-white/5 flex flex-col gap-2 font-sans text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#999999]">REGISTRATION:</span>
-                <span className="text-[#CCFF00] font-bold">OPENING SOON</span>
+                <span className="text-neutral-400">REGISTRATION:</span>
+                <span className="text-[#CCFF00] font-bold">OPEN / LIVE</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#999999]">PLATFORM:</span>
-                <span className="text-white">MOBILE (BYOD)</span>
+                <span className="text-neutral-400">PLATFORM:</span>
+                <span className="text-white font-medium">MOBILE (BYOD)</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#999999]">ENTRY:</span>
-                <span className="text-[#cccccc]">REGISTERED ATTENDEES</span>
+                <span className="text-neutral-400">ENTRY:</span>
+                <span className="text-neutral-200 font-medium">REGISTERED ATTENDEES</span>
               </div>
             </div>
-            <p className="font-mono text-[11px] text-[#999999]/70 leading-normal">
-              For partnership or squad inquiries, contact community organizers via official
-              channels.
+            <p className="font-sans text-xs text-neutral-400 leading-relaxed">
+              Official inquiries and partnership questions can be submitted via verified community channels.
             </p>
           </div>
         </div>
@@ -247,16 +246,20 @@ export function Footer() {
 
       {/* ─── Bottom Section: Disclaimers & Copyright ─── */}
       <div className="border-t border-white/5 bg-[#0a0a0a]/60 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs font-mono text-[#999999]/70">
-          {/* Official Team & Community Affiliation */}
-          <p className="leading-relaxed border-l-2 border-[#CCFF00] pl-3 text-[#cccccc]">
-            Official PUBG MOBILE Esports Team &amp; Community Assembly Ethiopia. Organized for competitive squads and esports talent in Ethiopia. All PUBG MOBILE logos, trademarks, and game properties belong to Krafton, Inc. and Level Infinite.
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs font-sans text-neutral-400">
+          {/* Official PUBGM HQ Affiliation & Ownership Statement */}
+          <div className="leading-relaxed border-l-2 border-[#CCFF00] pl-3 text-neutral-300">
+            <p className="font-semibold text-white mb-0.5">
+              Official PUBG MOBILE Community Assembly Ethiopia • Controlled and Organized under PUBG MOBILE HQ
+            </p>
+            <p className="text-neutral-400">
+              This event, registration system, tournament operations, and community assemblies are officially operated and administered under PUBG MOBILE HQ. All PUBG MOBILE marks, logos, and materials belong to PUBG MOBILE HQ and Krafton, Inc.
+            </p>
+          </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 font-medium">
             <div>
-              &copy; {currentYear} PUBG Mobile Community Assembly Ethiopia. All rights
-              reserved.
+              &copy; {currentYear} PUBG Mobile Community Assembly Ethiopia. Officially controlled by PUBG MOBILE HQ. All rights reserved.
             </div>
 
             <div className="flex items-center gap-6">
