@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 
@@ -41,6 +41,20 @@ const faqs = [
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [capacityText, setCapacityText] = useState('100–1000');
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.heroAttendeesDisplay) {
+          setCapacityText(d.heroAttendeesDisplay);
+        } else if (d?.maxCapacity) {
+          setCapacityText(`${d.maxCapacity}+`);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section id="faq" className="relative py-32 px-6" style={{ backgroundColor: '#0a0a0a' }}>
@@ -91,7 +105,9 @@ export function FAQ() {
                       className="pb-6 text-sm leading-relaxed"
                       style={{ color: '#999999' }}
                     >
-                      {faq.a}
+                      {faq.q.includes('capacity')
+                        ? `We are planning for ${capacityText} attendees. Registration may close when capacity is reached.`
+                        : faq.a}
                     </p>
                   </motion.div>
                 )}
