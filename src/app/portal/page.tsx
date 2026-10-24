@@ -329,6 +329,30 @@ export default function AttendeePortalPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Bottom Legal / Official Partner Logos (Left Bottom) */}
+        <footer className="mt-16 border-t border-white/10 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-xs font-sans text-neutral-400">
+          <div className="flex flex-col items-start gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/krafton-partner-logos.png"
+              alt="KRAFTON | LEVEL INFINITE | LIGHTSPEED STUDIOS"
+              className="h-8 sm:h-9 w-auto object-contain opacity-95 hover:opacity-100 transition-opacity"
+            />
+            <p className="text-[11px] text-neutral-400">
+              Official PUBG MOBILE Community Assembly • Officially Controlled and Operated under PUBG MOBILE HQ
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs font-medium self-start md:self-center">
+            <Link href="/privacy" className="hover:text-[#CCFF00] transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="text-white/20">•</span>
+            <Link href="/" className="text-[#CCFF00] hover:underline">
+              Return Home
+            </Link>
+          </div>
+        </footer>
       </main>
     </div>
   );

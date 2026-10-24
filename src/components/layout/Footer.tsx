@@ -245,8 +245,8 @@ export function Footer() {
       </div>
 
       {/* ─── Bottom Section: Disclaimers & Copyright ─── */}
-      <div className="border-t border-white/5 bg-[#0a0a0a]/60 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 text-xs font-sans text-neutral-400">
+      <div className="border-t border-white/5 bg-[#0a0a0a]/80 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6 text-xs font-sans text-neutral-400">
           {/* Official PUBGM HQ Affiliation & Ownership Statement */}
           <div className="leading-relaxed border-l-2 border-[#CCFF00] pl-3 text-neutral-300">
             <p className="font-semibold text-white mb-0.5">
@@ -257,12 +257,23 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 font-medium">
-            <div>
-              &copy; {currentYear} PUBG Mobile Community Assembly Ethiopia. Officially controlled by PUBG MOBILE HQ. All rights reserved.
+          {/* Bottom Left Logos & Bottom Right Links */}
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pt-3 border-t border-white/5">
+            {/* Left Bottom: Official Publisher & Studio Logos */}
+            <div className="flex flex-col items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/krafton-partner-logos.png"
+                alt="KRAFTON | LEVEL INFINITE | LIGHTSPEED STUDIOS"
+                className="h-9 sm:h-10 md:h-11 w-auto object-contain opacity-95 hover:opacity-100 transition-opacity"
+              />
+              <div className="text-[11px] text-neutral-400 font-medium">
+                &copy; {currentYear} PUBG Mobile Community Assembly Ethiopia. Officially controlled by PUBG MOBILE HQ. All rights reserved.
+              </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            {/* Right Bottom: Navigation & Policy Links */}
+            <div className="flex flex-wrap items-center gap-6 font-medium text-xs self-start lg:self-center">
               <Link
                 href="/privacy"
                 onClick={() => playSound('click')}

@@ -74,21 +74,31 @@ export default function RegisterPage() {
         {/* Multi-step Registration Form */}
         <RegistrationForm />
 
-        {/* Bottom Legal / Privacy Notice */}
-        <footer className="mt-12 text-center text-xs font-sans text-neutral-400 space-y-2 border-t border-white/5 pt-8">
-          <p>
-            By submitting this registration, you agree to the collection and handling of your information as outlined in our{' '}
+        {/* Bottom Legal / Privacy Notice with Official Partner Logos (Left Bottom) */}
+        <footer className="mt-14 border-t border-white/10 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-xs font-sans text-neutral-400">
+          <div className="flex flex-col items-start gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/krafton-partner-logos.png"
+              alt="KRAFTON | LEVEL INFINITE | LIGHTSPEED STUDIOS"
+              className="h-8 sm:h-9 w-auto object-contain opacity-95 hover:opacity-100 transition-opacity"
+            />
+            <p className="text-[11px] text-neutral-400">
+              Official PUBG MOBILE Community Assembly • Officially Controlled and Operated under PUBG MOBILE HQ
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs font-medium self-start md:self-center">
             <Link
               href="/privacy"
               className="text-[var(--color-lime,#CCFF00)] underline hover:text-white transition-colors"
             >
               Privacy Policy
             </Link>
-            .
-          </p>
-          <p className="text-[11px] text-neutral-400">
-            Official PUBG MOBILE Community Assembly • Officially Controlled and Operated under PUBG MOBILE HQ
-          </p>
+            <span className="text-white/20">•</span>
+            <Link href="/" className="hover:text-white transition-colors">
+              Return Home
+            </Link>
+          </div>
         </footer>
       </main>
     </div>
