@@ -88,8 +88,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const body = await request.json();
     const { status, teamName, category, paymentStatus } = body;
 
-    const existing = await prisma.registration.findUnique({
-      where: { id },
+    const existing = await prisma.registration.findFirst({
+      where: {
+        OR: [{ id }, { referenceId: id }],
+      },
     });
 
     if (!existing) {
@@ -108,7 +110,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       paymentApprovedBy?: string | null;
     } = {};
 
-    if (status) updateData.status = status;
+    if (status) {
+      updateData.status = status;
+      if (status === 'CONFIRMED') {
+        // Automatically approve VIP payment as well if attendee is VIP
+        if (existing.ticketTier === 'VIP') {
+          updateData.paymentStatus = 'APPROVED';
+          updateData.paymentApprovedAt = new Date();
+          updateData.paymentApprovedBy = session.user.email || 'Head Admin';
+        }
+      }
+    }
     if (teamName !== undefined) updateData.teamName = teamName;
     if (category) updateData.category = category;
 
@@ -117,16 +129,16 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       if (paymentStatus === 'APPROVED') {
         updateData.status = 'CONFIRMED';
         updateData.paymentApprovedAt = new Date();
-        updateData.paymentApprovedBy = session.user.email || 'Admin';
+        updateData.paymentApprovedBy = session.user.email || 'Head Admin';
       } else if (paymentStatus === 'REJECTED') {
         updateData.status = 'REJECTED';
         updateData.paymentApprovedAt = null;
-        updateData.paymentApprovedBy = session.user.email || 'Admin';
+        updateData.paymentApprovedBy = session.user.email || 'Head Admin';
       }
     }
 
     const updated = await prisma.registration.update({
-      where: { id },
+      where: { id: existing.id },
       data: updateData,
     });
 
@@ -139,8 +151,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
           : status
           ? `REGISTRATION_${status}`
           : 'REGISTRATION_UPDATED',
-        targetId: id,
+        targetId: existing.id,
         details: JSON.stringify({
+          referenceId: existing.referenceId,
           previousStatus: existing.status,
           previousPaymentStatus: existing.paymentStatus,
           newStatus: updateData.status || existing.status,

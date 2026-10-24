@@ -82,6 +82,8 @@ export default function RegistrationDetailPage() {
   const [copiedTxn, setCopiedTxn] = useState(false);
   const [idModalImage, setIdModalImage] = useState<string | null>(null);
 
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
   useEffect(() => {
     fetch(`/api/admin/registrations/${params.id}`)
       .then((r) => r.json())
@@ -94,40 +96,62 @@ export default function RegistrationDetailPage() {
   }, [params.id]);
 
   const updateStatus = async (status: string) => {
-    if (!confirm(`Set attendee status to ${status}?`)) return;
     setActionLoading(status);
+    setFeedback(null);
     try {
-      const res = await fetch(`/api/admin/registrations/${params.id}`, {
+      const targetId = reg?.id || (params.id as string);
+      const res = await fetch(`/api/admin/registrations/${targetId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
-      if (res.ok) {
-        const d = await res.json();
-        setReg((prev) => (prev ? { ...prev, ...d, status } : prev));
+      const d = await res.json();
+      if (res.ok && !d.error) {
+        setReg((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...d,
+                status: d.status || status,
+                paymentStatus: d.paymentStatus || prev.paymentStatus,
+              }
+            : prev
+        );
+        setFeedback({
+          type: 'success',
+          message:
+            status === 'CONFIRMED'
+              ? 'Registration accepted and confirmed successfully! Official event ticket is active.'
+              : `Registration status updated to ${status}.`,
+        });
+      } else {
+        setFeedback({
+          type: 'error',
+          message: d.error || 'Failed to update status. Please try again.',
+        });
       }
     } catch {
-      // ignore
+      setFeedback({
+        type: 'error',
+        message: 'Network error. Please try again.',
+      });
+    } finally {
+      setActionLoading('');
     }
-    setActionLoading('');
   };
 
   const updatePaymentStatus = async (paymentStatus: 'APPROVED' | 'REJECTED') => {
-    const actionLabel =
-      paymentStatus === 'APPROVED'
-        ? 'APPROVE VIP payment and issue official ticket'
-        : 'REJECT VIP payment';
-    if (!confirm(`Are you sure you want to ${actionLabel}?`)) return;
-
     setActionLoading(paymentStatus);
+    setFeedback(null);
     try {
-      const res = await fetch(`/api/admin/registrations/${params.id}`, {
+      const targetId = reg?.id || (params.id as string);
+      const res = await fetch(`/api/admin/registrations/${targetId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentStatus }),
       });
-      if (res.ok) {
-        const d = await res.json();
+      const d = await res.json();
+      if (res.ok && !d.error) {
         setReg((prev) =>
           prev
             ? {
@@ -138,11 +162,27 @@ export default function RegistrationDetailPage() {
               }
             : prev
         );
+        setFeedback({
+          type: 'success',
+          message:
+            paymentStatus === 'APPROVED'
+              ? 'VIP payment verified and approved! Official VIP pass issued.'
+              : 'VIP payment marked as rejected.',
+        });
+      } else {
+        setFeedback({
+          type: 'error',
+          message: d.error || 'Failed to update payment status.',
+        });
       }
     } catch {
-      // ignore
+      setFeedback({
+        type: 'error',
+        message: 'Network error. Please try again.',
+      });
+    } finally {
+      setActionLoading('');
     }
-    setActionLoading('');
   };
 
   const handleCopy = (text: string) => {
@@ -204,6 +244,34 @@ export default function RegistrationDetailPage() {
         </span>
       </div>
 
+      {/* Feedback Banner */}
+      {feedback && (
+        <div
+          className={`p-4 rounded-xl text-xs sm:text-sm font-sans font-semibold flex items-center justify-between gap-3 border transition-all ${
+            feedback.type === 'success'
+              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+              : 'bg-red-500/15 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {feedback.type === 'success' ? (
+              <CheckMarkIcon className="w-5 h-5 text-emerald-400 stroke-[3] shrink-0" />
+            ) : (
+              <XMarkIcon className="w-5 h-5 text-red-400 stroke-[3] shrink-0" />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            className="text-white/60 hover:text-white cursor-pointer shrink-0"
+            aria-label="Dismiss feedback"
+          >
+            <XMarkIcon className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header Card */}
       <div
         className="rounded-xl border p-6"
@@ -247,9 +315,37 @@ export default function RegistrationDetailPage() {
             </div>
           </div>
 
-          <div className="text-right text-xs" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
-            <div>Registration Received</div>
-            <div style={{ color: '#999999' }}>{new Date(reg.createdAt).toLocaleString()}</div>
+          {/* Quick Header Accept / Status Action */}
+          <div className="flex flex-col sm:items-end gap-2 shrink-0">
+            {reg.status !== 'CONFIRMED' ? (
+              <button
+                type="button"
+                onClick={() => updateStatus('CONFIRMED')}
+                disabled={!!actionLoading}
+                className="px-5 py-2.5 rounded-xl font-heading font-black text-xs uppercase tracking-wider bg-[#CCFF00] hover:bg-[#b8e600] text-black shadow-[0_0_20px_rgba(204,255,0,0.4)] cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {actionLoading === 'CONFIRMED' ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <span>ACCEPTING...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckMarkIcon className="w-4 h-4 stroke-[3]" />
+                    <span>ACCEPT &amp; CONFIRM ATTENDEE</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <span className="px-4 py-2 rounded-xl text-xs uppercase font-heading font-black tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.3)] inline-flex items-center gap-1.5">
+                <CheckMarkIcon className="w-4 h-4 stroke-[3]" />
+                <span>OFFICIALLY ACCEPTED &amp; ACTIVE</span>
+              </span>
+            )}
+            <div className="text-left sm:text-right text-xs" style={{ color: '#666666', fontFamily: 'var(--font-mono)' }}>
+              <div>Registration Received</div>
+              <div style={{ color: '#999999' }}>{new Date(reg.createdAt).toLocaleString()}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -707,46 +803,66 @@ export default function RegistrationDetailPage() {
             style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
           >
             <h2 className="text-sm uppercase tracking-wider mb-4" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-              OVERALL STATUS
+              OVERALL STATUS &amp; ACTIONS
             </h2>
-            <div className="space-y-2">
-              {reg.status !== 'CONFIRMED' && (
+            <div className="space-y-3">
+              {reg.status === 'CONFIRMED' ? (
+                <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/50 text-emerald-300 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CheckMarkIcon className="w-4 h-4 text-emerald-400 stroke-[3]" />
+                    <span className="font-heading font-black text-xs uppercase tracking-wider text-emerald-400">
+                      CURRENT STATUS: ACCEPTED &amp; CONFIRMED
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-mono text-neutral-300">
+                    Official ticket is active and authorized for venue gate entry.
+                  </p>
+                </div>
+              ) : (
                 <button
+                  type="button"
                   onClick={() => updateStatus('CONFIRMED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-emerald-500 text-black font-heading flex items-center justify-center gap-2"
+                  className="w-full px-4 py-3 rounded-xl text-xs font-heading font-black tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:bg-[#b8e600] bg-[#CCFF00] text-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(204,255,0,0.35)]"
                 >
                   {actionLoading === 'CONFIRMED' ? (
-                    'Processing...'
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      <span>ACCEPTING ATTENDEE...</span>
+                    </>
                   ) : (
                     <>
-                      <CheckMarkIcon className="w-4 h-4 stroke-[2.5]" />
-                      <span>Set Confirmed</span>
+                      <CheckMarkIcon className="w-4 h-4 stroke-[3]" />
+                      <span>ACCEPT &amp; CONFIRM REGISTRATION</span>
                     </>
                   )}
                 </button>
               )}
+
               {reg.status !== 'REJECTED' && (
                 <button
+                  type="button"
                   onClick={() => updateStatus('REJECTED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 bg-red-600 text-white font-heading flex items-center justify-center gap-2"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase cursor-pointer disabled:opacity-50 transition-all hover:bg-red-600/90 bg-red-600/80 text-white font-heading flex items-center justify-center gap-2 border border-red-500/40"
                 >
                   {actionLoading === 'REJECTED' ? (
                     'Processing...'
                   ) : (
                     <>
                       <XMarkIcon className="w-4 h-4 stroke-[2.5]" />
-                      <span>Set Rejected</span>
+                      <span>{reg.status === 'CONFIRMED' ? 'Revoke / Set Rejected' : 'Set Rejected'}</span>
                     </>
                   )}
                 </button>
               )}
+
               {reg.status !== 'WAITLISTED' && (
                 <button
+                  type="button"
                   onClick={() => updateStatus('WAITLISTED')}
                   disabled={!!actionLoading}
-                  className="w-full px-4 py-2.5 rounded-lg text-sm font-bold tracking-wider uppercase border cursor-pointer disabled:opacity-50 transition-all hover:opacity-90 border-blue-500 text-blue-400 font-heading"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase border cursor-pointer disabled:opacity-50 transition-all hover:bg-blue-500/10 border-blue-500/40 text-blue-400 font-heading"
                 >
                   {actionLoading === 'WAITLISTED' ? 'Processing...' : 'Set Waitlisted'}
                 </button>
