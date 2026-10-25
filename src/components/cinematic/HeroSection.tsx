@@ -189,7 +189,7 @@ export function HeroSection() {
             variants={itemVariants}
             className="mt-6 md:mt-8 max-w-2xl text-base sm:text-lg text-[#cccccc] leading-relaxed font-body font-normal text-center"
           >
-            &ldquo;Bringing Ethiopia&rsquo;s PUBG MOBILE community together through competition, collaboration, and a shared vision for the future of esports.&rdquo;
+            &ldquo;Bringing Ethiopia&rsquo;s PUBG MOBILE community together through collaboration, networking, and a shared vision for our community gathering.&rdquo;
           </motion.p>
 
           {/* Action Buttons */}
@@ -247,10 +247,10 @@ export function HeroSection() {
             {/* Stat 2 */}
             <div className="flex flex-col items-center justify-center sm:border-r sm:border-white/10 px-4">
               <span className="font-heading text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                ESPORTS
+                COMMUNITY
               </span>
               <span className="font-sans text-xs font-semibold text-neutral-400 tracking-wider uppercase mt-1.5">
-                TOURNAMENT
+                GATHERING
               </span>
             </div>
 

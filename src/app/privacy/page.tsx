@@ -43,7 +43,7 @@ export default function PrivacyPage() {
               <span>1.</span> PURPOSE OF REGISTRATION
             </h2>
             <p>
-              The PUBG MOBILE COMMUNITY ASSEMBLY website allows interested participants to register for community activities, esports tournaments, meetings, and related events.
+              The PUBG MOBILE COMMUNITY ASSEMBLY website allows interested participants to register for community gatherings, networking meetups, workshops, and related events.
             </p>
             <p>
               By submitting the registration form, you confirm that the information you provide is accurate and that you have read and accepted this policy.
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
               <li>PUBG MOBILE in-game name (IGN).</li>
               <li>PUBG MOBILE Player ID (UID).</li>
               <li>Phone number or email address.</li>
-              <li>Team name and tournament-related information.</li>
+              <li>Squad/team name and participant-related information.</li>
               <li>Registration status and event participation records.</li>
               <li>Any additional information you voluntarily provide through the form (such as National ID front/back photos for identity verification).</li>
             </ul>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-1.5 text-[#aaaaaa] pl-2">
               <li>Confirming registrations and contacting participants.</li>
               <li>Managing attendance and participant lists.</li>
-              <li>Organizing tournament brackets, teams, schedules, and results.</li>
+              <li>Organizing community schedules, team rosters, gathering activities, and session plans.</li>
               <li>Communicating event announcements, changes, and safety information.</li>
               <li>Preventing duplicate, fraudulent, or invalid registrations.</li>
               <li>Verifying eligibility where necessary and lawful.</li>
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
               <span>4.</span> OFFICIAL PUBG MOBILE HQ OPERATION &amp; GOVERNANCE
             </h2>
             <p>
-              This website, event operations, tournament rules, and community assemblies are officially controlled and operated under PUBG MOBILE HQ. All participant registrations, competitive brackets, and event logistics are administered in accordance with official PUBG MOBILE HQ guidelines and standards.
+              This website, event operations, community rules, and assemblies are officially controlled and operated under PUBG MOBILE HQ. All participant registrations and gathering logistics are administered in accordance with official PUBG MOBILE HQ guidelines and standards.
             </p>
             <p>
               All PUBG MOBILE trademarks, assets, logos, and related game intellectual properties utilized on this website and during the event are officially governed under PUBG MOBILE HQ and Krafton, Inc.

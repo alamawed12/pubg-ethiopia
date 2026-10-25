@@ -83,7 +83,7 @@ export function Contact() {
           >
             <p className="text-base leading-relaxed mb-6" style={{ color: '#999999' }}>
               The PUBG MOBILE Community Assembly is built by the community, for the community.
-              Join our channels to stay updated on event announcements, tournament details, and
+              Join our channels to stay updated on event announcements, gathering details, and
               connect with other Ethiopian PUBG MOBILE players.
             </p>
             <p className="text-base leading-relaxed" style={{ color: '#999999' }}>

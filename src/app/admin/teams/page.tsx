@@ -98,14 +98,14 @@ export default function AdminTeamsPage() {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#CCFF00] animate-pulse" />
             <span className="font-mono text-xs uppercase tracking-widest text-[#CCFF00]">
-              ESPORTS TOURNAMENT COMMAND
+              COMMUNITY SQUADS COMMAND
             </span>
           </div>
           <h1
             className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-white mt-1"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            SQUADS &amp; TOURNAMENT TEAMS
+            SQUADS &amp; COMMUNITY TEAMS
           </h1>
           <p className="text-sm text-[#999999] mt-0.5">
             Manage registered rosters, track complete vs partial 4-man squads, and inspect solo free agents.

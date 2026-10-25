@@ -8,7 +8,7 @@ const faqs = [
   {
     id: '01',
     q: 'What is the PUBG MOBILE Community Assembly?',
-    a: 'It is a community-focused event bringing together PUBG MOBILE players, esports teams, content creators, and gaming enthusiasts in Ethiopia for community networking and esports activities.',
+    a: 'It is a community-focused gathering bringing together PUBG MOBILE players, squads, content creators, and gaming enthusiasts in Ethiopia for community networking and collaborative activities.',
   },
   {
     id: '02',
@@ -18,7 +18,7 @@ const faqs = [
   {
     id: '03',
     q: 'Why do I need to provide my PUBG MOBILE UID?',
-    a: 'Your UID helps organizers identify your in-game account, manage tournament participation, and verify your player details when necessary.',
+    a: 'Your UID helps organizers identify your in-game account, manage community attendance, and verify your player details when necessary.',
   },
   {
     id: '04',
@@ -32,8 +32,8 @@ const faqs = [
   },
   {
     id: '06',
-    q: 'Will there be a PUBG MOBILE tournament?',
-    a: 'An esports tournament is part of the event plan. Tournament format, team requirements, rules, and any prizes will be announced when finalized.',
+    q: 'What activities are planned for the event?',
+    a: 'The event is an official community gathering featuring player meetups, networking sessions, community showcases, content creator spotlights, and discussions on growing the PUBG MOBILE community in Ethiopia.',
   },
   {
     id: '07',
@@ -43,7 +43,7 @@ const faqs = [
   {
     id: '08',
     q: 'How can I contact the organizers or get updates?',
-    a: 'Follow the official event communication channels linked on this website for announcements about registration, tournament details, venue information, and event updates.',
+    a: 'Follow the official event communication channels linked on this website for announcements about registration, gathering details, venue information, and event updates.',
   },
 ];
 

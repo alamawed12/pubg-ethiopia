@@ -6,7 +6,7 @@ import { RegistrationForm } from '@/components/registration/RegistrationForm';
 export const metadata: Metadata = {
   title: 'Secure Registration | PUBG MOBILE Community Assembly Ethiopia',
   description:
-    'Complete the official registration for the PUBG MOBILE Community Assembly Ethiopia. Secure your digital pass, compete in tournaments, and connect with the community.',
+    'Complete the official registration for the PUBG MOBILE Community Assembly Ethiopia. Secure your digital pass, meet the players, and connect with the community.',
   openGraph: {
     title: 'Register | PUBG MOBILE Community Assembly Ethiopia',
     description:

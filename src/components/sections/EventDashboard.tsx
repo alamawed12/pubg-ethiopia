@@ -54,32 +54,6 @@ function VenueDateIcon({ className = 'w-6 h-6' }: { className?: string }) {
   );
 }
 
-function TournamentIcon({ className = 'w-6 h-6' }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {/* Esports Championship Trophy with center star */}
-      <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" />
-      <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
-      <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" />
-      <path d="M12 16v3" />
-      <path d="M8 21h8" />
-      <polygon
-        points="12 6.5 13.2 8.5 15.5 8.7 13.8 10.2 14.3 12.5 12 11.2 9.7 12.5 10.2 10.2 8.5 8.7 10.8 8.5 12 6.5"
-        fill="currentColor"
-        stroke="none"
-      />
-    </svg>
-  );
-}
-
 function AttendanceIcon({ className = 'w-6 h-6' }: { className?: string }) {
   return (
     <svg
@@ -108,7 +82,7 @@ const panels = [
   {
     title: 'EVENT OVERVIEW',
     content:
-      'The PUBG MOBILE Community Assembly is a gathering for Ethiopian players, teams, content creators, and community organizers. Expect an esports tournament, community meetups, networking, and the chance to shape the future of PUBG MOBILE in Ethiopia.',
+      'The PUBG MOBILE Community Assembly is a gathering for Ethiopian players, teams, content creators, and community organizers. Expect community meetups, networking, interactive showcases, and the chance to shape the future of PUBG MOBILE in Ethiopia.',
     Icon: OverviewIcon,
   },
   {
@@ -118,10 +92,10 @@ const panels = [
     tba: true,
   },
   {
-    title: 'TOURNAMENT',
+    title: 'COMMUNITY GATHERING',
     content:
-      'An esports tournament is planned as part of the assembly. Format, rules, and eligibility details will be announced. Open to registered participants.',
-    Icon: TournamentIcon,
+      'A dedicated gathering for Ethiopian PUBG MOBILE players, squads, and creators to connect, share experiences, and celebrate the community together.',
+    Icon: AttendanceIcon,
   },
 ];
 
@@ -215,7 +189,7 @@ export function EventDashboard() {
 
   return (
     <section
-      id="tournament"
+      id="assembly"
       className="relative py-32 px-6"
       style={{ backgroundColor: '#0d1a0d' }}
     >

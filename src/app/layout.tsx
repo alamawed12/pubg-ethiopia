@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   keywords: [
     "PUBG MOBILE",
     "Ethiopia",
-    "esports",
     "community",
-    "tournament",
+    "gathering",
+    "assembly",
     "Addis Ababa",
     "gaming",
   ],
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PUBG MOBILE Community Assembly — Ethiopia",
     description:
-      "More than a tournament. A gathering of players, teams, creators, and community builders shaping the future of PUBG MOBILE in Ethiopia.",
+      "An official gathering of players, squads, creators, and community builders shaping the future of PUBG MOBILE in Ethiopia.",
     type: "website",
   },
 };
