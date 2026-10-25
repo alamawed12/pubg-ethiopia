@@ -12,9 +12,12 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   AlertTriangleIcon,
+  TrophyIcon,
+  TrashIcon,
+  LinkChainIcon,
 } from '@/components/ui/TacticalIcons';
 
-type TabKey = 'event' | 'announcements' | 'vip' | 'admins' | 'ai';
+type TabKey = 'event' | 'announcements' | 'vip' | 'sponsors' | 'admins' | 'ai';
 
 interface TabItem {
   id: TabKey;
@@ -26,6 +29,7 @@ const TABS: TabItem[] = [
   { id: 'event', label: 'Event & Gate', Icon: CalendarIcon },
   { id: 'announcements', label: 'Announcements', Icon: MegaphoneIcon },
   { id: 'vip', label: 'VIP & Banking', Icon: CreditCardIcon },
+  { id: 'sponsors', label: 'Sponsors', Icon: TrophyIcon },
   { id: 'admins', label: 'Admin Team', Icon: ShieldSecurityIcon },
   { id: 'ai', label: 'AI & Socials', Icon: LightningBoltIcon },
 ];
@@ -86,6 +90,20 @@ function SettingsContent() {
   const [telegramLink, setTelegramLink] = useState('https://t.me/pubgmethiopia');
   const [discordLink, setDiscordLink] = useState('https://discord.gg/pubgethiopia');
 
+  // Sponsors Marquee
+  const [sponsorsEnabled, setSponsorsEnabled] = useState(true);
+  const [sponsorsTitle, setSponsorsTitle] = useState('OFFICIAL SPONSORS & PARTNERS');
+  const [sponsorsSubtitle, setSponsorsSubtitle] = useState('POWERING THE PUBG MOBILE COMMUNITY ASSEMBLY ETHIOPIA');
+  const [sponsorsList, setSponsorsList] = useState<Array<{ id: string; name: string; logo?: string; url?: string; tier?: string }>>([]);
+
+  // Form state for adding/editing a sponsor
+  const [sponsorNameInput, setSponsorNameInput] = useState('');
+  const [sponsorTierInput, setSponsorTierInput] = useState('');
+  const [sponsorUrlInput, setSponsorUrlInput] = useState('');
+  const [sponsorLogoInput, setSponsorLogoInput] = useState('');
+  const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null);
+  const [sponsorFormError, setSponsorFormError] = useState('');
+
   // Stats & States
   const [stats, setStats] = useState({ vipCount: 0, standardCount: 0, totalRegistrations: 0, estimatedVipRevenue: 0 });
   const [loading, setLoading] = useState(true);
@@ -127,6 +145,12 @@ function SettingsContent() {
           // Socials
           if (d.telegramLink) setTelegramLink(d.telegramLink);
           if (d.discordLink) setDiscordLink(d.discordLink);
+
+          // Sponsors
+          if (d.sponsorsEnabled !== undefined) setSponsorsEnabled(Boolean(d.sponsorsEnabled));
+          if (d.sponsorsTitle) setSponsorsTitle(d.sponsorsTitle);
+          if (d.sponsorsSubtitle) setSponsorsSubtitle(d.sponsorsSubtitle);
+          if (Array.isArray(d.sponsors)) setSponsorsList(d.sponsors);
 
           if (d.stats) setStats(d.stats);
         }
@@ -170,6 +194,103 @@ function SettingsContent() {
     }
   };
 
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setSponsorFormError('Image size exceeds 2MB limit. Please upload a smaller logo or provide an image URL.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setSponsorLogoInput(reader.result);
+        setSponsorFormError('');
+      }
+    };
+    reader.onerror = () => {
+      setSponsorFormError('Failed to read file. Please try again.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddOrUpdateSponsor = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!sponsorNameInput.trim()) {
+      setSponsorFormError('Please enter a sponsor or partner name.');
+      return;
+    }
+
+    if (editingSponsorId) {
+      setSponsorsList((prev) =>
+        prev.map((s) =>
+          s.id === editingSponsorId
+            ? {
+                ...s,
+                name: sponsorNameInput.trim(),
+                tier: sponsorTierInput.trim() || 'Official Partner',
+                url: sponsorUrlInput.trim(),
+                logo: sponsorLogoInput.trim(),
+              }
+            : s
+        )
+      );
+      setEditingSponsorId(null);
+    } else {
+      const newSponsor = {
+        id: `sp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        name: sponsorNameInput.trim(),
+        tier: sponsorTierInput.trim() || 'Official Partner',
+        url: sponsorUrlInput.trim(),
+        logo: sponsorLogoInput.trim(),
+      };
+      setSponsorsList((prev) => [...prev, newSponsor]);
+    }
+
+    // Reset input fields
+    setSponsorNameInput('');
+    setSponsorTierInput('');
+    setSponsorUrlInput('');
+    setSponsorLogoInput('');
+    setSponsorFormError('');
+  };
+
+  const handleStartEditSponsor = (sponsor: { id: string; name: string; logo?: string; url?: string; tier?: string }) => {
+    setEditingSponsorId(sponsor.id);
+    setSponsorNameInput(sponsor.name);
+    setSponsorTierInput(sponsor.tier || '');
+    setSponsorUrlInput(sponsor.url || '');
+    setSponsorLogoInput(sponsor.logo || '');
+    setSponsorFormError('');
+  };
+
+  const handleCancelEditSponsor = () => {
+    setEditingSponsorId(null);
+    setSponsorNameInput('');
+    setSponsorTierInput('');
+    setSponsorUrlInput('');
+    setSponsorLogoInput('');
+    setSponsorFormError('');
+  };
+
+  const handleDeleteSponsor = (id: string) => {
+    setSponsorsList((prev) => prev.filter((s) => s.id !== id));
+    if (editingSponsorId === id) {
+      handleCancelEditSponsor();
+    }
+  };
+
+  const handleMoveSponsor = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= sponsorsList.length) return;
+    const updated = [...sponsorsList];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, moved);
+    setSponsorsList(updated);
+  };
+
   const executeSave = async () => {
     setSaving(true);
     setError('');
@@ -200,6 +321,10 @@ function SettingsContent() {
           awashName: awashName.trim(),
           telegramLink: telegramLink.trim(),
           discordLink: discordLink.trim(),
+          sponsorsEnabled,
+          sponsorsTitle: sponsorsTitle.trim(),
+          sponsorsSubtitle: sponsorsSubtitle.trim(),
+          sponsors: sponsorsList,
         }),
       });
 
@@ -307,19 +432,16 @@ function SettingsContent() {
       {/* ═══════════════════════════════════════════════════════════════
           APPLE-STYLE TAB NAVIGATION PILLS (ALL TABS 100% VISIBLE)
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-1.5 rounded-2xl bg-[#141414] border border-white/10">
-        {TABS.map((tab, idx) => {
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 p-1.5 rounded-2xl bg-[#141414] border border-white/10">
+        {TABS.map((tab) => {
           const isSelected = activeTab === tab.id;
           const TabIcon = tab.Icon;
-          const isLastOnMobile = idx === 4;
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => switchTab(tab.id)}
               className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer text-center ${
-                isLastOnMobile ? 'col-span-2 sm:col-span-1 lg:col-span-1' : ''
-              } ${
                 isSelected
                   ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.35)]'
                   : 'text-neutral-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.08] border border-white/5'
@@ -773,7 +895,378 @@ function SettingsContent() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          TAB 4: HEAD ADMIN ACCESS & SUB-ADMIN MANAGEMENT
+          TAB 4: SPONSORS & BRAND PARTNERS (RIGHT-TO-LEFT MARQUEE)
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === 'sponsors' && (
+        <div className="space-y-6">
+          {/* Main Controls Card */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/15 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00] shrink-0">
+                  <TrophyIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-sans font-bold text-white uppercase tracking-tight">
+                    OFFICIAL SPONSORS &amp; BRAND PARTNERS
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Manage sponsor logos, tiers, and clickable links for the right-to-left marquee ticker on the homepage.
+                  </p>
+                </div>
+              </div>
+
+              {/* Toggle Switch */}
+              <button
+                type="button"
+                onClick={() => setSponsorsEnabled(!sponsorsEnabled)}
+                className={`px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  sponsorsEnabled
+                    ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.35)]'
+                    : 'bg-white/10 text-neutral-400'
+                }`}
+              >
+                {sponsorsEnabled ? '● MARQUEE ACTIVE' : '○ MARQUEE HIDDEN'}
+              </button>
+            </div>
+
+            {/* Marquee Title & Subtitle Config */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  MARQUEE SECTION TITLE (HEADLINE)
+                </label>
+                <input
+                  type="text"
+                  value={sponsorsTitle}
+                  onChange={(e) => setSponsorsTitle(e.target.value)}
+                  placeholder="OFFICIAL SPONSORS & PARTNERS"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  SUPPORTING SUBTITLE
+                </label>
+                <input
+                  type="text"
+                  value={sponsorsSubtitle}
+                  onChange={(e) => setSponsorsSubtitle(e.target.value)}
+                  placeholder="POWERING THE PUBG MOBILE COMMUNITY ASSEMBLY ETHIOPIA"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Add / Edit Sponsor Form */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-5">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#CCFF00]" />
+                <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                  {editingSponsorId ? 'EDIT SPONSOR PARTNER' : 'ADD NEW SPONSOR OR PARTNER'}
+                </h3>
+              </div>
+              {editingSponsorId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEditSponsor}
+                  className="text-xs text-neutral-400 hover:text-white underline uppercase cursor-pointer"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
+
+            {sponsorFormError && (
+              <div className="p-3 rounded-xl text-xs bg-red-500/10 border border-red-500/30 text-red-300 flex items-center gap-2">
+                <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />
+                <span>{sponsorFormError}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  BRAND / COMPANY NAME *
+                </label>
+                <input
+                  type="text"
+                  value={sponsorNameInput}
+                  onChange={(e) => setSponsorNameInput(e.target.value)}
+                  placeholder="e.g. Telebirr, Level Infinite"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  PARTNERSHIP TIER / BADGE
+                </label>
+                <input
+                  type="text"
+                  value={sponsorTierInput}
+                  onChange={(e) => setSponsorTierInput(e.target.value)}
+                  placeholder="e.g. Official Title Sponsor, Banking Partner"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  WEBSITE / SOCIAL LINK
+                </label>
+                <input
+                  type="text"
+                  value={sponsorUrlInput}
+                  onChange={(e) => setSponsorUrlInput(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                />
+              </div>
+            </div>
+
+            {/* Logo Upload & URL Box */}
+            <div className="p-4 rounded-xl border border-white/10 bg-black/40 space-y-3">
+              <span className="font-sans text-xs font-bold text-neutral-300 uppercase tracking-wider block">
+                SPONSOR LOGO (FILE UPLOAD OR URL)
+              </span>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {/* Logo Preview Square */}
+                <div className="w-16 h-16 rounded-xl bg-[#141414] border border-white/15 flex items-center justify-center overflow-hidden shrink-0">
+                  {sponsorLogoInput ? (
+                    <img
+                      src={sponsorLogoInput}
+                      alt="Preview"
+                      className="w-full h-full object-contain p-1.5"
+                    />
+                  ) : (
+                    <span className="font-heading font-black text-base text-[#CCFF00]">
+                      {sponsorNameInput ? sponsorNameInput.slice(0, 2).toUpperCase() : 'LOGO'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Upload or URL Inputs */}
+                <div className="flex-1 w-full space-y-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <label className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-sans text-xs font-bold uppercase tracking-wider cursor-pointer text-center transition-colors">
+                      <span>CHOOSE LOGO FILE</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <input
+                      type="text"
+                      value={sponsorLogoInput}
+                      onChange={(e) => setSponsorLogoInput(e.target.value)}
+                      placeholder="Or paste image URL (e.g. /images/pubg-mobile-logo.png or https://...)"
+                      className="flex-1 px-4 py-2 rounded-xl border text-xs text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                    />
+
+                    {sponsorLogoInput && (
+                      <button
+                        type="button"
+                        onClick={() => setSponsorLogoInput('')}
+                        className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 text-xs font-sans font-bold uppercase cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-neutral-400 font-sans">
+                    Supports PNG, JPG, SVG, WebP with transparent backgrounds. If no logo is provided, a tactical monogram is generated automatically.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => handleAddOrUpdateSponsor()}
+                className="px-6 py-2.5 rounded-xl bg-[#CCFF00] text-black font-sans text-xs font-bold uppercase tracking-wider hover:bg-[#b8e600] transition-colors cursor-pointer shadow-md"
+              >
+                {editingSponsorId ? '✓ UPDATE SPONSOR' : '+ ADD SPONSOR TO MARQUEE'}
+              </button>
+            </div>
+          </div>
+
+          {/* Existing Sponsors List */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                CURRENT SPONSORS LIST ({sponsorsList.length})
+              </h3>
+              <span className="text-xs text-neutral-400 font-sans">
+                {sponsorsList.length} partner{sponsorsList.length === 1 ? '' : 's'} configured
+              </span>
+            </div>
+
+            {sponsorsList.length === 0 ? (
+              <div className="py-10 text-center space-y-2 border border-dashed border-white/10 rounded-xl bg-black/20">
+                <p className="text-sm text-neutral-400 font-sans">No sponsors added yet.</p>
+                <p className="text-xs text-neutral-500 font-sans">
+                  Use the form above to add your first event partner or sponsor brand.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {sponsorsList.map((sponsor, idx) => (
+                  <div
+                    key={sponsor.id}
+                    className="p-3 sm:p-4 rounded-xl border border-white/10 bg-[#161616] hover:bg-[#1a1a1a] transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                  >
+                    {/* Left: Thumbnail & Info */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                        {sponsor.logo ? (
+                          <img
+                            src={sponsor.logo}
+                            alt={sponsor.name}
+                            className="w-full h-full object-contain p-1"
+                          />
+                        ) : (
+                          <span className="font-heading font-black text-sm text-[#CCFF00]">
+                            {sponsor.name.slice(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-heading font-bold text-sm text-white tracking-wide uppercase truncate">
+                            {sponsor.name}
+                          </h4>
+                          {sponsor.tier && (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#CCFF00]/10 text-[#CCFF00] border border-[#CCFF00]/20 uppercase">
+                              {sponsor.tier}
+                            </span>
+                          )}
+                        </div>
+                        {sponsor.url && (
+                          <a
+                            href={sponsor.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-neutral-400 hover:text-[#CCFF00] truncate flex items-center gap-1 font-sans mt-0.5"
+                          >
+                            <LinkChainIcon className="w-3 h-3 shrink-0" />
+                            <span className="truncate">{sponsor.url}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right: Order & Management Controls */}
+                    <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleMoveSponsor(idx, 'up')}
+                        disabled={idx === 0}
+                        title="Move Up"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveSponsor(idx, 'down')}
+                        disabled={idx === sponsorsList.length - 1}
+                        title="Move Down"
+                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartEditSponsor(sponsor)}
+                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-sans font-semibold text-neutral-200 hover:text-white cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSponsor(sponsor.id)}
+                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 cursor-pointer"
+                        title="Delete Sponsor"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Live Marquee Preview Box */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
+                <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                  LIVE MARQUEE PREVIEW (RIGHT TO LEFT)
+                </h3>
+              </div>
+              <span className="text-[11px] text-neutral-400 font-sans">
+                Hover to pause ticker
+              </span>
+            </div>
+
+            <div className="relative w-full overflow-hidden py-4 rounded-xl bg-black/60 border border-white/5">
+              <div className="absolute top-0 bottom-0 left-0 w-16 z-10 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none" />
+              <div className="absolute top-0 bottom-0 right-0 w-16 z-10 bg-gradient-to-l from-black via-black/80 to-transparent pointer-events-none" />
+
+              {sponsorsList.length === 0 ? (
+                <div className="py-6 text-center text-xs text-neutral-500 font-sans">
+                  Add sponsors above to see the live marquee ticker preview.
+                </div>
+              ) : (
+                <div className="animate-marquee gap-3 py-1 px-4 cursor-default select-none">
+                  {[...sponsorsList, ...sponsorsList, ...sponsorsList].map((sp, i) => (
+                    <div
+                      key={`preview-${sp.id}-${i}`}
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#181818] border border-white/10 shrink-0 min-w-[200px]"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-black border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                        {sp.logo ? (
+                          <img src={sp.logo} alt={sp.name} className="w-full h-full object-contain p-1" />
+                        ) : (
+                          <span className="font-heading font-black text-xs text-[#CCFF00]">
+                            {sp.name.slice(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0 pr-1">
+                        <span className="font-heading font-bold text-xs text-white uppercase truncate block">
+                          {sp.name}
+                        </span>
+                        {sp.tier && (
+                          <span className="font-sans text-[9px] text-[#CCFF00] uppercase truncate block">
+                            {sp.tier}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 5: HEAD ADMIN ACCESS & SUB-ADMIN MANAGEMENT
       ═══════════════════════════════════════════════════════════════ */}
       {activeTab === 'admins' && (
         <div className="space-y-6">

@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { CursorGlow } from '@/components/cinematic/CursorGlow';
 import { IntroSequence } from '@/components/cinematic/IntroSequence';
 import { HeroSection } from '@/components/cinematic/HeroSection';
+import { SponsorsMarquee } from '@/components/sections/SponsorsMarquee';
 import { AnnouncementPopup } from '@/components/ui/AnnouncementPopup';
 import { EventStory } from '@/components/sections/EventStory';
 import { EventDashboard } from '@/components/sections/EventDashboard';
@@ -28,6 +29,7 @@ export default function HomePage() {
 
       <main>
         <HeroSection />
+        <SponsorsMarquee />
         <EventStory />
         <EventDashboard />
         <FAQ />

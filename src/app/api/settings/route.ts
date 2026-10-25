@@ -43,6 +43,47 @@ export async function GET() {
       // Community Socials
       telegramLink: map.get('telegram_link') || 'https://t.me/pubgmethiopia',
       discordLink: map.get('discord_link') || 'https://discord.gg/pubgethiopia',
+      // Sponsors Marquee
+      sponsorsEnabled: map.has('sponsors_enabled') ? map.get('sponsors_enabled') === 'true' : true,
+      sponsorsTitle: map.get('sponsors_title') || 'OFFICIAL SPONSORS & PARTNERS',
+      sponsorsSubtitle: map.get('sponsors_subtitle') || 'POWERING THE PUBG MOBILE COMMUNITY ASSEMBLY ETHIOPIA',
+      sponsors: (() => {
+        try {
+          if (map.has('sponsors_data')) return JSON.parse(map.get('sponsors_data')!);
+        } catch {
+          // fallback
+        }
+        return [
+          {
+            id: 'sp-1',
+            name: 'PUBG MOBILE',
+            logo: '/images/pubg-mobile-logo.png',
+            url: 'https://www.pubgmobile.com',
+            tier: 'Official Title Sponsor',
+          },
+          {
+            id: 'sp-2',
+            name: 'Level Infinite',
+            logo: '',
+            url: 'https://www.levelinfinite.com',
+            tier: 'Official Publisher',
+          },
+          {
+            id: 'sp-3',
+            name: 'Telebirr',
+            logo: '',
+            url: 'https://www.ethiotelecom.et/telebirr',
+            tier: 'Official Payment Partner',
+          },
+          {
+            id: 'sp-4',
+            name: 'Awash Bank',
+            logo: '',
+            url: 'https://awashbank.com',
+            tier: 'Official Banking Partner',
+          },
+        ];
+      })(),
     });
   } catch {
     return NextResponse.json({
@@ -69,6 +110,39 @@ export async function GET() {
       awashName: 'Tsige Dagne',
       telegramLink: 'https://t.me/pubgmethiopia',
       discordLink: 'https://discord.gg/pubgethiopia',
+      sponsorsEnabled: true,
+      sponsorsTitle: 'OFFICIAL SPONSORS & PARTNERS',
+      sponsorsSubtitle: 'POWERING THE PUBG MOBILE COMMUNITY ASSEMBLY ETHIOPIA',
+      sponsors: [
+        {
+          id: 'sp-1',
+          name: 'PUBG MOBILE',
+          logo: '/images/pubg-mobile-logo.png',
+          url: 'https://www.pubgmobile.com',
+          tier: 'Official Title Sponsor',
+        },
+        {
+          id: 'sp-2',
+          name: 'Level Infinite',
+          logo: '',
+          url: 'https://www.levelinfinite.com',
+          tier: 'Official Publisher',
+        },
+        {
+          id: 'sp-3',
+          name: 'Telebirr',
+          logo: '',
+          url: 'https://www.ethiotelecom.et/telebirr',
+          tier: 'Official Payment Partner',
+        },
+        {
+          id: 'sp-4',
+          name: 'Awash Bank',
+          logo: '',
+          url: 'https://awashbank.com',
+          tier: 'Official Banking Partner',
+        },
+      ],
     });
   }
 }
