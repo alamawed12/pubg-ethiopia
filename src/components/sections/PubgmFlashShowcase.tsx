@@ -148,39 +148,6 @@ export function PubgmFlashShowcase() {
           </button>
         </motion.div>
 
-        {/* App Store & Google Play Quick Links */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-3 pt-1"
-        >
-          <a
-            href="https://pubggo.go.link/c6Use"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => playSound('click')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-xs font-sans text-neutral-300 transition-colors"
-          >
-            <span className="text-white font-bold">App Store</span>
-            <span className="text-neutral-500">•</span>
-            <span className="text-[#00c2ff]">Pre-order</span>
-          </a>
-
-          <a
-            href="https://pubggo.go.link/c6Use"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => playSound('click')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-xs font-sans text-neutral-300 transition-colors"
-          >
-            <span className="text-white font-bold">Google Play</span>
-            <span className="text-neutral-500">•</span>
-            <span className="text-[#00c2ff]">Pre-register</span>
-          </a>
-        </motion.div>
-
         {/* Legal Footnote */}
         <p className="font-sans text-[11px] sm:text-xs text-neutral-400 italic pt-1 max-w-md mx-auto">
           Total rewards include in-game and out-of-game rewards. Actual value may vary by region.

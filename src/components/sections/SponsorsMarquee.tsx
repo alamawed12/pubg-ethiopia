@@ -68,8 +68,8 @@ export function SponsorsMarquee() {
         <div className="absolute top-0 bottom-0 left-0 w-20 sm:w-36 z-10 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none" />
         <div className="absolute top-0 bottom-0 right-0 w-20 sm:w-36 z-10 bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent pointer-events-none" />
 
-        {/* Scrolling Strip */}
-        <div className="animate-marquee items-center py-2 border-none">
+        {/* Scrolling Strip — Uninterrupted Continuous Infinite Loop */}
+        <div className="animate-marquee items-center py-2 border-none pointer-events-none select-none">
           {marqueeItems.map((sponsor, index) => {
             const errorKey = `${sponsor.id}-${index}`;
             const hasLogo = Boolean(sponsor.logo && !imgErrors[errorKey]);

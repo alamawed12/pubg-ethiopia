@@ -234,10 +234,6 @@ body {
   will-change: transform;
 }
 
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
-
 /* ─── Reduced Motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
