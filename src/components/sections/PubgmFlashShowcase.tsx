@@ -31,167 +31,163 @@ export function PubgmFlashShowcase() {
     <section
       id="flash"
       aria-label="PUBG Mobile Flash Official Launch"
-      className="relative w-full min-h-[580px] lg:min-h-[660px] flex flex-col justify-center bg-[#040811] overflow-hidden select-none py-12 sm:py-16"
+      className="relative w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-[#040811] overflow-hidden select-none"
     >
-      {/* ─── Ambient Atmospheric Lightning & Glow Effects ─── */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[400px] bg-[#00c2ff]/10 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[550px] h-[400px] bg-[#00a3ff]/12 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute inset-0 tactical-grid opacity-10 pointer-events-none" />
+      {/* ─── Ambient Atmospheric Cyan Lighting & Tactical Grid ─── */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[900px] h-[450px] bg-[#00c2ff]/10 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[300px] bg-[#0077ff]/8 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute inset-0 tactical-grid opacity-15 pointer-events-none" />
 
-      {/* ─── Big Frameless Right-Bleed Artwork (Full Height, Edge-to-Edge Right, Seamless Dissolve) ─── */}
-      <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[60%] xl:w-[54%] h-full flex items-center justify-end overflow-hidden z-10 pointer-events-none lg:pointer-events-auto">
-        <a
-          href="https://pubggo.go.link/c6Use"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => playSound('click')}
-          onMouseEnter={() => playSound('hover')}
-          title="Pre-Register for PUBG MOBILE FLASH"
-          className="relative h-full w-full flex items-center justify-end cursor-pointer group select-none focus:outline-none"
+      {/* ─── Centered Clean Typography & Action Content ─── */}
+      <div className="max-w-4xl mx-auto relative z-10 text-center space-y-7">
+        
+        {/* Top Status Pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00c2ff]/10 border border-[#00c2ff]/40 text-[#00c2ff] text-xs font-mono font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(0,194,255,0.25)]"
         >
-          {/* Soft dissolving gradients blending the photo edges into the dark background */}
-          <div className="absolute inset-y-0 left-0 w-32 sm:w-48 md:w-64 bg-gradient-to-r from-[#040811] via-[#040811]/90 to-transparent z-20 pointer-events-none" />
-          <div className="absolute inset-x-0 top-0 h-16 sm:h-24 bg-gradient-to-b from-[#040811] to-transparent z-20 pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-16 sm:h-24 bg-gradient-to-t from-[#040811] to-transparent z-20 pointer-events-none" />
+          <span className="w-2 h-2 rounded-full bg-[#00c2ff] animate-ping" />
+          <span>OFFICIAL GLOBAL PRE-REGISTRATION · COMING SOON</span>
+        </motion.div>
 
-          {/* Big high-resolution promo artwork spanning full height */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/pubgm-flash-promo.png"
-            alt="PUBG Mobile Flash - Coming Soon November 13"
-            className="h-full w-full object-cover lg:object-contain object-right transform group-hover:scale-[1.015] transition-transform duration-700 opacity-90 lg:opacity-100"
-            style={{
-              WebkitMaskImage:
-                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 12%, rgba(0,0,0,0.9) 25%, black 40%)',
-              maskImage:
-                'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 12%, rgba(0,0,0,0.9) 25%, black 40%)',
-            }}
-          />
-        </a>
-      </div>
+        {/* Main Title: Crisp White PUBG MOBILE + Full Blue FLASH */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="space-y-1"
+        >
+          <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black font-heading tracking-tight uppercase leading-none">
+            <span className="text-white block drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+              PUBG MOBILE
+            </span>
+            {/* Full Solid Electric Blue FLASH */}
+            <span className="text-[#00c2ff] drop-shadow-[0_0_40px_rgba(0,194,255,0.85)] filter inline-block">
+              FLASH
+            </span>
+          </h2>
 
-      {/* ─── Left Content Column (Native Sharp Typography & Actions) ─── */}
-      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="max-w-xl lg:max-w-2xl space-y-5 text-center lg:text-left">
-          
-          {/* Top Status Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00c2ff]/10 border border-[#00c2ff]/40 text-[#00c2ff] text-xs font-mono font-bold tracking-wider uppercase shadow-[0_0_20px_rgba(0,194,255,0.25)]">
-            <span className="w-2 h-2 rounded-full bg-[#00c2ff] animate-ping" />
-            <span>OFFICIAL GLOBAL PRE-REGISTRATION · COMING SOON</span>
+          {/* Subheading: November 13 Launch Date */}
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <span className="inline-block w-8 sm:w-12 h-[2px] bg-gradient-to-r from-transparent to-[#00c2ff]/60" />
+            <span className="font-heading font-black italic text-lg sm:text-2xl md:text-3xl text-[#00c2ff] tracking-widest uppercase">
+              COMING SOON · NOVEMBER 13
+            </span>
+            <span className="inline-block w-8 sm:w-12 h-[2px] bg-gradient-to-l from-transparent to-[#00c2ff]/60" />
           </div>
+        </motion.div>
 
-          {/* Main Title: Full Blue FLASH */}
-          <div className="space-y-1.5">
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-black font-heading tracking-tight uppercase leading-none">
-              <span className="text-white block drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
-                PUBG MOBILE
-              </span>
-              {/* Full Solid Electric Blue FLASH */}
-              <span className="text-[#00c2ff] drop-shadow-[0_0_40px_rgba(0,194,255,0.9)] filter inline-block">
-                FLASH
-              </span>
-            </h2>
-
-            {/* Subheading: November 13 Launch Date */}
-            <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
-              <span className="font-heading font-black italic text-lg sm:text-2xl text-[#00c2ff] tracking-widest uppercase">
-                COMING SOON · NOVEMBER 13 —
-              </span>
-            </div>
+        {/* US $1,000,000 Reward Callout */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="py-1"
+        >
+          <div className="font-heading font-black text-4xl sm:text-6xl md:text-7xl text-[#ffe600] tracking-tight leading-none drop-shadow-[0_4px_20px_rgba(255,230,0,0.45)]">
+            US $1,000,000
           </div>
-
-          {/* US $1,000,000 Reward Callout */}
-          <div className="py-1">
-            <div className="inline-block text-center lg:text-left">
-              <div className="font-heading font-black text-4xl sm:text-6xl md:text-7xl text-[#ffe600] tracking-tight leading-none drop-shadow-[0_4px_20px_rgba(255,230,0,0.5)]">
-                US $1,000,000
-              </div>
-              <div className="font-heading font-bold text-sm sm:text-lg text-neutral-300 tracking-wider uppercase mt-1">
-                IN REWARDS AWAITS — STAY TUNED!
-              </div>
-            </div>
+          <div className="font-heading font-bold text-sm sm:text-lg md:text-xl text-neutral-300 tracking-wider uppercase mt-1.5">
+            IN REWARDS AWAITS — STAY TUNED!
           </div>
+        </motion.div>
 
-          {/* Primary Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-1">
-            {/* Main Pre-Register Button */}
-            <a
-              href="https://pubggo.go.link/c6Use"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => playSound('click')}
-              onMouseEnter={() => playSound('hover')}
-              className="px-7 sm:px-9 py-3.5 rounded-xl font-heading font-black text-sm sm:text-base uppercase tracking-wider bg-[#00c2ff] hover:bg-[#38bdf8] text-black shadow-[0_0_30px_rgba(0,194,255,0.6)] hover:shadow-[0_0_45px_rgba(0,194,255,0.9)] transform hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <span>PRE-REGISTER NOW</span>
-              <span className="font-bold">&gt;</span>
-            </a>
+        {/* Primary Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex flex-wrap items-center justify-center gap-3.5 pt-2"
+        >
+          {/* Main Pre-Register Button */}
+          <a
+            href="https://pubggo.go.link/c6Use"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => playSound('click')}
+            onMouseEnter={() => playSound('hover')}
+            className="px-8 sm:px-10 py-4 rounded-xl font-heading font-black text-sm sm:text-base uppercase tracking-wider bg-[#00c2ff] hover:bg-[#38bdf8] text-black shadow-[0_0_30px_rgba(0,194,255,0.6)] hover:shadow-[0_0_45px_rgba(0,194,255,0.9)] transform hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <span>PRE-REGISTER NOW</span>
+            <span className="font-bold">&gt;</span>
+          </a>
 
-            {/* Go to Official Website */}
-            <a
-              href="https://pubgmobile.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => playSound('click')}
-              onMouseEnter={() => playSound('hover')}
-              className="px-5 py-3.5 rounded-xl font-heading font-bold text-xs sm:text-sm uppercase tracking-wider bg-black/80 hover:bg-black text-white border border-white/20 hover:border-[#00c2ff]/60 transition-all flex items-center gap-2 cursor-pointer shadow-md"
-            >
-              <svg className="w-4 h-4 text-[#00c2ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span>GO TO OFFICIAL WEBSITE &gt;</span>
-            </a>
+          {/* Go to Official Website */}
+          <a
+            href="https://pubgmobile.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => playSound('click')}
+            onMouseEnter={() => playSound('hover')}
+            className="px-5 py-4 rounded-xl font-heading font-bold text-xs sm:text-sm uppercase tracking-wider bg-black/80 hover:bg-black text-white border border-white/20 hover:border-[#00c2ff]/60 transition-all flex items-center gap-2.5 cursor-pointer shadow-md"
+          >
+            <svg className="w-4 h-4 text-[#00c2ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>GO TO OFFICIAL WEBSITE &gt;</span>
+          </a>
 
-            {/* Share Button */}
-            <button
-              type="button"
-              onClick={handleShare}
-              onMouseEnter={() => playSound('hover')}
-              title="Share Campaign"
-              aria-label="Share Campaign Link"
-              className="p-3.5 rounded-xl bg-black/80 hover:bg-black text-neutral-300 hover:text-white border border-white/20 hover:border-[#00c2ff]/60 transition-all cursor-pointer shadow-md"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-            </button>
-          </div>
+          {/* Share Button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            onMouseEnter={() => playSound('hover')}
+            title="Share Campaign"
+            aria-label="Share Campaign Link"
+            className="p-4 rounded-xl bg-black/80 hover:bg-black text-neutral-300 hover:text-white border border-white/20 hover:border-[#00c2ff]/60 transition-all cursor-pointer shadow-md"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
+        </motion.div>
 
-          {/* App Store & Google Play Quick Links */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1">
-            <a
-              href="https://pubggo.go.link/c6Use"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => playSound('click')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-[11px] font-sans text-neutral-300 transition-colors"
-            >
-              <span className="text-white font-bold">App Store</span>
-              <span className="text-neutral-500">•</span>
-              <span className="text-[#00c2ff]">Pre-order</span>
-            </a>
+        {/* App Store & Google Play Quick Links */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-3 pt-1"
+        >
+          <a
+            href="https://pubggo.go.link/c6Use"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => playSound('click')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-xs font-sans text-neutral-300 transition-colors"
+          >
+            <span className="text-white font-bold">App Store</span>
+            <span className="text-neutral-500">•</span>
+            <span className="text-[#00c2ff]">Pre-order</span>
+          </a>
 
-            <a
-              href="https://pubggo.go.link/c6Use"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => playSound('click')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-[11px] font-sans text-neutral-300 transition-colors"
-            >
-              <span className="text-white font-bold">Google Play</span>
-              <span className="text-neutral-500">•</span>
-              <span className="text-[#00c2ff]">Pre-register</span>
-            </a>
-          </div>
+          <a
+            href="https://pubggo.go.link/c6Use"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => playSound('click')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-xs font-sans text-neutral-300 transition-colors"
+          >
+            <span className="text-white font-bold">Google Play</span>
+            <span className="text-neutral-500">•</span>
+            <span className="text-[#00c2ff]">Pre-register</span>
+          </a>
+        </motion.div>
 
-          {/* Legal Footnote */}
-          <p className="font-sans text-[11px] text-neutral-400 italic pt-1">
-            Total rewards include in-game and out-of-game rewards. Actual value may vary by region.
-          </p>
-        </div>
+        {/* Legal Footnote */}
+        <p className="font-sans text-[11px] sm:text-xs text-neutral-400 italic pt-1 max-w-md mx-auto">
+          Total rewards include in-game and out-of-game rewards. Actual value may vary by region.
+        </p>
 
-        {/* ─── Bottom Navigation: Smooth Scroll Down ─── */}
-        <div className="text-center pt-10 sm:pt-14">
+        {/* Bottom Navigation: Smooth Scroll Down */}
+        <div className="pt-8 sm:pt-12">
           <button
             type="button"
             onClick={scrollToNext}
