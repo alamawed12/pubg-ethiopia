@@ -159,12 +159,12 @@ export function FAQ() {
             </p>
           </div>
           <a
-            href="https://t.me/pubgmethsupport"
+            href="https://t.me/pubgm_eth"
             target="_blank"
             rel="noopener noreferrer"
             className="font-sans text-xs font-bold text-[#CCFF00] hover:underline shrink-0 uppercase tracking-wider"
           >
-            NEED HELP? ASK SUPPORT →
+            OFFICIAL TELEGRAM CHANNEL →
           </a>
         </div>
       </div>

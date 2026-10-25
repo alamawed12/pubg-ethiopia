@@ -127,14 +127,14 @@ export function Footer() {
             <ul className="flex flex-col gap-2 font-sans text-xs text-neutral-400 font-medium">
               <li>
                 <a
-                  href="https://t.me/pubgmethsupport"
+                  href="https://t.me/pubgm_eth"
                   target="_blank"
                   rel="noopener noreferrer"
                   onMouseEnter={() => playSound('hover')}
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>TELEGRAM SUPPORT</span>
+                  <span>OFFICIAL TELEGRAM</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>

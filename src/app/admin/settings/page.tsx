@@ -86,7 +86,7 @@ function SettingsContent() {
   const [awashName, setAwashName] = useState('Tsige Dagne');
 
   // Community Socials
-  const [telegramLink, setTelegramLink] = useState('https://t.me/pubgmethiopia');
+  const [telegramLink, setTelegramLink] = useState('https://t.me/pubgm_eth');
   const [discordLink, setDiscordLink] = useState('https://discord.gg/pubgethiopia');
 
   // Sponsors Marquee
@@ -1350,7 +1350,7 @@ function SettingsContent() {
                   type="text"
                   value={telegramLink}
                   onChange={(e) => setTelegramLink(e.target.value)}
-                  placeholder="https://t.me/pubgmethiopia"
+                  placeholder="https://t.me/pubgm_eth"
                   className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
                 />
               </div>

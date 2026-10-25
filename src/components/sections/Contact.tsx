@@ -27,12 +27,12 @@ function DiscordLogo({ className = 'w-7 h-7' }: { className?: string }) {
 
 const communityChannels = [
   {
-    name: 'TELEGRAM SUPPORT',
-    handle: '@pubgmethsupport',
-    href: 'https://t.me/pubgmethsupport',
+    name: 'OFFICIAL TELEGRAM CHANNEL',
+    handle: '@pubgm_eth',
+    href: 'https://t.me/pubgm_eth',
     icon: <TelegramLogo className="w-7 h-7 shrink-0" />,
-    badge: 'SUPPORT',
-    badgeColor: 'bg-sky-400/10 text-sky-300 border-sky-400/30',
+    badge: 'OFFICIAL',
+    badgeColor: 'bg-[#CCFF00]/10 text-[#CCFF00] border-[#CCFF00]/30',
   },
   {
     name: 'DISCORD SERVER',
@@ -43,12 +43,12 @@ const communityChannels = [
     badgeColor: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/30',
   },
   {
-    name: 'TELEGRAM CHANNEL',
+    name: 'TELEGRAM COMMUNITY',
     handle: '@pubgm_eth',
     href: 'https://t.me/pubgm_eth',
     icon: <TelegramLogo className="w-7 h-7 shrink-0" />,
-    badge: 'OFFICIAL',
-    badgeColor: 'bg-[#CCFF00]/10 text-[#CCFF00] border-[#CCFF00]/30',
+    badge: 'JOIN NOW',
+    badgeColor: 'bg-sky-400/10 text-sky-300 border-sky-400/30',
   },
 ];
 

@@ -57,7 +57,7 @@ export async function GET() {
       awashAccount: map.get('awash_account') || '013201378990300',
       awashName: map.get('awash_name') || 'Tsige Dagne',
       // Community links
-      telegramLink: map.get('telegram_link') || 'https://t.me/pubgmethiopia',
+      telegramLink: map.get('telegram_link') || 'https://t.me/pubgm_eth',
       discordLink: map.get('discord_link') || 'https://discord.gg/pubgethiopia',
       // Sponsors Marquee
       sponsorsEnabled: map.has('sponsors_enabled') ? map.get('sponsors_enabled') === 'true' : true,

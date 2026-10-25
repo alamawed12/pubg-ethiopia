@@ -98,7 +98,7 @@ export function RegistrationForm() {
   // Dynamic Registration Gate status (controlled by Head Admin in /admin/settings)
   const [isGateLoaded, setIsGateLoaded] = useState<boolean>(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean>(true);
-  const [telegramLink, setTelegramLink] = useState<string>('https://t.me/pubgmethiopia');
+  const [telegramLink, setTelegramLink] = useState<string>('https://t.me/pubgm_eth');
 
   useEffect(() => {
     fetch('/api/settings')
@@ -275,7 +275,7 @@ export function RegistrationForm() {
           </Button>
 
           <a
-            href={telegramLink}
+            href={telegramLink || 'https://t.me/pubgm_eth'}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto px-6 py-4 rounded-xl border border-white/20 bg-neutral-900 hover:bg-neutral-800 text-white font-heading font-black text-xs sm:text-sm tracking-wider uppercase transition-colors flex items-center justify-center gap-2"
