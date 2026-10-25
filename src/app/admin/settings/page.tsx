@@ -105,6 +105,7 @@ function SettingsContent() {
 
   // Community Socials
   const [telegramLink, setTelegramLink] = useState('https://t.me/pubgm_eth');
+  const [telegramSupport, setTelegramSupport] = useState('https://t.me/pubgmethsupport');
   const [discordLink, setDiscordLink] = useState('https://discord.gg/pubgethiopia');
 
   // Sponsors Marquee
@@ -161,6 +162,7 @@ function SettingsContent() {
 
           // Socials
           if (d.telegramLink) setTelegramLink(d.telegramLink);
+          if (d.telegramSupport) setTelegramSupport(d.telegramSupport);
           if (d.discordLink) setDiscordLink(d.discordLink);
 
           // Sponsors
@@ -513,6 +515,7 @@ function SettingsContent() {
           awashAccount: awashAccount.trim(),
           awashName: awashName.trim(),
           telegramLink: telegramLink.trim(),
+          telegramSupport: telegramSupport.trim(),
           discordLink: discordLink.trim(),
           sponsorsEnabled,
           sponsorsTitle: sponsorsTitle.trim(),
@@ -2019,6 +2022,42 @@ function SettingsContent() {
                 />
                 <p className="text-[11px] text-neutral-400 font-sans mt-1.5 leading-relaxed">
                   Active across the site footer, registration confirmation screen, and attendee pass portal. This is the single official channel for PUBG Mobile Ethiopia.
+                </p>
+              </div>
+            </div>
+
+            {/* Official Telegram Support Team Card */}
+            <div className="p-5 rounded-xl border border-sky-500/30 bg-sky-500/[0.04] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="font-sans text-xs font-bold text-amber-300 uppercase tracking-wider">
+                    TELEGRAM SUPPORT TEAM ACCOUNT
+                  </span>
+                </div>
+                <a
+                  href={telegramSupport}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-sans font-bold uppercase transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+                >
+                  <span>Open Support ↗</span>
+                </a>
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  SUPPORT ACCOUNT LINK / HANDLE
+                </label>
+                <input
+                  type="text"
+                  value={telegramSupport}
+                  onChange={(e) => setTelegramSupport(e.target.value)}
+                  placeholder="https://t.me/pubgmethsupport"
+                  className="w-full px-4 py-3 rounded-xl border text-sm text-white font-sans outline-none focus:border-amber-400 bg-black/50 border-white/10"
+                />
+                <p className="text-[11px] text-neutral-400 font-sans mt-1.5 leading-relaxed">
+                  Direct attendee support line for payment disputes, ticket recovery, and registration help. Displayed across the homepage contact section, FAQ, and footer.
                 </p>
               </div>
             </div>

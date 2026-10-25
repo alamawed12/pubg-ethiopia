@@ -158,14 +158,25 @@ export function FAQ() {
               Official PUBG MOBILE Assembly FAQ • Controlled and operated directly under <strong className="text-white font-semibold">PUBG MOBILE HQ</strong>.
             </p>
           </div>
-          <a
-            href="https://t.me/pubgm_eth"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-sans text-xs font-bold text-[#CCFF00] hover:underline shrink-0 uppercase tracking-wider"
-          >
-            OFFICIAL TELEGRAM CHANNEL →
-          </a>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4">
+            <a
+              href="https://t.me/pubgmethsupport"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-xs font-bold text-[#CCFF00] hover:underline shrink-0 uppercase tracking-wider"
+            >
+              NEED HELP? ASK SUPPORT TEAM →
+            </a>
+            <span className="text-white/20 hidden sm:inline">•</span>
+            <a
+              href="https://t.me/pubgm_eth"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-xs font-bold text-neutral-300 hover:text-white hover:underline shrink-0 uppercase tracking-wider"
+            >
+              TELEGRAM CHANNEL →
+            </a>
+          </div>
         </div>
       </div>
     </section>

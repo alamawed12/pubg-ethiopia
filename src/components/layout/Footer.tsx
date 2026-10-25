@@ -142,6 +142,21 @@ export function Footer() {
               </li>
               <li>
                 <a
+                  href="https://t.me/pubgmethsupport"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => playSound('click')}
+                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
+                >
+                  <span>TELEGRAM SUPPORT TEAM</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
+                    ↗
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
                   href="https://discord.gg/73xvuBch"
                   target="_blank"
                   rel="noopener noreferrer"

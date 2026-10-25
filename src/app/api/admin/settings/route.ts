@@ -58,6 +58,7 @@ export async function GET() {
       awashName: map.get('awash_name') || 'Tsige Dagne',
       // Community links
       telegramLink: map.get('telegram_link') || 'https://t.me/pubgm_eth',
+      telegramSupport: map.get('telegram_support') || 'https://t.me/pubgmethsupport',
       discordLink: map.get('discord_link') || 'https://discord.gg/pubgethiopia',
       // Sponsors Marquee
       sponsorsEnabled: map.has('sponsors_enabled') ? map.get('sponsors_enabled') === 'true' : true,
@@ -134,6 +135,7 @@ export async function POST(req: NextRequest) {
       awashAccount,
       awashName,
       telegramLink,
+      telegramSupport,
       discordLink,
       sponsorsEnabled,
       sponsorsTitle,
@@ -417,6 +419,14 @@ export async function POST(req: NextRequest) {
         where: { key: 'telegram_link' },
         update: { value: String(telegramLink).trim() },
         create: { key: 'telegram_link', value: String(telegramLink).trim() },
+      });
+    }
+
+    if (telegramSupport !== undefined) {
+      await prisma.systemSetting.upsert({
+        where: { key: 'telegram_support' },
+        update: { value: String(telegramSupport).trim() },
+        create: { key: 'telegram_support', value: String(telegramSupport).trim() },
       });
     }
 
