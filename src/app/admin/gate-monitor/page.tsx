@@ -69,7 +69,6 @@ export default function AdminGateMonitorPage() {
   const [search, setSearch] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [selectedEntry, setSelectedEntry] = useState<RecentCheckIn | null>(null);
-  const [modalImageMode, setModalImageMode] = useState<'selfie' | 'id'>('selfie');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -144,10 +143,10 @@ export default function AdminGateMonitorPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-sans font-black uppercase tracking-tight text-white mt-1">
-            GATE COMMAND &amp; BIOMETRIC MONITOR
+            GATE COMMAND &amp; VENUE MONITOR
           </h1>
           <p className="text-sm font-sans text-neutral-400 mt-0.5">
-            Real-time venue check-ins, attendee face identity inspection, and admission telemetry.
+            Real-time venue check-ins, attendee access verification, and admission telemetry (Privacy Protected).
           </p>
         </div>
 
@@ -327,14 +326,11 @@ export default function AdminGateMonitorPage() {
         <div className="p-4 sm:p-5 rounded-2xl border border-[#CCFF00]/40 bg-gradient-to-r from-[#0d170d] via-[#121212] to-[#141414] shadow-[0_0_25px_rgba(204,255,0,0.12)]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              {/* Large Spotlight Face Avatar */}
+              {/* Large Spotlight Tactical Avatar */}
               <div
-                onClick={() => {
-                  setSelectedEntry(latestEntry);
-                  setModalImageMode('selfie');
-                }}
+                onClick={() => setSelectedEntry(latestEntry)}
                 className="relative group shrink-0 cursor-pointer"
-                title="Click to inspect latest attendee"
+                title="Click to inspect attendee credentials"
               >
                 <div
                   className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-0.5 transition-all duration-300 group-hover:scale-105 ${
@@ -343,36 +339,23 @@ export default function AdminGateMonitorPage() {
                       : 'bg-gradient-to-br from-[#CCFF00] via-[#88bb00] to-emerald-500 shadow-[0_0_20px_rgba(204,255,0,0.35)]'
                   }`}
                 >
-                  <div className="w-full h-full bg-[#111111] rounded-[14px] overflow-hidden flex items-center justify-center relative">
-                    {latestEntry.selfieImage ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={latestEntry.selfieImage}
-                        alt={latestEntry.fullName}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : latestEntry.idFrontImage ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={latestEntry.idFrontImage}
-                        alt={latestEntry.fullName}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-white/10 to-white/5 text-white">
-                        <span className="font-heading font-black text-lg tracking-wider text-neutral-200">
-                          {getInitials(latestEntry.fullName || latestEntry.inGameName)}
-                        </span>
-                        <span className="text-[9px] font-mono text-[#CCFF00] uppercase tracking-widest mt-0.5">
-                          PUBG·M
-                        </span>
-                      </div>
-                    )}
+                  <div className="w-full h-full bg-[#111111] rounded-[14px] overflow-hidden flex flex-col items-center justify-center relative p-2">
+                    <span className="font-heading font-black text-xl tracking-wider text-white">
+                      {getInitials(latestEntry.fullName || latestEntry.inGameName)}
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono font-bold uppercase tracking-widest mt-0.5 ${
+                        latestEntry.ticketTier === 'VIP' ? 'text-amber-400' : 'text-[#CCFF00]'
+                      }`}
+                    >
+                      {latestEntry.ticketTier === 'VIP' ? 'VIP' : 'PUBG·M'}
+                    </span>
 
                     {/* Hover Zoom Overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </div>
                   </div>
@@ -454,13 +437,10 @@ export default function AdminGateMonitorPage() {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedEntry(latestEntry);
-                  setModalImageMode('selfie');
-                }}
+                onClick={() => setSelectedEntry(latestEntry)}
                 className="px-4 py-2 rounded-xl text-xs font-bold uppercase font-sans bg-[#CCFF00] text-black hover:bg-[#b8e600] transition-colors cursor-pointer shadow-[0_0_15px_rgba(204,255,0,0.25)]"
               >
-                Inspect Face Dossier
+                Inspect Gate Dossier
               </button>
             </div>
           </div>
@@ -520,14 +500,11 @@ export default function AdminGateMonitorPage() {
               >
                 {/* Left: Face Thumbnail + Attendee Info */}
                 <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  {/* Pro Face Avatar Beside Name */}
+                  {/* Pro Gamer Emblem Beside Name */}
                   <div
-                    onClick={() => {
-                      setSelectedEntry(entry);
-                      setModalImageMode('selfie');
-                    }}
+                    onClick={() => setSelectedEntry(entry)}
                     className="relative group/face shrink-0 cursor-pointer"
-                    title="Click to inspect attendee face"
+                    title="Click to inspect attendee credentials"
                   >
                     <div
                       className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl p-0.5 transition-all duration-200 group-hover/face:scale-105 ${
@@ -536,36 +513,23 @@ export default function AdminGateMonitorPage() {
                           : 'bg-gradient-to-br from-[#CCFF00] via-[#88bb00] to-emerald-500 shadow-[0_0_10px_rgba(204,255,0,0.25)]'
                       }`}
                     >
-                      <div className="w-full h-full bg-[#111111] rounded-[14px] overflow-hidden flex items-center justify-center relative">
-                        {entry.selfieImage ? (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={entry.selfieImage}
-                            alt={entry.fullName}
-                            className="w-full h-full object-cover group-hover/face:scale-110 transition-transform duration-300"
-                          />
-                        ) : entry.idFrontImage ? (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={entry.idFrontImage}
-                            alt={entry.fullName}
-                            className="w-full h-full object-cover group-hover/face:scale-110 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-white/10 to-white/5 text-white">
-                            <span className="font-heading font-black text-xs tracking-wider text-neutral-200">
-                              {getInitials(entry.fullName || entry.inGameName)}
-                            </span>
-                            <span className="text-[7px] font-mono text-[#CCFF00] uppercase tracking-widest mt-0.5">
-                              PUBG·M
-                            </span>
-                          </div>
-                        )}
+                      <div className="w-full h-full bg-[#111111] rounded-[14px] overflow-hidden flex flex-col items-center justify-center relative p-1.5">
+                        <span className="font-heading font-black text-sm sm:text-base tracking-wider text-white">
+                          {getInitials(entry.fullName || entry.inGameName)}
+                        </span>
+                        <span
+                          className={`text-[7px] font-mono font-bold uppercase tracking-widest mt-0.5 ${
+                            entry.ticketTier === 'VIP' ? 'text-amber-400' : 'text-[#CCFF00]'
+                          }`}
+                        >
+                          {entry.ticketTier === 'VIP' ? 'VIP' : 'PUBG·M'}
+                        </span>
 
                         {/* Hover Overlay Zoom Icon */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/face:opacity-100 transition-opacity flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </div>
                       </div>
@@ -587,14 +551,11 @@ export default function AdminGateMonitorPage() {
                     </div>
                   </div>
 
-                  {/* Name & Credentials Beside Face */}
+                  {/* Name & Credentials Beside Avatar */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span
-                        onClick={() => {
-                          setSelectedEntry(entry);
-                          setModalImageMode('selfie');
-                        }}
+                        onClick={() => setSelectedEntry(entry)}
                         className="font-heading text-base sm:text-lg font-black text-white tracking-wide truncate cursor-pointer hover:text-[#CCFF00] transition-colors"
                       >
                         {entry.inGameName}
@@ -619,18 +580,6 @@ export default function AdminGateMonitorPage() {
                       <span className="px-2 py-0.5 rounded text-[10px] font-sans font-medium uppercase bg-white/5 border border-white/10 text-neutral-300">
                         {formatCategory(entry.category)}
                       </span>
-
-                      {/* Live Face Badge */}
-                      {entry.selfieImage ? (
-                        <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          LIVE FACE VERIFIED
-                        </span>
-                      ) : entry.idFrontImage ? (
-                        <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-blue-500/15 text-blue-400 border border-blue-500/30">
-                          ID CARD ON FILE
-                        </span>
-                      ) : null}
                     </div>
 
                     {/* Metadata Sub-row */}
@@ -667,12 +616,9 @@ export default function AdminGateMonitorPage() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setSelectedEntry(entry);
-                      setModalImageMode('selfie');
-                    }}
+                    onClick={() => setSelectedEntry(entry)}
                     className="p-2 rounded-lg bg-white/5 hover:bg-[#CCFF00] hover:text-black text-neutral-300 border border-white/10 transition-colors cursor-pointer"
-                    title="Inspect Attendee Face &amp; ID Dossier"
+                    title="Inspect Attendee Gate Dossier"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -725,72 +671,39 @@ export default function AdminGateMonitorPage() {
               </button>
             </div>
 
-            {/* Photo Preview Section with Mode Switcher */}
+            {/* Privacy & ID Document Verification Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs uppercase tracking-wider text-neutral-400">
-                  {modalImageMode === 'selfie' ? 'LIVE CAPTURED FACE SELFIE' : 'NATIONAL ID CARD PHOTO'}
+                  {selectedEntry.idFrontImage ? 'NATIONAL ID DOCUMENT (GATE VERIFICATION)' : 'IDENTITY PRIVACY VERIFICATION'}
                 </span>
-
-                {selectedEntry.selfieImage && selectedEntry.idFrontImage && (
-                  <div className="flex items-center gap-1 bg-black/50 p-1 rounded-xl border border-white/10 text-xs font-mono">
-                    <button
-                      type="button"
-                      onClick={() => setModalImageMode('selfie')}
-                      className={`px-3 py-1 rounded-lg uppercase transition-all cursor-pointer ${
-                        modalImageMode === 'selfie'
-                          ? 'bg-[#CCFF00] text-black font-bold'
-                          : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Face Selfie
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setModalImageMode('id')}
-                      className={`px-3 py-1 rounded-lg uppercase transition-all cursor-pointer ${
-                        modalImageMode === 'id'
-                          ? 'bg-[#CCFF00] text-black font-bold'
-                          : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      National ID
-                    </button>
-                  </div>
-                )}
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  PRIVACY SECURED
+                </span>
               </div>
 
-              {/* Photo Display Card */}
+              {/* ID Document or Privacy Banner */}
               <div
-                className={`relative rounded-2xl overflow-hidden border p-1 bg-black flex items-center justify-center min-h-[220px] max-h-[340px] ${
-                  selectedEntry.ticketTier === 'VIP' ? 'border-amber-500/50 shadow-[0_0_20px_rgba(251,191,36,0.2)]' : 'border-[#CCFF00]/40'
+                className={`relative rounded-2xl overflow-hidden border p-3 bg-black flex items-center justify-center min-h-[160px] max-h-[300px] ${
+                  selectedEntry.ticketTier === 'VIP' ? 'border-amber-500/50 shadow-[0_0_20px_rgba(251,191,36,0.15)]' : 'border-[#CCFF00]/40'
                 }`}
               >
-                {modalImageMode === 'selfie' && selectedEntry.selfieImage ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={selectedEntry.selfieImage}
-                    alt="Attendee Live Face"
-                    className="max-h-[320px] w-auto max-w-full object-contain rounded-xl"
-                  />
-                ) : modalImageMode === 'id' && selectedEntry.idFrontImage ? (
+                {selectedEntry.idFrontImage ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={selectedEntry.idFrontImage}
                     alt="National ID Card"
-                    className="max-h-[320px] w-auto max-w-full object-contain rounded-xl"
-                  />
-                ) : selectedEntry.idFrontImage ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={selectedEntry.idFrontImage}
-                    alt="National ID Card"
-                    className="max-h-[320px] w-auto max-w-full object-contain rounded-xl"
+                    className="max-h-[280px] w-auto max-w-full object-contain rounded-xl"
                   />
                 ) : (
-                  <div className="py-12 text-center text-neutral-500 font-mono text-xs space-y-2">
-                    <ShieldSecurityIcon className="w-10 h-10 mx-auto text-neutral-600" />
-                    <p>No high-resolution live photo uploaded for this attendee.</p>
+                  <div className="py-8 text-center text-neutral-400 font-mono text-xs space-y-2 max-w-md mx-auto">
+                    <ShieldSecurityIcon className="w-10 h-10 mx-auto text-[#CCFF00]" />
+                    <p className="font-bold text-white uppercase text-sm font-heading">
+                      FACIAL BIOMETRICS EXEMPT (PRIVACY MODE)
+                    </p>
+                    <p className="text-[11px] text-neutral-400 leading-relaxed">
+                      In accordance with player privacy policies, no facial photos or camera selfies are collected from VIP or standard attendees.
+                    </p>
                   </div>
                 )}
               </div>

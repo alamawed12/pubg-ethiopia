@@ -23,7 +23,7 @@ const faqs = [
   {
     id: '04',
     q: 'Do I need to verify my identity or face?',
-    a: 'Additional identity verification may be required if implemented by the organizers. If ID or facial verification is introduced, the website will explain the process, request consent, and describe how your information will be protected.',
+    a: 'No face photo or facial scan is required. To protect attendee and VIP privacy, no facial biometric photos are collected. Standard player registration details and National ID verification are used exclusively for secure event admission.',
   },
   {
     id: '05',

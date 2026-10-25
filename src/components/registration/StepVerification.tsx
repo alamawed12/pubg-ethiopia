@@ -72,10 +72,6 @@ export function StepVerification({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.selfieImage) {
-      setConsentError('Please take your face photo in Step 4 before proceeding.');
-      return;
-    }
     if (!agreedToPrivacy) {
       setConsentError('Please agree to the Registration and Privacy Policy to proceed.');
       return;
@@ -334,70 +330,17 @@ export function StepVerification({
           </div>
         </div>
 
-        {/* Section 4: Face Photo (For Admin Review) */}
-        <div className="space-y-3 pt-2">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
-            <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-white flex items-center gap-2">
-              <span className="text-[var(--color-lime,#CCFF00)]">04.</span> FACE PHOTO
-            </h3>
-            {onEditStep && (
-              <button
-                type="button"
-                onClick={() => onEditStep(4)}
-                className="px-3 py-1 rounded-md bg-white/5 hover:bg-[var(--color-lime,#CCFF00)] hover:text-black text-[var(--color-lime,#CCFF00)] font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-[var(--color-lime,#CCFF00)]/30 hover:border-[var(--color-lime,#CCFF00)] shadow-sm active:scale-95"
-              >
-                EDIT
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {formData.selfieImage ? (
-              <div className="rounded-lg overflow-hidden border border-white/10 bg-black/40 p-2 flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={formData.selfieImage}
-                  alt="Live Selfie"
-                  className="w-16 h-16 rounded-full object-cover border border-[#CCFF00]/40 shrink-0"
-                />
-                <div className="text-xs font-mono">
-                  <span className="text-[#CCFF00] font-bold flex items-center gap-1.5">
-                    <CheckMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>PHOTO ATTACHED</span>
-                  </span>
-                  <span className="text-[#888888] text-[11px]">
-                    Ready for Admin Verification
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-red-500/30 bg-red-950/20 flex items-center justify-center p-3">
-                <span className="font-mono text-xs text-red-400">NO PHOTO TAKEN</span>
-              </div>
-            )}
-
-            <div className="rounded-lg border border-white/10 bg-black/40 p-3 flex flex-col justify-center text-xs font-mono">
-              <span className="text-white font-bold block mb-1">
-                ADMIN APPROVAL QUEUE
-              </span>
-              <span className="text-[#888888] text-[11px] leading-relaxed">
-                Your face photo and ID card have been recorded. The event administration team will review your application and confirm your pass.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 5 (If Paid VIP): Payment Review */}
+        {/* Section 4 (If Paid VIP): Payment Review */}
         {isVipPaid && (
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
               <h3 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-                <span>05.</span> VIP PAYMENT DETAILS
+                <span>04.</span> VIP PAYMENT DETAILS
               </h3>
               {onEditStep && (
                 <button
                   type="button"
-                  onClick={() => onEditStep(5)}
+                  onClick={() => onEditStep(4)}
                   className="px-3 py-1 rounded-md bg-white/5 hover:bg-amber-400 hover:text-black text-amber-400 font-sans font-black text-xs uppercase tracking-wider transition-all duration-150 cursor-pointer border border-amber-400/30 hover:border-amber-400 shadow-sm active:scale-95"
                 >
                   EDIT

@@ -173,7 +173,6 @@ export async function POST(req: NextRequest) {
     }
 
     const submittedTxnCode = (((rawBody as Record<string, unknown>).paymentTxnCode as string) || '').trim().toUpperCase();
-    const rawSelfieImage = ((rawBody as Record<string, unknown>).selfieImage as string) || null;
 
     // Consolidate Creator & Volunteer specific information into details
     let consolidatedDetails = data.squadDetails || '';
@@ -241,10 +240,10 @@ export async function POST(req: NextRequest) {
         squadDetails: consolidatedDetails || null,
         idFrontImage: ((rawBody as Record<string, unknown>).idFrontImage as string) || null,
         idBackImage: ((rawBody as Record<string, unknown>).idBackImage as string) || null,
-        selfieImage: rawSelfieImage,
-        faceMatchScore: 100,
-        faceMatchStatus: 'PENDING_ADMIN_REVIEW',
-        faceMatchDetails: 'Face photo captured by attendee. Awaiting Admin Manual Verification alongside National ID.',
+        selfieImage: null,
+        faceMatchScore: null,
+        faceMatchStatus: 'PRIVACY_PROTECTED',
+        faceMatchDetails: 'Privacy mode active: Facial biometric photo collection disabled for attendee privacy.',
         ticketTier: rawTier,
         vipPrice: rawTier === 'VIP' ? (isCreator ? 0 : Number((rawBody as Record<string, unknown>).vipPrice || 500)) : null,
         paymentMethod: isCreator ? 'COMPLIMENTARY_CREATOR' : isVolunteer ? 'FREE_VOLUNTEER' : ((rawBody as Record<string, unknown>).paymentMethod as string) || null,

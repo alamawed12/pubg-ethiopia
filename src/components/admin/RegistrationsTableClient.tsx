@@ -358,12 +358,6 @@ export function RegistrationsTableClient({
                       {/* Full Name */}
                       <td className="px-4 py-3">
                         <div className="font-semibold text-white">{r.fullName}</div>
-                        {r.faceMatchScore && r.faceMatchScore >= 70 ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 mt-0.5">
-                            <CheckMarkIcon className="w-3 h-3 stroke-[3]" />
-                            <span>KYC Match {r.faceMatchScore}%</span>
-                          </span>
-                        ) : null}
                       </td>
 
                       {/* IGN & UID */}

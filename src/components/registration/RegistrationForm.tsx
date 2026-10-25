@@ -8,7 +8,6 @@ import { ClockPendingIcon } from '@/components/ui/TacticalIcons';
 import { StepPlayerIdentity } from './StepPlayerIdentity';
 import { StepParticipation } from './StepParticipation';
 import { StepIdUpload } from './StepIdUpload';
-import { StepFaceVerification } from './StepFaceVerification';
 import { StepVipPayment } from './StepVipPayment';
 import { StepVerification } from './StepVerification';
 import { RegistrationSuccess, RegistrationSuccessData } from './RegistrationSuccess';
@@ -132,19 +131,17 @@ export function RegistrationForm() {
         { number: 1, label: 'Identity' },
         { number: 2, label: 'Role' },
         { number: 3, label: 'ID Upload' },
-        { number: 4, label: 'Face Photo' },
-        { number: 5, label: 'VIP Payment' },
-        { number: 6, label: 'Review' },
+        { number: 4, label: 'VIP Payment' },
+        { number: 5, label: 'Review' },
       ]
     : [
         { number: 1, label: 'Identity' },
         { number: 2, label: 'Role' },
         { number: 3, label: 'ID Upload' },
-        { number: 4, label: 'Face Photo' },
-        { number: 5, label: 'Review' },
+        { number: 4, label: 'Review' },
       ];
 
-  const maxSteps = isVipPaid ? 6 : 5;
+  const maxSteps = isVipPaid ? 5 : 4;
 
   // Field updater
   const updateField = (field: string, value: string | boolean | number) => {
@@ -177,11 +174,6 @@ export function RegistrationForm() {
 
   // Form submission handler
   const handleSubmit = async () => {
-    if (!formData.selfieImage) {
-      setApiError('Please take your face photo in Step 4 before submitting registration.');
-      return;
-    }
-
     if (!formData.idFrontImage) {
       setApiError('Please upload your National ID card before submitting registration.');
       return;
@@ -428,34 +420,10 @@ export function RegistrationForm() {
               </motion.div>
             )}
 
-            {/* Step 4: Face Photo Capture */}
-            {currentStep === 4 && (
+            {/* Step 4 (Paid VIP Only): VIP Payment */}
+            {isVipPaid && currentStep === 4 && (
               <motion.div
-                key="step-4-face-kyc"
-                custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <StepFaceVerification
-                  idFrontImage={formData.idFrontImage}
-                  selfieImage={formData.selfieImage}
-                  faceMatchScore={formData.faceMatchScore}
-                  faceMatchStatus={formData.faceMatchStatus}
-                  ticketTier={formData.ticketTier}
-                  updateField={updateField}
-                  onNext={goToNextStep}
-                  onBack={goToPreviousStep}
-                />
-              </motion.div>
-            )}
-
-            {/* Step 5 (Paid VIP Only): VIP Payment */}
-            {isVipPaid && currentStep === 5 && (
-              <motion.div
-                key="step-5-vip-payment"
+                key="step-4-vip-payment"
                 custom={direction}
                 variants={slideVariants}
                 initial="enter"
@@ -473,7 +441,7 @@ export function RegistrationForm() {
             )}
 
             {/* Final Step: Verification & Review */}
-            {((isVipPaid && currentStep === 6) || (!isVipPaid && currentStep === 5)) && (
+            {((isVipPaid && currentStep === 5) || (!isVipPaid && currentStep === 4)) && (
               <motion.div
                 key="step-verification"
                 custom={direction}

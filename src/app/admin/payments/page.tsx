@@ -377,11 +377,6 @@ export default function AdminPaymentsPage() {
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30">
                         VIP PASS
                       </span>
-                      {p.selfieImage ? (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30">
-                          PHOTO ATTACHED
-                        </span>
-                      ) : null}
 
                       {/* Payment Status Pill */}
                       {isPending && (

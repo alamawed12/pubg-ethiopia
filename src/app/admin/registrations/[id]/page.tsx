@@ -684,86 +684,25 @@ export default function RegistrationDetailPage() {
             )}
           </div>
 
-          {/* AI Biometric Face Match (Bybit-grade KYC) */}
+          {/* Attendee Privacy Protection */}
           <div
             className="rounded-xl border p-5"
             style={{ backgroundColor: '#111111', borderColor: 'rgba(255,255,255,0.06)' }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="flex items-center gap-2 text-sm uppercase tracking-wider" style={{ color: '#CCFF00', fontFamily: 'var(--font-heading)' }}>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="flex items-center gap-2 text-sm uppercase tracking-wider text-[#CCFF00] font-heading">
+                <svg className="w-4 h-4 text-[#CCFF00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
-                FACE PHOTO &amp; ID MATCH VERIFICATION
+                ATTENDEE PRIVACY PROTECTION
               </h2>
-
-              <span
-                className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${
-                  reg.status === 'CONFIRMED'
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/40'
-                    : reg.status === 'REJECTED'
-                    ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                }`}
-              >
-                {reg.status === 'CONFIRMED'
-                  ? 'VERIFIED & APPROVED'
-                  : reg.status === 'REJECTED'
-                  ? 'REJECTED'
-                  : 'PENDING ADMIN REVIEW'}
+              <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                PRIVACY SECURED
               </span>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Selfie */}
-              <div>
-                <p className="text-[11px] uppercase tracking-wider mb-2 font-mono text-[#999999]">
-                  LIVE CAPTURED SELFIE
-                </p>
-                {reg.selfieImage ? (
-                  <div
-                    className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors bg-black/40"
-                    style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-                    onClick={() => setIdModalImage(reg.selfieImage || null)}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={reg.selfieImage} alt="Live Selfie" className="w-full h-40 object-contain p-2" />
-                  </div>
-                ) : (
-                  <div className="h-40 rounded-lg border border-dashed flex items-center justify-center text-xs text-[#666666]">
-                    No live selfie captured
-                  </div>
-                )}
-              </div>
-
-              {/* ID Front Comparison */}
-              <div>
-                <p className="text-[11px] uppercase tracking-wider mb-2 font-mono text-[#999999]">
-                  MATCHED NATIONAL ID PHOTO
-                </p>
-                {reg.idFrontImage ? (
-                  <div
-                    className="rounded-lg overflow-hidden border cursor-pointer hover:border-[#CCFF00]/50 transition-colors bg-black/40"
-                    style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-                    onClick={() => setIdModalImage(reg.idFrontImage)}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={reg.idFrontImage} alt="ID Front Portrait" className="w-full h-40 object-contain p-2" />
-                  </div>
-                ) : (
-                  <div className="h-40 rounded-lg border border-dashed flex items-center justify-center text-xs text-[#666666]">
-                    No ID photo uploaded
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {reg.faceMatchDetails && (
-              <p className="mt-3 text-xs font-mono text-neutral-400 bg-black/40 p-2.5 rounded border border-white/5">
-                {reg.faceMatchDetails}
-              </p>
-            )}
+            <p className="text-xs font-mono text-neutral-400 leading-relaxed bg-black/40 p-3 rounded-lg border border-white/5">
+              Facial biometric photo collection is disabled to ensure maximum privacy for VIP and standard attendees. Admission verification is conducted using verified PUBG Mobile UID, Reference ID, and valid National ID credentials.
+            </p>
           </div>
 
           {/* Audit Logs */}
