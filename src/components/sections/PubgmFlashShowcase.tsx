@@ -17,16 +17,6 @@ export function PubgmFlashShowcase() {
     }
   };
 
-  const scrollToNext = () => {
-    playSound('click');
-    const target = document.getElementById('story') || document.getElementById('assembly');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    } else if (typeof window !== 'undefined') {
-      window.scrollBy({ top: 600, behavior: 'smooth' });
-    }
-  };
-
   return (
     <section
       id="flash"
@@ -152,28 +142,6 @@ export function PubgmFlashShowcase() {
         <p className="font-sans text-[11px] sm:text-xs text-neutral-400 italic pt-1 max-w-md mx-auto">
           Total rewards include in-game and out-of-game rewards. Actual value may vary by region.
         </p>
-
-        {/* Bottom Navigation: Smooth Scroll Down */}
-        <div className="pt-8 sm:pt-12">
-          <button
-            type="button"
-            onClick={scrollToNext}
-            onMouseEnter={() => playSound('hover')}
-            className="inline-flex flex-col items-center gap-1.5 text-neutral-400 hover:text-[#00c2ff] transition-colors cursor-pointer group"
-          >
-            <span className="font-sans text-xs sm:text-sm font-semibold tracking-wider">
-              Scroll down to explore Ethiopian Community Assembly
-            </span>
-            <svg
-              className="w-5 h-5 text-[#00c2ff] group-hover:translate-y-1 transition-transform"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        </div>
       </div>
 
       {/* ─── Share Notification Toast ─── */}

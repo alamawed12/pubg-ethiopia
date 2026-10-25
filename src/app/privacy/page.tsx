@@ -258,7 +258,7 @@ export default function PrivacyPage() {
             <p>For registration questions, privacy requests, corrections, or complaints, contact:</p>
             <div className="p-4 rounded-lg bg-black/50 border border-white/10 font-mono text-xs space-y-1.5 text-[#aaaaaa]">
               <div><strong className="text-white">Organizer:</strong> PUBG MOBILE COMMUNITY ASSEMBLY Organizing Team</div>
-              <div><strong className="text-white">Email:</strong> pubgmethiopia.et@gmail.com</div>
+              <div><strong className="text-white">Email:</strong> <a href="mailto:support.pmcaethiopia@gmail.com" className="text-neutral-300 hover:text-white transition-colors underline">support.pmcaethiopia@gmail.com</a></div>
               <div><strong className="text-white">Location:</strong> Addis Ababa, Ethiopia</div>
             </div>
           </section>

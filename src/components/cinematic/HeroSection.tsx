@@ -267,10 +267,10 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      {/* ─── Hero Footer / Coming Soon Status & Scroll Indicator ─── */}
-      <div className="relative z-20 w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5">
+      {/* ─── Hero Footer / Coming Soon Status ─── */}
+      <div className="relative z-20 w-full max-w-5xl mx-auto flex items-center justify-center pt-4 border-t border-white/5">
         {/* Status Labels */}
-        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 md:gap-8 font-sans text-xs text-neutral-400 font-medium tracking-wide">
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 font-sans text-xs text-neutral-400 font-medium tracking-wide">
           <div className="flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CCFF00]" />
             <span>DATE: <strong className="text-white font-semibold">{eventDate}</strong></span>
@@ -280,28 +280,6 @@ export function HeroSection() {
             <span>VENUE: <strong className="text-white font-semibold">{eventVenue}</strong></span>
           </div>
         </div>
-
-        {/* Scroll Indicator */}
-        <button
-          type="button"
-          onClick={() => {
-            playSound('click');
-            window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
-          }}
-          className="flex items-center gap-2 font-sans text-xs font-semibold text-neutral-400 hover:text-[#CCFF00] tracking-wider uppercase transition-colors group cursor-pointer"
-          aria-label="Scroll down"
-        >
-          <span>SCROLL</span>
-          <svg
-            className="w-4 h-4 text-[#CCFF00] animate-bounce transition-transform duration-300 group-hover:translate-y-0.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
       </div>
     </section>
   );
