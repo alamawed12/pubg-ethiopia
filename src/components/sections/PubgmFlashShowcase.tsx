@@ -4,29 +4,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundContext } from '../sound/SoundManager';
 
-const FLASH_FAQS = [
-  {
-    q: 'What is PUBG MOBILE Flash?',
-    a: 'PUBG MOBILE Flash is a high-speed, lightweight official edition designed for ultra-smooth performance, faster matchmaking, optimized storage, and competitive 90/120 FPS gameplay.',
-  },
-  {
-    q: 'When do I receive my pre-registration rewards?',
-    a: 'After pre-registering, rewards will be automatically delivered to your in-game mailbox when the game officially launches in November.',
-  },
-  {
-    q: 'Can I play with my existing squad and friends?',
-    a: 'Yes, PUBG MOBILE Flash shares the same global match servers, inventory, friends lists, and battleground lobbies as standard PUBG MOBILE.',
-  },
-  {
-    q: 'Are there special perks for Ethiopian Community Assembly attendees?',
-    a: 'Yes! Pre-registered attendees at the Addis Ababa gathering get priority access to on-site flash tournament challenges and limited physical merchandise.',
-  },
-];
-
 export function PubgmFlashShowcase() {
   const { playSound } = useSoundContext();
   const [showToast, setShowToast] = useState(false);
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const handleShare = () => {
     playSound('click');
@@ -35,11 +15,6 @@ export function PubgmFlashShowcase() {
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     }
-  };
-
-  const toggleFaq = (index: number) => {
-    playSound('click');
-    setActiveFaq((prev) => (prev === index ? null : index));
   };
 
   const scrollToNext = () => {
@@ -56,45 +31,50 @@ export function PubgmFlashShowcase() {
     <section
       id="flash"
       aria-label="PUBG Mobile Flash Official Launch"
-      className="relative w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#050505] via-[#070e1c] to-[#050505] overflow-hidden select-none border-y border-[#00c2ff]/15"
+      className="relative w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#050505] via-[#070e1c] to-[#050505] overflow-hidden select-none border-y border-[#00c2ff]/20"
     >
-      {/* ─── Ambient Lightning Glows & Atmospheric Fog ─── */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[350px] bg-[#00c2ff]/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/4 w-[450px] h-[300px] bg-[#ffe600]/10 rounded-full blur-[130px] pointer-events-none" />
+      {/* ─── Ambient Atmospheric Lightning & Glow Effects ─── */}
+      <div className="absolute top-1/3 left-1/4 w-[550px] h-[350px] bg-[#00c2ff]/12 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[350px] bg-[#00a3ff]/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute inset-0 tactical-grid opacity-15 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto relative z-10 space-y-16">
-        
-        {/* ─── Hero Row: Native Sharp Branding + Parachute Artwork ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
-          {/* Left Column: Native Crisp Typography & Action CTA (7 cols) */}
+          {/* ─── Left Column: Native Sharp Information & Actions (7 cols) ─── */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
-            {/* Top Status Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#00c2ff]/10 border border-[#00c2ff]/30 text-[#00c2ff] text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,194,255,0.2)]">
+            {/* Top Status Pill */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#00c2ff]/10 border border-[#00c2ff]/30 text-[#00c2ff] text-xs font-mono font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,194,255,0.25)]">
               <span className="w-2 h-2 rounded-full bg-[#00c2ff] animate-ping" />
-              <span>PUBGMOBILE FLASH PRE-REGISTRATION · Coming Soon</span>
+              <span>OFFICIAL GLOBAL PRE-REGISTRATION · COMING SOON</span>
             </div>
 
-            {/* Main Title */}
-            <div className="space-y-1">
+            {/* Main Title: Full Blue FLASH */}
+            <div className="space-y-2">
               <h2 className="text-4xl sm:text-6xl md:text-7xl font-black font-heading tracking-tight uppercase leading-none">
-                <span className="text-white block">PUBG MOBILE</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c2ff] via-[#38bdf8] to-[#ffe600] drop-shadow-[0_0_35px_rgba(0,194,255,0.6)]">
+                <span className="text-white block drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                  PUBG MOBILE
+                </span>
+                {/* Full Solid Electric Blue FLASH */}
+                <span className="text-[#00c2ff] drop-shadow-[0_0_35px_rgba(0,194,255,0.85)] filter inline-block">
                   FLASH
                 </span>
               </h2>
 
-              <p className="font-heading font-black italic text-lg sm:text-2xl text-[#00c2ff] tracking-widest uppercase pt-2">
-                LAUNCHES IN NOVEMBER
-              </p>
+              {/* Subheading: November 13 Launch Date */}
+              <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
+                <span className="font-heading font-black italic text-lg sm:text-2xl text-[#00c2ff] tracking-widest uppercase">
+                  COMING SOON · NOVEMBER 13
+                </span>
+                <span className="hidden sm:inline-block w-8 h-[2px] bg-[#00c2ff]/60" />
+              </div>
             </div>
 
             {/* US $1,000,000 Reward Callout */}
             <div className="py-2">
-              <div className="inline-block text-left">
-                <div className="font-heading font-black text-4xl sm:text-6xl md:text-7xl text-[#ffe600] tracking-tight leading-none drop-shadow-[0_4px_16px_rgba(255,230,0,0.45)]">
+              <div className="inline-block text-center lg:text-left">
+                <div className="font-heading font-black text-4xl sm:text-6xl md:text-7xl text-[#ffe600] tracking-tight leading-none drop-shadow-[0_4px_18px_rgba(255,230,0,0.45)]">
                   US $1,000,000
                 </div>
                 <div className="font-heading font-bold text-sm sm:text-lg text-neutral-300 tracking-wider uppercase mt-1">
@@ -103,9 +83,9 @@ export function PubgmFlashShowcase() {
               </div>
             </div>
 
-            {/* Official CTA Buttons Row */}
+            {/* Primary Action Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-              {/* Primary Pre-Register Button */}
+              {/* Main Pre-Register Button */}
               <a
                 href="https://pubggo.go.link/c6Use"
                 target="_blank"
@@ -148,148 +128,98 @@ export function PubgmFlashShowcase() {
               </button>
             </div>
 
-            {/* Legal Footnote */}
-            <p className="font-sans text-[11px] sm:text-xs text-neutral-400 italic">
-              Total rewards include in-game and out-of-game rewards. Actual value may vary by region.
-            </p>
-          </div>
-
-          {/* Right Column: Level 3 Helmet & Parachute Artwork (5 cols) */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Pulsing Lightning Energy Behind Art */}
-            <div className="absolute inset-0 bg-radial-gradient from-[#00c2ff]/20 via-[#00c2ff]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-            {/* High-Resolution Parachute Helmet Artwork */}
-            <motion.div
-              initial={{ y: 0 }}
-              animate={{ y: [-8, 8, -8] }}
-              transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
-              className="relative z-10 w-full max-w-[480px]"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/pubgm-flash-helmet-art.png"
-                alt="PUBG Mobile Flash Level 3 Helmet Parachute Drop"
-                className="w-full h-auto object-contain filter drop-shadow-[0_20px_40px_rgba(0,194,255,0.35)] select-none"
-              />
-            </motion.div>
-          </div>
-        </div>
-
-        {/* ─── Secondary Cards Row: Rewards Card + Gameplay Preview Card ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-          
-          {/* Card 1: Pre-Register Rewards Notice */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#0b1220]/90 border border-[#00c2ff]/25 shadow-[0_10px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-xl bg-[#00c2ff]/15 border border-[#00c2ff]/30 flex items-center justify-center text-[#00c2ff] font-heading font-black text-lg">
-                  ★
-                </span>
-                <h3 className="font-heading font-black text-xl sm:text-2xl text-white uppercase tracking-wider">
-                  Pre-register to get
-                </h3>
-              </div>
-              
-              <p className="font-sans text-sm sm:text-base text-neutral-300 leading-relaxed">
-                After pre-registering, rewards will be sent when the game officially launches.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-[#00c2ff]/10 border border-[#00c2ff]/20 flex items-center justify-between gap-4">
-              <span className="font-mono text-xs text-[#00c2ff] font-semibold">
-                OFFICIAL PORTAL: pubggo.go.link/c6Use
-              </span>
+            {/* App Store & Google Play Quick-Links */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
               <a
                 href="https://pubggo.go.link/c6Use"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => playSound('click')}
-                className="text-xs font-heading font-bold uppercase text-[#ffe600] hover:underline whitespace-nowrap"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-[11px] font-sans text-neutral-300 transition-colors"
               >
-                Claim Entry &gt;
+                <span className="text-white font-bold">App Store</span>
+                <span className="text-neutral-500">•</span>
+                <span className="text-[#00c2ff]">Pre-order</span>
+              </a>
+
+              <a
+                href="https://pubggo.go.link/c6Use"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => playSound('click')}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-black/80 hover:bg-black border border-white/15 hover:border-[#00c2ff]/50 text-[11px] font-sans text-neutral-300 transition-colors"
+              >
+                <span className="text-white font-bold">Google Play</span>
+                <span className="text-neutral-500">•</span>
+                <span className="text-[#00c2ff]">Pre-register</span>
               </a>
             </div>
-          </div>
 
-          {/* Card 2: Gameplay Preview Feature */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#0b1220]/90 border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-heading font-bold text-xs uppercase tracking-widest text-[#ffe600]">
-                  OFFICIAL PREVIEW ENGINE
-                </span>
-                <span className="text-[11px] font-mono text-neutral-400">90/120 FPS READY</span>
-              </div>
-
-              {/* Gameplay Graphic */}
-              <div className="rounded-xl overflow-hidden border border-white/10 shadow-inner">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/pubgm-flash-gameplay.png"
-                  alt="PUBG Mobile Flash Squad Drop Gameplay Preview"
-                  className="w-full h-auto object-cover max-h-[140px] select-none"
-                />
-              </div>
-            </div>
-
-            <p className="font-sans text-xs text-neutral-400 leading-relaxed">
-              Experience dynamic Day &amp; Night battlefield lighting with rapid asset streaming optimized for high-intensity mobile combat.
-            </p>
-          </div>
-        </div>
-
-        {/* ─── Interactive Section: Why choose PUBG MOBILE Flash? (FAQ Accordion) ─── */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#090e1a]/95 border border-white/10 shadow-xl space-y-6">
-          <div className="text-center sm:text-left space-y-1">
-            <h3 className="font-heading font-black text-2xl sm:text-3xl text-white uppercase tracking-wider">
-              Why choose PUBG MOBILE Flash?
-            </h3>
-            <p className="font-sans text-xs sm:text-sm text-neutral-400">
-              Tap here to learn about common questions regarding PUBG MOBILE Flash.
+            {/* Legal Footnote */}
+            <p className="font-sans text-[11px] sm:text-xs text-neutral-400 italic pt-1">
+              Total rewards include in-game and out-of-game rewards. Actual value may vary by region.
             </p>
           </div>
 
-          {/* Accordion Questions */}
-          <div className="divide-y divide-white/10">
-            {FLASH_FAQS.map((faq, index) => {
-              const isOpen = activeFaq === index;
-              return (
-                <div key={faq.q} className="py-3.5">
-                  <button
-                    type="button"
-                    onClick={() => toggleFaq(index)}
-                    className="w-full flex items-center justify-between gap-4 text-left font-heading font-bold text-sm sm:text-base text-neutral-200 hover:text-[#00c2ff] transition-colors cursor-pointer"
+          {/* ─── Right Column: Stylish Promo Artwork Frame (5 cols) ─── */}
+          <div className="lg:col-span-5 flex items-center justify-center lg:justify-end">
+            <motion.div
+              initial={{ opacity: 0, y: 25, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-[440px] group"
+            >
+              {/* Ambient electric cyan backlight */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-[#00c2ff]/40 via-[#0077ff]/30 to-[#00c2ff]/40 rounded-3xl blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500 pointer-events-none" />
+
+              {/* Polished Glassmorphic Frame */}
+              <div className="relative rounded-3xl p-2.5 sm:p-3 bg-gradient-to-b from-white/10 via-[#071324]/90 to-[#040812] border border-[#00c2ff]/40 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-all duration-300 group-hover:border-[#00c2ff]/70 group-hover:shadow-[0_25px_60px_rgba(0,194,255,0.3)]">
+                
+                {/* Inner Image Container */}
+                <div className="relative rounded-2xl overflow-hidden bg-[#0d1627] select-none">
+                  <a
+                    href="https://pubggo.go.link/c6Use"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => playSound('click')}
+                    onMouseEnter={() => playSound('hover')}
+                    className="block cursor-pointer focus:outline-none"
+                    title="Pre-Register for PUBG MOBILE FLASH"
                   >
-                    <span>{faq.q}</span>
-                    <span className="font-mono text-lg text-[#00c2ff]">
-                      {isOpen ? '−' : '+'}
-                    </span>
-                  </button>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="pt-2.5 font-sans text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                          {faq.a}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/pubgm-flash-promo.png"
+                      alt="PUBG Mobile Flash - Coming Soon November 13"
+                      className="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-500"
+                    />
+                    
+                    {/* Hover Overlay Hint */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
+                      <span className="px-4 py-1.5 rounded-full bg-[#00c2ff] text-black font-heading font-black text-xs uppercase tracking-wider shadow-lg">
+                        CLICK TO PRE-REGISTER &gt;
+                      </span>
+                    </div>
+                  </a>
                 </div>
-              );
-            })}
+
+                {/* Subtle bottom frame accent bar */}
+                <div className="flex items-center justify-between px-3 pt-2.5 text-[11px] font-mono text-neutral-400">
+                  <div className="flex items-center gap-1.5 text-[#00c2ff]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c2ff] animate-pulse" />
+                    <span>NOVEMBER 13, 2026</span>
+                  </div>
+                  <span className="text-neutral-500 uppercase tracking-widest text-[10px]">
+                    OFFICIAL RELEASE
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
 
-        {/* ─── Bottom Navigation: Scroll Down to Learn More ─── */}
-        <div className="text-center pt-2">
+        {/* ─── Bottom Navigation: Smooth Scroll Down ─── */}
+        <div className="text-center pt-8">
           <button
             type="button"
             onClick={scrollToNext}
@@ -297,7 +227,7 @@ export function PubgmFlashShowcase() {
             className="inline-flex flex-col items-center gap-1.5 text-neutral-400 hover:text-[#00c2ff] transition-colors cursor-pointer group"
           >
             <span className="font-sans text-xs sm:text-sm font-semibold tracking-wider">
-              Scroll down to learn more.
+              Scroll down to explore Ethiopian Community Assembly
             </span>
             <svg
               className="w-5 h-5 text-[#00c2ff] group-hover:translate-y-1 transition-transform"
@@ -311,7 +241,7 @@ export function PubgmFlashShowcase() {
         </div>
       </div>
 
-      {/* ─── Share Toast Notification ─── */}
+      {/* ─── Share Notification Toast ─── */}
       <AnimatePresence>
         {showToast && (
           <motion.div
