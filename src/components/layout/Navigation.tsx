@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundContext } from '../sound/SoundManager';
-import { useTheme } from '../theme/ThemeContext';
 
 interface NavItem {
   label: string;
@@ -36,7 +35,6 @@ export function Navigation() {
       .catch(() => {});
   }, []);
   const { isMuted, toggleMute, playSound } = useSoundContext();
-  const { toggleTheme, isNight, isLight } = useTheme();
 
   // Scroll detection
   useEffect(() => {
@@ -88,10 +86,8 @@ export function Navigation() {
       <header
         className={`fixed top-0 left-0 right-0 w-full z-40 transition-all duration-300 ${
           isScrolled
-            ? isLight
-              ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.06)] py-3'
-              : 'bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] py-3'
-            : 'bg-transparent border-b border-transparent py-5 md:py-6'
+            ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] py-3'
+            : 'bg-gradient-to-b from-black/85 via-black/45 to-transparent border-b border-transparent py-4 md:py-5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
@@ -122,62 +118,17 @@ export function Navigation() {
                 href={item.href}
                 onClick={(e) => handleLinkClick(e, item.href)}
                 onMouseEnter={() => playSound('hover')}
-                className={`relative py-1 font-mono text-xs xl:text-sm tracking-wider transition-colors duration-200 group uppercase whitespace-nowrap ${
-                  isLight
-                    ? 'text-slate-700 hover:text-black font-semibold'
-                    : 'text-[#cccccc] hover:text-white'
-                }`}
+                className="relative py-1 font-mono text-xs xl:text-sm tracking-wider text-[#cccccc] hover:text-white transition-colors duration-200 group uppercase whitespace-nowrap"
               >
                 <span>{item.label}</span>
                 {/* Underline growing from center */}
-                <span
-                  className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] transition-all duration-300 group-hover:w-full ${
-                    isLight
-                      ? 'bg-[#00c2ff] group-hover:shadow-[0_0_8px_#00c2ff]'
-                      : 'bg-[#CCFF00] group-hover:shadow-[0_0_8px_#CCFF00]'
-                  }`}
-                />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[#CCFF00] transition-all duration-300 group-hover:w-full group-hover:shadow-[0_0_8px_#CCFF00]" />
               </a>
             ))}
           </nav>
 
-          {/* ─── Right: Theme Mode + Audio Toggle + Register Button + Mobile Menu Button ─── */}
+          {/* ─── Right: Audio Toggle + Register Button + Mobile Menu Button ─── */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0">
-            {/* Theme Toggle Button (Night / Light Mode) */}
-            <button
-              type="button"
-              onClick={() => {
-                toggleTheme();
-                playSound('click');
-              }}
-              onMouseEnter={() => playSound('hover')}
-              aria-label={isNight ? 'Switch to Light Mode (PUBGM Flash Day)' : 'Switch to Night Mode'}
-              title={isNight ? 'Switch to Light Mode (Flash Day)' : 'Switch to Night Mode'}
-              className={`p-2 rounded-xl border transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                isLight
-                  ? 'border-slate-300/80 bg-white/90 hover:bg-slate-100 text-slate-700 shadow-sm'
-                  : 'border-white/10 hover:border-[#00c2ff]/60 bg-black/40 hover:bg-[#00c2ff]/10 text-neutral-300 hover:text-[#00c2ff]'
-              }`}
-            >
-              {isNight ? (
-                <>
-                  {/* Sun / Flash Day icon */}
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#ffe600]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <span className="hidden xl:inline text-[10px] font-mono font-bold tracking-wider text-[#ffe600]">FLASH DAY</span>
-                </>
-              ) : (
-                <>
-                  {/* Moon / Night Mode icon */}
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#00c2ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                  </svg>
-                  <span className="hidden xl:inline text-[10px] font-mono font-bold tracking-wider text-[#00c2ff]">NIGHT</span>
-                </>
-              )}
-            </button>
-
             {/* Sound Toggle Button */}
             <button
               type="button"
@@ -188,11 +139,7 @@ export function Navigation() {
               onMouseEnter={() => playSound('hover')}
               aria-label={isMuted ? 'Unmute tactical audio' : 'Mute tactical audio'}
               title={isMuted ? 'Turn Sound ON' : 'Mute Audio'}
-              className={`p-2 rounded-xl border transition-all duration-200 cursor-pointer ${
-                isLight
-                  ? 'border-slate-300/80 bg-white/90 hover:bg-slate-100 text-slate-700 shadow-sm'
-                  : 'border-white/10 hover:border-[#CCFF00]/50 bg-black/40 hover:bg-[#CCFF00]/10 text-[#999999] hover:text-[#CCFF00]'
-              }`}
+              className="p-2 rounded-xl border border-white/10 hover:border-[#CCFF00]/50 bg-black/40 hover:bg-[#CCFF00]/10 text-[#999999] hover:text-[#CCFF00] transition-all duration-200 cursor-pointer"
             >
               {isMuted ? (
                 /* Muted Speaker Icon */
@@ -363,21 +310,6 @@ export function Navigation() {
               >
                 {isRegistrationOpen ? 'REGISTER NOW' : 'REGISTRATION ON HOLD'}
               </Link>
-
-              {/* Mobile Theme Switcher */}
-              <div className="flex items-center justify-between text-xs font-mono text-[#999999]">
-                <span>THEME DISPLAY:</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    toggleTheme();
-                    playSound('click');
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded border border-white/20 text-[#00c2ff]"
-                >
-                  <span>{isNight ? '🌙 NIGHT MODE' : '☀️ FLASH DAY'}</span>
-                </button>
-              </div>
 
               <div className="flex items-center justify-between text-xs font-mono text-[#999999]">
                 <span>TACTICAL AUDIO:</span>

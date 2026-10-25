@@ -29,9 +29,9 @@ export default function HomePage() {
       <Navigation />
 
       <main>
+        <PubgmFlashShowcase />
         <HeroSection />
         <SponsorsMarquee />
-        <PubgmFlashShowcase />
         <EventStory />
         <EventDashboard />
         <FAQ />
