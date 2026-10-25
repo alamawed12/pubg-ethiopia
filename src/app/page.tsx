@@ -8,6 +8,7 @@ import { CursorGlow } from '@/components/cinematic/CursorGlow';
 import { IntroSequence } from '@/components/cinematic/IntroSequence';
 import { HeroSection } from '@/components/cinematic/HeroSection';
 import { SponsorsMarquee } from '@/components/sections/SponsorsMarquee';
+import { PubgmFlashShowcase } from '@/components/sections/PubgmFlashShowcase';
 import { AnnouncementPopup } from '@/components/ui/AnnouncementPopup';
 import { EventStory } from '@/components/sections/EventStory';
 import { EventDashboard } from '@/components/sections/EventDashboard';
@@ -30,6 +31,7 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <SponsorsMarquee />
+        <PubgmFlashShowcase />
         <EventStory />
         <EventDashboard />
         <FAQ />

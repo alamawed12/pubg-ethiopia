@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Oswald, JetBrains_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -81,7 +82,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/images/pubg-helmet-logo.png?v=2" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="film-grain">{children}</body>
+      <body className="film-grain">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

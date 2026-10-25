@@ -249,3 +249,31 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ═══════════════════════════════════════════════
+   PUBG MOBILE FLASH — Light & Night Theme Modes
+   ═══════════════════════════════════════════════ */
+
+html.light {
+  scrollbar-color: #00c2ff #e2e8f0;
+}
+
+html.light body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+html.light ::selection {
+  background-color: #00c2ff;
+  color: #000000;
+}
+
+html.light .tactical-grid {
+  background-image:
+    linear-gradient(rgba(0, 194, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 194, 255, 0.06) 1px, transparent 1px);
+}
+
+html.light .scan-line {
+  background: linear-gradient(90deg, transparent, #00c2ff, transparent);
+}
