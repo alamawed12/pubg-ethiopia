@@ -14,7 +14,6 @@ import {
   AlertTriangleIcon,
   TrophyIcon,
   TrashIcon,
-  LinkChainIcon,
 } from '@/components/ui/TacticalIcons';
 
 type TabKey = 'event' | 'announcements' | 'vip' | 'sponsors' | 'admins' | 'ai';
@@ -987,89 +986,68 @@ function SettingsContent() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  BRAND / COMPANY NAME *
+                  SPONSOR / BRAND NAME *
                 </label>
                 <input
                   type="text"
                   value={sponsorNameInput}
                   onChange={(e) => setSponsorNameInput(e.target.value)}
-                  placeholder="e.g. Telebirr, Level Infinite"
+                  placeholder="e.g. Telebirr, Level Infinite, Awash Bank"
                   className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  PARTNERSHIP TIER / BADGE
+                  LOGO IMAGE URL / PATH
                 </label>
                 <input
                   type="text"
-                  value={sponsorTierInput}
-                  onChange={(e) => setSponsorTierInput(e.target.value)}
-                  placeholder="e.g. Official Title Sponsor, Banking Partner"
-                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  WEBSITE / SOCIAL LINK
-                </label>
-                <input
-                  type="text"
-                  value={sponsorUrlInput}
-                  onChange={(e) => setSponsorUrlInput(e.target.value)}
-                  placeholder="https://example.com"
+                  value={sponsorLogoInput}
+                  onChange={(e) => setSponsorLogoInput(e.target.value)}
+                  placeholder="e.g. /images/pubg-mobile-logo.png or https://..."
                   className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
                 />
               </div>
             </div>
 
-            {/* Logo Upload & URL Box */}
+            {/* PNG Logo Upload & Preview Box */}
             <div className="p-4 rounded-xl border border-white/10 bg-black/40 space-y-3">
               <span className="font-sans text-xs font-bold text-neutral-300 uppercase tracking-wider block">
-                SPONSOR LOGO (FILE UPLOAD OR URL)
+                SPONSOR PNG LOGO (TRANSPARENT BACKGROUND)
               </span>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                {/* Logo Preview Square */}
-                <div className="w-16 h-16 rounded-xl bg-[#141414] border border-white/15 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="flex flex-col sm:flex-row items-center gap-5">
+                {/* Logo Preview (Transparent, borderless logo) */}
+                <div className="w-24 h-16 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center p-2 shrink-0 overflow-hidden">
                   {sponsorLogoInput ? (
                     <img
                       src={sponsorLogoInput}
-                      alt="Preview"
-                      className="w-full h-full object-contain p-1.5"
+                      alt="Logo Preview"
+                      className="max-h-full max-w-full object-contain"
                     />
                   ) : (
-                    <span className="font-heading font-black text-base text-[#CCFF00]">
-                      {sponsorNameInput ? sponsorNameInput.slice(0, 2).toUpperCase() : 'LOGO'}
+                    <span className="font-heading font-black text-xs text-neutral-500 uppercase">
+                      NO LOGO
                     </span>
                   )}
                 </div>
 
-                {/* Upload or URL Inputs */}
+                {/* Upload Action */}
                 <div className="flex-1 w-full space-y-2">
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    <label className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-sans text-xs font-bold uppercase tracking-wider cursor-pointer text-center transition-colors">
-                      <span>CHOOSE LOGO FILE</span>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-sans text-xs font-bold uppercase tracking-wider cursor-pointer text-center transition-colors">
+                      <span>CHOOSE PNG LOGO FILE</span>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/svg+xml,image/webp,image/*"
                         onChange={handleLogoFileUpload}
                         className="hidden"
                       />
                     </label>
-
-                    <input
-                      type="text"
-                      value={sponsorLogoInput}
-                      onChange={(e) => setSponsorLogoInput(e.target.value)}
-                      placeholder="Or paste image URL (e.g. /images/pubg-mobile-logo.png or https://...)"
-                      className="flex-1 px-4 py-2 rounded-xl border text-xs text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
-                    />
 
                     {sponsorLogoInput && (
                       <button
@@ -1077,12 +1055,12 @@ function SettingsContent() {
                         onClick={() => setSponsorLogoInput('')}
                         className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 text-xs font-sans font-bold uppercase cursor-pointer"
                       >
-                        Clear
+                        Remove Logo
                       </button>
                     )}
                   </div>
                   <p className="text-[11px] text-neutral-400 font-sans">
-                    Supports PNG, JPG, SVG, WebP with transparent backgrounds. If no logo is provided, a tactical monogram is generated automatically.
+                    Recommended: Transparent PNG or SVG logos. The logo will loop seamlessly from right to left on the main homepage without borders or cards.
                   </p>
                 </div>
               </div>
@@ -1095,7 +1073,7 @@ function SettingsContent() {
                 onClick={() => handleAddOrUpdateSponsor()}
                 className="px-6 py-2.5 rounded-xl bg-[#CCFF00] text-black font-sans text-xs font-bold uppercase tracking-wider hover:bg-[#b8e600] transition-colors cursor-pointer shadow-md"
               >
-                {editingSponsorId ? '✓ UPDATE SPONSOR' : '+ ADD SPONSOR TO MARQUEE'}
+                {editingSponsorId ? '✓ UPDATE LOGO' : '+ ADD LOGO TO LOOP'}
               </button>
             </div>
           </div>
@@ -1104,18 +1082,18 @@ function SettingsContent() {
           <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
-                CURRENT SPONSORS LIST ({sponsorsList.length})
+                CURRENT SPONSOR LOGOS ({sponsorsList.length})
               </h3>
               <span className="text-xs text-neutral-400 font-sans">
-                {sponsorsList.length} partner{sponsorsList.length === 1 ? '' : 's'} configured
+                {sponsorsList.length} logo{sponsorsList.length === 1 ? '' : 's'} in loop
               </span>
             </div>
 
             {sponsorsList.length === 0 ? (
               <div className="py-10 text-center space-y-2 border border-dashed border-white/10 rounded-xl bg-black/20">
-                <p className="text-sm text-neutral-400 font-sans">No sponsors added yet.</p>
+                <p className="text-sm text-neutral-400 font-sans">No sponsor logos added yet.</p>
                 <p className="text-xs text-neutral-500 font-sans">
-                  Use the form above to add your first event partner or sponsor brand.
+                  Use the form above to add sponsor PNG logos to the continuous homepage loop.
                 </p>
               </div>
             ) : (
@@ -1125,44 +1103,29 @@ function SettingsContent() {
                     key={sponsor.id}
                     className="p-3 sm:p-4 rounded-xl border border-white/10 bg-[#161616] hover:bg-[#1a1a1a] transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                   >
-                    {/* Left: Thumbnail & Info */}
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-12 h-12 rounded-lg bg-black/60 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                    {/* Left: Pure Logo Preview & Brand Name */}
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-20 h-12 rounded-lg bg-black/70 flex items-center justify-center p-1.5 shrink-0">
                         {sponsor.logo ? (
                           <img
                             src={sponsor.logo}
                             alt={sponsor.name}
-                            className="w-full h-full object-contain p-1"
+                            className="max-h-full max-w-full object-contain"
                           />
                         ) : (
-                          <span className="font-heading font-black text-sm text-[#CCFF00]">
+                          <span className="font-heading font-black text-xs text-neutral-500">
                             {sponsor.name.slice(0, 2).toUpperCase()}
                           </span>
                         )}
                       </div>
 
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-heading font-bold text-sm text-white tracking-wide uppercase truncate">
-                            {sponsor.name}
-                          </h4>
-                          {sponsor.tier && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-[#CCFF00]/10 text-[#CCFF00] border border-[#CCFF00]/20 uppercase">
-                              {sponsor.tier}
-                            </span>
-                          )}
-                        </div>
-                        {sponsor.url && (
-                          <a
-                            href={sponsor.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-neutral-400 hover:text-[#CCFF00] truncate flex items-center gap-1 font-sans mt-0.5"
-                          >
-                            <LinkChainIcon className="w-3 h-3 shrink-0" />
-                            <span className="truncate">{sponsor.url}</span>
-                          </a>
-                        )}
+                        <h4 className="font-heading font-bold text-sm text-white tracking-wide uppercase truncate">
+                          {sponsor.name}
+                        </h4>
+                        <span className="text-[11px] text-neutral-400 font-sans">
+                          {sponsor.logo ? 'Custom PNG Logo' : 'Text Wordmark'}
+                        </span>
                       </div>
                     </div>
 
@@ -1197,7 +1160,7 @@ function SettingsContent() {
                         type="button"
                         onClick={() => handleDeleteSponsor(sponsor.id)}
                         className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 cursor-pointer"
-                        title="Delete Sponsor"
+                        title="Delete Logo"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
@@ -1208,54 +1171,46 @@ function SettingsContent() {
             )}
           </div>
 
-          {/* Live Marquee Preview Box */}
+          {/* Live Marquee Preview Box (Exact match to homepage: Pure PNGs looping without borders) */}
           <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
                 <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
-                  LIVE MARQUEE PREVIEW (RIGHT TO LEFT)
+                  HOMEPAGE MARQUEE PREVIEW (PURE LOGOS, NO BORDERS)
                 </h3>
               </div>
               <span className="text-[11px] text-neutral-400 font-sans">
-                Hover to pause ticker
+                Infinite Right-to-Left Loop
               </span>
             </div>
 
-            <div className="relative w-full overflow-hidden py-4 rounded-xl bg-black/60 border border-white/5">
+            <div className="relative w-full overflow-hidden py-6 rounded-xl bg-black/60 border border-white/5">
               <div className="absolute top-0 bottom-0 left-0 w-16 z-10 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none" />
               <div className="absolute top-0 bottom-0 right-0 w-16 z-10 bg-gradient-to-l from-black via-black/80 to-transparent pointer-events-none" />
 
               {sponsorsList.length === 0 ? (
                 <div className="py-6 text-center text-xs text-neutral-500 font-sans">
-                  Add sponsors above to see the live marquee ticker preview.
+                  Add sponsor logos above to see the live marquee ticker preview.
                 </div>
               ) : (
-                <div className="animate-marquee gap-3 py-1 px-4 cursor-default select-none">
+                <div className="animate-marquee items-center gap-12 py-3 px-6 cursor-default select-none border-none">
                   {[...sponsorsList, ...sponsorsList, ...sponsorsList].map((sp, i) => (
                     <div
                       key={`preview-${sp.id}-${i}`}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#181818] border border-white/10 shrink-0 min-w-[200px]"
+                      className="flex items-center justify-center shrink-0 border-none bg-transparent px-4"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-black border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
-                        {sp.logo ? (
-                          <img src={sp.logo} alt={sp.name} className="w-full h-full object-contain p-1" />
-                        ) : (
-                          <span className="font-heading font-black text-xs text-[#CCFF00]">
-                            {sp.name.slice(0, 2).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0 pr-1">
-                        <span className="font-heading font-bold text-xs text-white uppercase truncate block">
+                      {sp.logo ? (
+                        <img
+                          src={sp.logo}
+                          alt={sp.name}
+                          className="h-10 sm:h-12 w-auto max-w-[140px] object-contain filter brightness-95"
+                        />
+                      ) : (
+                        <span className="font-heading font-black text-sm text-neutral-400 uppercase">
                           {sp.name}
                         </span>
-                        {sp.tier && (
-                          <span className="font-sans text-[9px] text-[#CCFF00] uppercase truncate block">
-                            {sp.tier}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
