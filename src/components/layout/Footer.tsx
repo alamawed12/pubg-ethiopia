@@ -134,7 +134,7 @@ export function Footer() {
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>OFFICIAL TELEGRAM</span>
+                  <span>OFFICIAL TELEGRAM CHANNEL</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>
@@ -149,67 +149,7 @@ export function Footer() {
                   onClick={() => playSound('click')}
                   className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
                 >
-                  <span>DISCORD SERVER</span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
-                    ↗
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://t.me/pubgm_eth"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => playSound('click')}
-                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
-                >
-                  <span>TELEGRAM CHANNEL</span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
-                    ↗
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => playSound('click')}
-                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
-                >
-                  <span>TIKTOK CLIPS &amp; HUBS</span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
-                    ↗
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => playSound('click')}
-                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
-                >
-                  <span>YOUTUBE BROADCASTS</span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
-                    ↗
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => playSound('click')}
-                  className="hover:text-[#CCFF00] transition-colors duration-200 flex items-center justify-between group py-0.5"
-                >
-                  <span>INSTAGRAM UPDATES</span>
+                  <span>OFFICIAL DISCORD SERVER</span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[#CCFF00]">
                     ↗
                   </span>

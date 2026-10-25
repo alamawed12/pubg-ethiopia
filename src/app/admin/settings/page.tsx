@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AdminManagementSection } from '@/components/admin/AdminManagementSection';
 import {
   CalendarIcon,
@@ -14,9 +15,23 @@ import {
   AlertTriangleIcon,
   TrophyIcon,
   TrashIcon,
+  SearchIcon,
+  ChatBubbleLeftRightIcon,
+  EmergencySirenIcon,
+  CheckedInDeviceIcon,
+  StarVipIcon,
 } from '@/components/ui/TacticalIcons';
 
-type TabKey = 'event' | 'announcements' | 'vip' | 'sponsors' | 'admins' | 'ai';
+type TabKey =
+  | 'event'
+  | 'announcements'
+  | 'vip'
+  | 'sponsors'
+  | 'lookup'
+  | 'security'
+  | 'socials'
+  | 'ai'
+  | 'admins';
 
 interface TabItem {
   id: TabKey;
@@ -26,11 +41,14 @@ interface TabItem {
 
 const TABS: TabItem[] = [
   { id: 'event', label: 'Event & Gate', Icon: CalendarIcon },
-  { id: 'announcements', label: 'Announcements', Icon: MegaphoneIcon },
-  { id: 'vip', label: 'VIP & Banking', Icon: CreditCardIcon },
+  { id: 'announcements', label: 'Announce', Icon: MegaphoneIcon },
+  { id: 'vip', label: 'VIP & Banks', Icon: CreditCardIcon },
   { id: 'sponsors', label: 'Sponsors', Icon: TrophyIcon },
+  { id: 'lookup', label: 'Quick Lookup', Icon: SearchIcon },
+  { id: 'security', label: 'Gate Security', Icon: EmergencySirenIcon },
+  { id: 'socials', label: 'Socials', Icon: ChatBubbleLeftRightIcon },
+  { id: 'ai', label: 'AI Vision', Icon: LightningBoltIcon },
   { id: 'admins', label: 'Admin Team', Icon: ShieldSecurityIcon },
-  { id: 'ai', label: 'AI & Socials', Icon: LightningBoltIcon },
 ];
 
 function SettingsContent() {
@@ -290,6 +308,182 @@ function SettingsContent() {
     setSponsorsList(updated);
   };
 
+  // ─── QUICK LOOKUP & GATE SECURITY STATE & HANDLERS ───
+  type LookupFilterKey = 'ALL' | 'VIP' | 'STANDARD' | 'PENDING' | 'CHECKED_IN';
+
+  interface LookupAttendee {
+    id: string;
+    referenceId: string;
+    fullName: string;
+    inGameName: string;
+    pubgUid: string;
+    phoneNumber: string;
+    ticketTier?: string;
+    status: string;
+    paymentStatus?: string | null;
+    teamName?: string | null;
+    telegramUsername?: string | null;
+    checkedInAt?: string | null;
+    checkedInBy?: string | null;
+  }
+
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [lookupFilter, setLookupFilter] = useState<LookupFilterKey>('ALL');
+  const [lookupResults, setLookupResults] = useState<LookupAttendee[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [lookupSearched, setLookupSearched] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [lookupActionToast, setLookupActionToast] = useState<{ success: boolean; message: string } | null>(null);
+  const [copiedPassRef, setCopiedPassRef] = useState<string | null>(null);
+
+  // Gate Security Protocol State
+  const [securityNotice, setSecurityNotice] = useState(
+    'ADMISSION TEMPORARILY ON HOLD — VENUE REACHED OPERATIONAL CAPACITY'
+  );
+
+  const performLookup = async (
+    filterOverride?: LookupFilterKey,
+    customQuery?: string
+  ) => {
+    const activeFilter = filterOverride !== undefined ? filterOverride : lookupFilter;
+    const activeQ = (customQuery !== undefined ? customQuery : lookupQuery).trim();
+    setIsSearching(true);
+    setLookupSearched(true);
+    setLookupActionToast(null);
+
+    try {
+      const params = new URLSearchParams();
+      if (activeQ) params.set('search', activeQ);
+      if (activeFilter === 'VIP') params.set('ticketTier', 'VIP');
+      if (activeFilter === 'STANDARD') params.set('ticketTier', 'STANDARD');
+      if (activeFilter === 'PENDING') params.set('status', 'PENDING');
+      if (activeFilter === 'CHECKED_IN') params.set('status', 'CHECKED_IN');
+      params.set('limit', '30');
+
+      const res = await fetch(`/api/admin/registrations?${params.toString()}`);
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.registrations)) {
+        setLookupResults(data.registrations);
+      } else {
+        setLookupResults([]);
+      }
+    } catch {
+      setLookupResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleQuickApprove = async (id: string, ign: string) => {
+    setActionLoadingId(id);
+    setLookupActionToast(null);
+    try {
+      const res = await fetch('/api/admin/registrations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'CONFIRM', ids: [id] }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLookupResults((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: 'CONFIRMED' } : item))
+        );
+        setLookupActionToast({
+          success: true,
+          message: `Player "${ign}" pass confirmed & active!`,
+        });
+      } else {
+        setLookupActionToast({
+          success: false,
+          message: data.error || 'Failed to approve registration.',
+        });
+      }
+    } catch {
+      setLookupActionToast({
+        success: false,
+        message: 'Network error approving registration.',
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleQuickCheckIn = async (ref: string, ign: string, id: string) => {
+    setActionLoadingId(id);
+    setLookupActionToast(null);
+    try {
+      const res = await fetch('/api/scanner/check-in', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-scanner-key': 'pubget_gate_2026_scanner',
+        },
+        body: JSON.stringify({
+          ticket: ref,
+          staffName: 'Admin HQ Quick Gate',
+          secretKey: 'pubget_gate_2026_scanner',
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && (data.success || data.status === 'SUCCESS' || data.status === 'ALREADY_CHECKED_IN')) {
+        setLookupResults((prev) =>
+          prev.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  status: 'CHECKED_IN',
+                  checkedInAt: new Date().toISOString(),
+                  checkedInBy: 'Admin HQ',
+                }
+              : item
+          )
+        );
+        setLookupActionToast({
+          success: true,
+          message: `Player "${ign}" checked in at gate successfully!`,
+        });
+      } else {
+        setLookupActionToast({
+          success: false,
+          message: data.error || data.message || 'Check-in failed.',
+        });
+      }
+    } catch {
+      setLookupActionToast({
+        success: false,
+        message: 'Network error processing check-in.',
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleCopyPassLink = (ref: string) => {
+    const url = `${window.location.origin}/portal/ticket/${ref}`;
+    navigator.clipboard.writeText(url);
+    setCopiedPassRef(ref);
+    setTimeout(() => setCopiedPassRef(null), 3000);
+  };
+
+  const engageEmergencyLockdown = () => {
+    setRegistrationOpen(false);
+    setAnnouncementEnabled(true);
+    setAnnouncementType('urgent');
+    setAnnouncementTitle('GATE ADMISSION TEMPORARILY ON HOLD');
+    setAnnouncementMessage(securityNotice);
+    setAnnouncementLinkText('CHECK TICKET STATUS');
+    setAnnouncementLinkUrl('/portal');
+  };
+
+  const disengageEmergencyLockdown = () => {
+    setRegistrationOpen(true);
+    setAnnouncementEnabled(false);
+  };
+
+  const adjustCapacityQuota = (delta: number) => {
+    setMaxCapacity((prev) => Math.max(10, prev + delta));
+  };
+
   const executeSave = async () => {
     setSaving(true);
     setError('');
@@ -429,9 +623,9 @@ function SettingsContent() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          APPLE-STYLE TAB NAVIGATION PILLS (ALL TABS 100% VISIBLE)
+          APPLE-STYLE TAB NAVIGATION PILLS (ALL 9 TABS 100% VISIBLE)
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 p-1.5 rounded-2xl bg-[#141414] border border-white/10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl bg-[#141414] border border-white/10 shadow-lg">
         {TABS.map((tab) => {
           const isSelected = activeTab === tab.id;
           const TabIcon = tab.Icon;
@@ -440,14 +634,14 @@ function SettingsContent() {
               key={tab.id}
               type="button"
               onClick={() => switchTab(tab.id)}
-              className={`flex items-center justify-center gap-2 px-3 py-3 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer text-center ${
+              className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-xl font-sans text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer text-center ${
                 isSelected
-                  ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.35)]'
+                  ? 'bg-[#CCFF00] text-black shadow-[0_0_20px_rgba(204,255,0,0.35)] scale-[1.02]'
                   : 'text-neutral-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.08] border border-white/5'
               }`}
             >
               <TabIcon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-black' : 'text-[#CCFF00]'}`} />
-              <span className="whitespace-nowrap">{tab.label}</span>
+              <span className="leading-tight text-center truncate max-w-full">{tab.label}</span>
             </button>
           );
         })}
@@ -1221,16 +1415,666 @@ function SettingsContent() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          TAB 5: HEAD ADMIN ACCESS & SUB-ADMIN MANAGEMENT
+          TAB 5: QUICK ATTENDEE & PASS LOOKUP (FAST VERIFICATION TOOL)
       ═══════════════════════════════════════════════════════════════ */}
-      {activeTab === 'admins' && (
+      {activeTab === 'lookup' && (
         <div className="space-y-6">
-          <AdminManagementSection />
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00] shrink-0">
+                  <SearchIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-sans font-bold text-white uppercase tracking-tight">
+                    QUICK ATTENDEE &amp; PASS LOOKUP
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Instantly verify any player by PUBG Mobile UID, Reference ID, Phone, IGN, or Squad name.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-sans text-xs font-bold uppercase tracking-wider">
+                  REAL-TIME REGISTRY SEARCH
+                </span>
+              </div>
+            </div>
+
+            {/* Toast feedback */}
+            {lookupActionToast && (
+              <div
+                className={`p-3.5 rounded-xl text-xs font-sans border flex items-center gap-2 ${
+                  lookupActionToast.success
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                    : 'bg-red-500/10 border-red-500/30 text-red-300'
+                }`}
+              >
+                {lookupActionToast.success ? (
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" />
+                ) : (
+                  <XCircleIcon className="w-4 h-4 text-red-400 shrink-0" />
+                )}
+                <span>{lookupActionToast.message}</span>
+              </div>
+            )}
+
+            {/* Search Input Bar */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                performLookup();
+              }}
+              className="space-y-3"
+            >
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <SearchIcon className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={lookupQuery}
+                    onChange={(e) => setLookupQuery(e.target.value)}
+                    placeholder="Enter PUBG UID (e.g. 5123456789), Ref (e.g. PUBG-VIP-...), Phone, IGN..."
+                    className="w-full pl-10 pr-14 py-3 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
+                  />
+                  {lookupQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLookupQuery('');
+                        performLookup(lookupFilter, '');
+                      }}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs text-neutral-400 hover:text-white cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="px-6 py-3 rounded-xl bg-[#CCFF00] hover:bg-[#b8e600] text-black font-sans text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                >
+                  {isSearching ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      <span>SEARCHING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <SearchIcon className="w-4 h-4" />
+                      <span>SEARCH REGISTRY</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Quick Filter Badges */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-neutral-400 mr-1">
+                  FILTERS:
+                </span>
+                {[
+                  { id: 'ALL' as const, label: 'All Players' },
+                  { id: 'VIP' as const, label: 'VIP Passes Only' },
+                  { id: 'STANDARD' as const, label: 'Standard Passes' },
+                  { id: 'PENDING' as const, label: 'Pending Approval' },
+                  { id: 'CHECKED_IN' as const, label: 'Checked In at Gate' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => {
+                      setLookupFilter(f.id);
+                      performLookup(f.id);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                      lookupFilter === f.id
+                        ? 'bg-[#CCFF00] text-black shadow-sm'
+                        : 'bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/5'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </form>
+          </div>
+
+          {/* Results List */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                SEARCH RESULTS {lookupSearched && `(${lookupResults.length})`}
+              </h3>
+              {lookupSearched && (
+                <span className="text-xs text-neutral-400 font-sans">
+                  {lookupResults.length === 0 ? 'No matching attendees' : `${lookupResults.length} attendee(s) located`}
+                </span>
+              )}
+            </div>
+
+            {isSearching ? (
+              <div className="py-16 text-center space-y-3">
+                <div className="w-8 h-8 border-3 border-[#CCFF00] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-sans text-neutral-400 uppercase tracking-wider">
+                  Querying database registry...
+                </p>
+              </div>
+            ) : !lookupSearched ? (
+              <div className="py-12 text-center space-y-3 border border-dashed border-white/10 rounded-xl bg-black/20 p-6">
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mx-auto text-neutral-400">
+                  <SearchIcon className="w-5 h-5" />
+                </div>
+                <h4 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                  RAPID ATTENDEE VERIFICATION TOOL
+                </h4>
+                <p className="text-xs text-neutral-400 font-sans max-w-md mx-auto leading-relaxed">
+                  Enter any player&apos;s in-game name, PUBG UID, phone number, or ticket reference code above to instantly pull up their full status, payment proof, and gate check-in record.
+                </p>
+                <div className="pt-2 flex flex-wrap justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLookupFilter('VIP');
+                      performLookup('VIP');
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-sans text-xs font-bold uppercase cursor-pointer"
+                  >
+                    View VIP Pass Holders →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLookupFilter('PENDING');
+                      performLookup('PENDING');
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-neutral-200 border border-white/10 font-sans text-xs font-bold uppercase cursor-pointer"
+                  >
+                    View Pending Review →
+                  </button>
+                </div>
+              </div>
+            ) : lookupResults.length === 0 ? (
+              <div className="py-12 text-center space-y-2 border border-dashed border-white/10 rounded-xl bg-black/20">
+                <p className="text-sm text-neutral-300 font-sans font-bold uppercase">NO PLAYERS FOUND</p>
+                <p className="text-xs text-neutral-500 font-sans">
+                  No registered attendees match &quot;{lookupQuery}&quot;. Please verify the spelling or UID.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {lookupResults.map((r) => {
+                  const isVip = r.ticketTier === 'VIP';
+                  const isApproved = r.status === 'CONFIRMED' || r.status === 'CHECKED_IN';
+                  const isCheckedIn = r.status === 'CHECKED_IN';
+                  const isLoadingAction = actionLoadingId === r.id;
+
+                  return (
+                    <div
+                      key={r.id}
+                      className="p-4 sm:p-5 rounded-xl border border-white/10 bg-[#161616] hover:bg-[#1a1a1a] transition-all space-y-3"
+                    >
+                      {/* Top Header of Card */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-white/5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* VIP vs Standard Badge */}
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full font-sans text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                              isVip
+                                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+                                : 'bg-[#CCFF00]/15 border border-[#CCFF00]/40 text-[#CCFF00]'
+                            }`}
+                          >
+                            {isVip && <StarVipIcon className="w-3 h-3 text-amber-400" />}
+                            <span>{isVip ? 'VIP PASS' : 'STANDARD PASS'}</span>
+                          </span>
+
+                          {/* Admission Status */}
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full font-sans text-[11px] font-bold uppercase tracking-wider ${
+                              isCheckedIn
+                                ? 'bg-[#CCFF00]/20 border border-[#CCFF00]/50 text-[#CCFF00]'
+                                : isApproved
+                                ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400'
+                                : r.status === 'PENDING'
+                                ? 'bg-amber-500/15 border border-amber-500/40 text-amber-400'
+                                : 'bg-red-500/15 border border-red-500/40 text-red-400'
+                            }`}
+                          >
+                            {isCheckedIn
+                              ? '● CHECKED IN'
+                              : isApproved
+                              ? '✓ CONFIRMED'
+                              : r.status === 'PENDING'
+                              ? '⏳ PENDING REVIEW'
+                              : '✕ REJECTED'}
+                          </span>
+
+                          {/* Payment Status for VIP */}
+                          {isVip && (
+                            <span
+                              className={`px-2 py-0.5 rounded-full font-sans text-[10px] font-bold uppercase tracking-wider ${
+                                r.paymentStatus === 'APPROVED'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                  : r.paymentStatus === 'PENDING_APPROVAL'
+                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                  : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                              }`}
+                            >
+                              PAYMENT: {r.paymentStatus || 'UNPAID'}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Reference Code */}
+                        <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-xs text-neutral-400">
+                          <span className="text-white font-bold">{r.referenceId}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPassLink(r.referenceId)}
+                            className="text-[11px] text-[#CCFF00] hover:underline cursor-pointer"
+                          >
+                            {copiedPassRef === r.referenceId ? '✓ Copied Link' : 'Copy Ticket Link'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Middle Details Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-sans">
+                        <div>
+                          <span className="text-[10px] text-neutral-500 uppercase tracking-wider block font-semibold">
+                            IN-GAME NAME (IGN)
+                          </span>
+                          <span className="font-bold text-white text-sm truncate block mt-0.5">
+                            {r.inGameName}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] text-neutral-500 uppercase tracking-wider block font-semibold">
+                            PUBG MOBILE UID
+                          </span>
+                          <span className="font-mono text-white text-sm tracking-wider block mt-0.5">
+                            {r.pubgUid}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] text-neutral-500 uppercase tracking-wider block font-semibold">
+                            FULL NAME
+                          </span>
+                          <span className="text-neutral-300 truncate block mt-0.5 font-medium">
+                            {r.fullName}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] text-neutral-500 uppercase tracking-wider block font-semibold">
+                            PHONE NUMBER
+                          </span>
+                          <span className="font-mono text-neutral-300 block mt-0.5">
+                            {r.phoneNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Additional Details (Team & Gate status) */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-[11px] font-sans text-neutral-400">
+                        <div className="flex items-center gap-3">
+                          {r.teamName && (
+                            <span>
+                              Squad: <strong className="text-neutral-200">{r.teamName}</strong>
+                            </span>
+                          )}
+                          {r.telegramUsername && (
+                            <span>
+                              Telegram: <strong className="text-[#CCFF00]">@{r.telegramUsername.replace('@', '')}</strong>
+                            </span>
+                          )}
+                          {isCheckedIn && (
+                            <span className="text-[#CCFF00] font-medium flex items-center gap-1">
+                              <CheckedInDeviceIcon className="w-3.5 h-3.5" />
+                              Checked in {r.checkedInAt ? new Date(r.checkedInAt).toLocaleTimeString() : 'at Gate'}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Quick Action Buttons */}
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/admin/registrations/${r.id}`}
+                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-sans text-xs font-bold uppercase transition-colors"
+                          >
+                            Full Dossier →
+                          </Link>
+
+                          {r.status === 'PENDING' && (
+                            <button
+                              type="button"
+                              onClick={() => handleQuickApprove(r.id, r.inGameName)}
+                              disabled={isLoadingAction}
+                              className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-sans text-xs font-bold uppercase transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              {isLoadingAction ? 'Approving...' : '✓ Approve Pass'}
+                            </button>
+                          )}
+
+                          {!isCheckedIn && isApproved && (
+                            <button
+                              type="button"
+                              onClick={() => handleQuickCheckIn(r.referenceId, r.inGameName, r.id)}
+                              disabled={isLoadingAction}
+                              className="px-3 py-1.5 rounded-lg bg-[#CCFF00] hover:bg-[#b8e600] text-black font-sans text-xs font-bold uppercase transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              {isLoadingAction ? 'Checking In...' : '● Check In at Gate'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          TAB 5: AI BIOMETRICS & COMMUNITY INTEGRATIONS
+          TAB 6: GATE SECURITY & EMERGENCY CONTROLS
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === 'security' && (
+        <div className="space-y-6">
+          {/* Emergency Gate Lockdown Card */}
+          <div className="p-6 sm:p-8 rounded-2xl border-2 border-red-500/40 bg-gradient-to-b from-[#180d0d] to-[#120a0a] space-y-6 shadow-[0_0_40px_rgba(239,68,68,0.15)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-red-500/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+                  <EmergencySirenIcon className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-sans font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                    <span>EMERGENCY GATE PROTOCOL &amp; ADMISSION LOCKDOWN</span>
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Immediate 1-click crowd control to pause registrations and broadcast venue capacity alerts.
+                  </p>
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              <span
+                className={`px-3.5 py-1.5 rounded-full font-sans text-xs font-bold uppercase tracking-wider border flex items-center gap-1.5 self-start sm:self-auto ${
+                  registrationOpen
+                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                    : 'bg-red-500/20 border-red-500/50 text-red-300 animate-pulse'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${registrationOpen ? 'bg-emerald-400' : 'bg-red-400 animate-ping'}`} />
+                <span>{registrationOpen ? 'ADMISSION: ACTIVE (OPEN)' : 'ADMISSION: LOCKDOWN (CLOSED)'}</span>
+              </span>
+            </div>
+
+            {/* Emergency Action Box */}
+            <div className="p-5 rounded-xl border border-white/10 bg-black/50 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
+                    {registrationOpen ? 'ENGAGE IMMEDIATE GATE HOLD' : 'DISENGAGE GATE HOLD (RESUME REGISTRATIONS)'}
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-sans leading-relaxed max-w-xl">
+                    {registrationOpen
+                      ? 'Instantly locks public registrations, puts visitors on hold, and broadcasts an emergency alert banner across the site.'
+                      : 'Unlocks the registration gate and restores the registration form for new attendee submissions.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={registrationOpen ? engageEmergencyLockdown : disengageEmergencyLockdown}
+                  className={`px-6 py-3.5 rounded-xl font-sans text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-95 shrink-0 ${
+                    registrationOpen
+                      ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/40'
+                      : 'bg-[#CCFF00] hover:bg-[#b8e600] text-black shadow-[#CCFF00]/40'
+                  }`}
+                >
+                  {registrationOpen ? '🚨 ENGAGE EMERGENCY LOCKDOWN' : '✓ RE-OPEN REGISTRATION GATE'}
+                </button>
+              </div>
+
+              {/* Emergency Notice Customizer */}
+              <div className="pt-2 border-t border-white/5 space-y-2">
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300">
+                  EMERGENCY BROADCAST MESSAGE (DISPLAYED TO VISITORS WHEN HOLD IS ACTIVE)
+                </label>
+                <input
+                  type="text"
+                  value={securityNotice}
+                  onChange={(e) => setSecurityNotice(e.target.value)}
+                  placeholder="e.g. ADMISSION TEMPORARILY ON HOLD — VENUE REACHED OPERATIONAL CAPACITY"
+                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-red-400 bg-[#161616] border-white/10"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Real-time Capacity Gauge Card */}
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00] shrink-0">
+                  <CheckedInDeviceIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-sans font-bold text-white uppercase tracking-tight">
+                    LIVE CAPACITY &amp; CROWD GAUGE
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Monitors overall capacity threshold against server database quota.
+                  </p>
+                </div>
+              </div>
+
+              <span className="font-heading font-black text-2xl text-[#CCFF00]">
+                {Math.min(100, Math.round(((stats.totalRegistrations || 0) / (maxCapacity || 1)) * 100))}%
+              </span>
+            </div>
+
+            {/* Capacity Progress Bar */}
+            <div className="space-y-2">
+              <div className="w-full h-4 bg-black/60 rounded-full overflow-hidden p-0.5 border border-white/10">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    (stats.totalRegistrations || 0) >= maxCapacity
+                      ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)]'
+                      : (stats.totalRegistrations || 0) >= maxCapacity * 0.85
+                      ? 'bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.8)]'
+                      : 'bg-[#CCFF00] shadow-[0_0_15px_rgba(204,255,0,0.8)]'
+                  }`}
+                  style={{
+                    width: `${Math.min(100, Math.round(((stats.totalRegistrations || 0) / (maxCapacity || 1)) * 100))}%`,
+                  }}
+                />
+              </div>
+
+              <div className="flex justify-between text-xs font-sans text-neutral-400 pt-1">
+                <span>{stats.totalRegistrations || 0} Registered Attendees</span>
+                <span>{Math.max(0, maxCapacity - (stats.totalRegistrations || 0))} Remaining Slots</span>
+                <span>Hard Cap: {maxCapacity}</span>
+              </div>
+            </div>
+
+            {/* Fast Quota Bumpers */}
+            <div className="p-4 rounded-xl border border-white/10 bg-black/40 space-y-3">
+              <span className="text-xs font-sans font-bold uppercase tracking-wider text-neutral-300 block">
+                FAST ATTENDANCE QUOTA BUMPERS (1-TAP CAPACITY EXPANSION)
+              </span>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[
+                  { label: '+25 SLOTS', delta: 25 },
+                  { label: '+50 SLOTS', delta: 50 },
+                  { label: '+100 SLOTS', delta: 100 },
+                  { label: '-50 SLOTS', delta: -50 },
+                ].map((b) => (
+                  <button
+                    key={b.label}
+                    type="button"
+                    onClick={() => adjustCapacityQuota(b.delta)}
+                    className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-sans text-xs font-bold uppercase tracking-wider cursor-pointer text-center transition-colors hover:border-[#CCFF00]/40"
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* VIP Bypass Switch */}
+            <div className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <span className="font-sans text-sm font-bold text-white uppercase tracking-wider block">
+                  VIP PASS PRICING OVERRIDE (EMERGENCY 0 ETB FREE VIP)
+                </span>
+                <span className="text-xs text-neutral-400 font-sans">
+                  Allows attendees to claim VIP passes without payment during special promotional waves.
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setVipPrice(vipPrice === 0 ? 500 : 0)}
+                className={`px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0 ${
+                  vipPrice === 0
+                    ? 'bg-amber-400 text-black shadow-[0_0_20px_rgba(251,191,36,0.4)]'
+                    : 'bg-white/10 text-neutral-300 hover:text-white'
+                }`}
+              >
+                {vipPrice === 0 ? '● FREE VIP PASS ACTIVE (0 ETB)' : '○ REGULAR VIP PRICE (500 ETB)'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 7: OFFICIAL SOCIAL CHANNELS & COMMUNITY HUBS
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === 'socials' && (
+        <div className="space-y-6">
+          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00] shrink-0">
+                  <ChatBubbleLeftRightIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-sans font-bold text-white uppercase tracking-tight">
+                    COMMUNITY CHANNELS &amp; OFFICIAL SOCIALS
+                  </h2>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Configure the tournament Telegram channel and Discord server. All public footer links route here.
+                  </p>
+                </div>
+              </div>
+
+              <span className="px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] font-sans text-xs font-bold uppercase tracking-wider">
+                COMMUNITY HUBS
+              </span>
+            </div>
+
+            {/* Official Telegram Channel Card */}
+            <div className="p-5 rounded-xl border border-sky-500/30 bg-sky-500/[0.04] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
+                  <span className="font-sans text-xs font-bold text-sky-300 uppercase tracking-wider">
+                    PRIMARY TELEGRAM BROADCAST CHANNEL
+                  </span>
+                </div>
+                <a
+                  href={telegramLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 text-xs font-sans font-bold uppercase transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+                >
+                  <span>Open @pubgm_eth Channel ↗</span>
+                </a>
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  TELEGRAM CHANNEL DESTINATION URL
+                </label>
+                <input
+                  type="text"
+                  value={telegramLink}
+                  onChange={(e) => setTelegramLink(e.target.value)}
+                  placeholder="https://t.me/pubgm_eth"
+                  className="w-full px-4 py-3 rounded-xl border text-sm text-white font-sans outline-none focus:border-sky-400 bg-black/50 border-white/10"
+                />
+                <p className="text-[11px] text-neutral-400 font-sans mt-1.5 leading-relaxed">
+                  Active across the site footer, registration confirmation screen, and attendee pass portal. This is the single official channel for PUBG Mobile Ethiopia.
+                </p>
+              </div>
+            </div>
+
+            {/* Official Discord Server Card */}
+            <div className="p-5 rounded-xl border border-indigo-500/30 bg-indigo-500/[0.04] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
+                  <span className="font-sans text-xs font-bold text-indigo-300 uppercase tracking-wider">
+                    DISCORD COMMUNITY SERVER
+                  </span>
+                </div>
+                <a
+                  href={discordLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-xs font-sans font-bold uppercase transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+                >
+                  <span>Open Discord ↗</span>
+                </a>
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  DISCORD INVITE URL
+                </label>
+                <input
+                  type="text"
+                  value={discordLink}
+                  onChange={(e) => setDiscordLink(e.target.value)}
+                  placeholder="https://discord.gg/pubgethiopia"
+                  className="w-full px-4 py-3 rounded-xl border text-sm text-white font-sans outline-none focus:border-indigo-400 bg-black/50 border-white/10"
+                />
+                <p className="text-[11px] text-neutral-400 font-sans mt-1.5">
+                  Primary voice communication and squad recruitment hub for attendees.
+                </p>
+              </div>
+            </div>
+
+            {/* Channel Policy Notice */}
+            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.05] space-y-1.5">
+              <div className="flex items-center gap-2 text-emerald-400 text-xs font-sans font-bold uppercase tracking-wider">
+                <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>OFFICIAL CHANNEL COMPLIANCE</span>
+              </div>
+              <p className="text-xs text-neutral-300 font-sans leading-relaxed">
+                Obsolete social links (TikTok, YouTube, and Instagram) have been permanently retired from the website layout. All community traffic and official announcements are consolidated into the verified Telegram channel (<strong>@pubgm_eth</strong>).
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 8: AI BIOMETRICS & VERIFICATION
       ═══════════════════════════════════════════════════════════════ */}
       {activeTab === 'ai' && (
         <div className="space-y-6">
@@ -1335,40 +2179,15 @@ function SettingsContent() {
               </div>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Socials Card */}
-          <div className="p-6 sm:p-8 rounded-2xl border border-white/10 bg-[#121212] space-y-4">
-            <h2 className="text-lg font-sans font-bold text-white uppercase tracking-tight">
-              COMMUNITY CHANNELS &amp; SOCIALS
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  TELEGRAM CHANNEL / SUPPORT LINK
-                </label>
-                <input
-                  type="text"
-                  value={telegramLink}
-                  onChange={(e) => setTelegramLink(e.target.value)}
-                  placeholder="https://t.me/pubgm_eth"
-                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-sans font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  DISCORD COMMUNITY SERVER LINK
-                </label>
-                <input
-                  type="text"
-                  value={discordLink}
-                  onChange={(e) => setDiscordLink(e.target.value)}
-                  placeholder="https://discord.gg/..."
-                  className="w-full px-4 py-2.5 rounded-xl border text-sm text-white font-sans outline-none focus:border-[#CCFF00] bg-[#161616] border-white/10"
-                />
-              </div>
-            </div>
-          </div>
+      {/* ═══════════════════════════════════════════════════════════════
+          TAB 9: HEAD ADMIN ACCESS & SUB-ADMIN MANAGEMENT
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === 'admins' && (
+        <div className="space-y-6">
+          <AdminManagementSection />
         </div>
       )}
 

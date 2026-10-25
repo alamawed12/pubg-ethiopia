@@ -320,3 +320,35 @@ export function LockIcon({ className = 'w-5 h-5', ...props }: IconProps) {
     </svg>
   );
 }
+
+// 30. Search / Radar Query
+export function SearchIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <path d="M11 8v6M8 11h6" strokeWidth="1.2" opacity="0.6" />
+    </svg>
+  );
+}
+
+// 31. Socials / Community Chat
+export function ChatBubbleLeftRightIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  );
+}
+
+// 32. Emergency Siren / Flasher
+export function EmergencySirenIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 2v4M4.93 4.93l2.83 2.83M2 12h4M19.07 4.93l-2.83 2.83M22 12h-4" />
+      <path d="M8 18a4 4 0 0 1 8 0v2H8v-2z" />
+      <path d="M6 22h12" />
+    </svg>
+  );
+}
+
